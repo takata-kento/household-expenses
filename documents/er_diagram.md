@@ -3,13 +3,19 @@
 ```mermaid
 erDiagram
     %% ユーザー
-    USER {
-        bigint id PK
-        varchar username "ユーザー名"
-        varchar password_hash "パスワードハッシュ"
+    USERS {
+        varchar username PK "ユーザー名"
+        varchar password "パスワード"
         bigint user_group_id FK "所属グループID（NULL可）"
         timestamp created_at
         timestamp updated_at
+        boolean enabled
+    }
+
+    %% オーソリティ
+    AUTHORITIES {
+        varchar username FK "ユーザー名"
+        varchar authority "権限"
     }
 
     %% ユーザーグループ
@@ -160,13 +166,14 @@ erDiagram
     }
 
     %% リレーションシップ
-    USER }|--|| USER_GROUP : "所属"
-    USER ||--o{ FINANCIAL_ACCOUNT : "所有"
-    USER ||--o{ DAILY_TRANSACTION : "記録"
-    USER ||--o{ MONTHLY_SAVING : "貯金"
-    USER ||--o{ MONTHLY_BUDGET : "設定"
-    USER ||--o{ GROUP_INVITATION : "招待"
-    USER ||--o{ GROUP_INVITATION : "被招待"
+    USERS }|--|| USER_GROUP : "所属"
+    USERS ||--|| AUTHORITIES : "権限"
+    USERS ||--o{ FINANCIAL_ACCOUNT : "所有"
+    USERS ||--o{ DAILY_TRANSACTION : "記録"
+    USERS ||--o{ MONTHLY_SAVING : "貯金"
+    USERS ||--o{ MONTHLY_BUDGET : "設定"
+    USERS ||--o{ GROUP_INVITATION : "招待"
+    USERS ||--o{ GROUP_INVITATION : "被招待"
     
     USER_GROUP ||--o{ GROUP_INVITATION : "招待管理"
     USER_GROUP ||--o{ MONTHLY_BUDGET : "予算管理"
@@ -192,7 +199,7 @@ erDiagram
 
 ## エンティティ説明
 
-### USER（ユーザー）
+### USERS（ユーザー）
 - アプリケーションのユーザー情報を管理
 - 認証に必要なユーザー名とパスワードハッシュを保持
 

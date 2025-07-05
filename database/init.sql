@@ -12,17 +12,24 @@ CREATE TABLE user_group (
 );
 
 -- ユーザーテーブル
-CREATE TABLE "user" (
-    id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
+CREATE TABLE "users" (
+    username VARCHAR(255) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
     user_group_id BIGINT REFERENCES user_group(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE
+    enabled BOOLEAN
 );
 
 -- ユーザーグループの作成者外部キー制約を追加
 ALTER TABLE user_group ADD FOREIGN KEY (created_by_user_id) REFERENCES "user"(id) ON DELETE SET NULL;
+
+CREATE TABLE "authorities" (
+    username varchar(50) not null,
+    authority varchar(50) not null,
+    constraint fk_authorities_users foreign key(username) references users(username)
+);
+CREATE UNIQUE INDEX ix_auth_username ON authorities (username,authority);
 
 -- グループ招待テーブル
 CREATE TABLE group_invitation (
