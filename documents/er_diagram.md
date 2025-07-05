@@ -23,7 +23,7 @@ erDiagram
         bigint id PK
         varchar group_name "グループ名"
         int month_start_day "月の始まり日"
-        bigint created_by_user_id FK
+        varchar created_by_username FK
         timestamp created_at
         timestamp updated_at
     }
@@ -32,8 +32,8 @@ erDiagram
     %% グループ招待
     GROUP_INVITATION {
         bigint user_group_id PK,FK
-        bigint invited_user_id PK,FK
-        bigint invited_by_user_id FK
+        varchar invited_username PK,FK
+        varchar invited_by_username FK
         varchar status "pending/accepted/rejected"
         timestamp invited_at
         timestamp responded_at
@@ -44,7 +44,7 @@ erDiagram
     %% 金融口座
     FINANCIAL_ACCOUNT {
         bigint id PK
-        bigint user_id FK
+        varchar username FK
         varchar account_name "口座名"
         decimal balance "残高"
         boolean is_main_account "メイン口座フラグ"
@@ -68,7 +68,7 @@ erDiagram
         int year PK "年"
         int month PK "月"
         decimal budget_amount "予算額"
-        bigint set_by_user_id FK
+        varchar set_by_username FK
         timestamp created_at
         timestamp updated_at
     }
@@ -86,7 +86,7 @@ erDiagram
 
     %% 日次収支
     DAILY_TRANSACTION {
-        bigint user_id PK,FK
+        varchar username PK,FK
         date transaction_date PK "取引日"
         decimal income "収入"
         decimal total_expense "支出合計"
@@ -99,7 +99,7 @@ erDiagram
     %% 日次生活費
     DAILY_LIVING_EXPENSE {
         bigint id PK
-        bigint user_id FK
+        varchar username FK
         date transaction_date FK
         bigint living_expense_category_id FK
         decimal amount "金額"
@@ -110,7 +110,7 @@ erDiagram
 
     %% 日次個人支出
     DAILY_PERSONAL_EXPENSE {
-        bigint user_id PK,FK
+        varchar username PK,FK
         date transaction_date PK,FK
         int sequence_no PK "連番"
         decimal amount "金額"
@@ -155,7 +155,7 @@ erDiagram
 
     %% 月次貯金
     MONTHLY_SAVING {
-        bigint user_id PK,FK
+        varchar username PK,FK
         int year PK "年"
         int month PK "月"
         decimal saving_amount "貯金額"
@@ -266,8 +266,8 @@ erDiagram
 ### MONTHLY_SAVING（月次貯金）
 - ユーザーごとの月次貯金実績を記録
 - 非共有データ（記録者のみ閲覧可能）
-- **設計補足**: 複合主キーは`user_id + year + month`を採用
-  - `user_id`を含む理由: 同一口座を複数ユーザーが使用する場合でも、各ユーザーの貯金記録を個別に管理するため
+- **設計補足**: 複合主キーは`username + year + month`を採用
+  - `username`を含む理由: 同一口座を複数ユーザーが使用する場合でも、各ユーザーの貯金記録を個別に管理するため
   - 権限制御: 貯金額は非共有データであり、記録者本人のみが閲覧可能
   - `financial_account_id`は外部キーとして貯金先口座を特定
 
