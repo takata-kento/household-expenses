@@ -4,10 +4,8 @@
 classDiagram
     %% エンティティクラス
     class User {
-        -UserId id
         -Username username
         -UserGroupId userGroupId
-        +getId() UserId
         +getUsername() Username
         +getUserGroupId() UserGroupId
     }
@@ -16,34 +14,34 @@ classDiagram
         -UserGroupId id
         -GroupName groupName
         -Day monthStartDay
-        -UserId createdByUserId
+        -Username createdByUsername
         +getId() UserGroupId
         +getGroupName() GroupName
         +getMonthStartDay() Day
-        +getCreatedByUserId() UserId
+        +getCreatedByUsername() Username
     }
 
     class GroupInvitation {
         -UserGroupId userGroupId
-        -UserId invitedUserId
-        -UserId invitedByUserId
+        -Username invitedUsername
+        -Username invitedByUsername
         -InvitationStatus status
         -LocalDateTime invitedAt
         -LocalDateTime respondedAt
         +getUserGroupId() UserGroupId
-        +getInvitedUserId() UserId
-        +getInvitedByUserId() UserId
+        +getInvitedUsername() Username
+        +getInvitedByUsername() Username
         +getStatus() InvitationStatus
     }
 
     class FinancialAccount {
         -FinancialAccountId id
-        -UserId userId
+        -Username username
         -AccountName accountName
         -Money balance
         -Boolean isMainAccount
         +getId() FinancialAccountId
-        +getUserId() UserId
+        +getUsername() Username
         +getAccountName() AccountName
         +getBalance() Money
         +getIsMainAccount() Boolean
@@ -68,12 +66,12 @@ classDiagram
         -Year year
         -Month month
         -Money budgetAmount
-        -UserId setByUserId
+        -Username setByUsername
         +getUserGroupId() UserGroupId
         +getYear() Year
         +getMonth() Month
         +getBudgetAmount() Money
-        +getSetByUserId() UserId
+        +getSetByUsername() Username
     }
 
     class LivingExpenseCategory {
@@ -90,13 +88,13 @@ classDiagram
     }
 
     class DailyTransaction {
-        -UserId userId
+        -Username username
         -LocalDate transactionDate
         -Money income
         -Money totalExpense
         -Money personalExpense
         -FinancialAccountId financialAccountId
-        +getUserId() UserId
+        +getUsername() Username
         +getTransactionDate() LocalDate
         +getIncome() Money
         +getTotalExpense() Money
@@ -106,13 +104,13 @@ classDiagram
 
     class DailyLivingExpense {
         -DailyLivingExpenseId id
-        -UserId userId
+        -Username username
         -LocalDate transactionDate
         -LivingExpenseCategoryId livingExpenseCategoryId
         -Money amount
         -Description memo
         +getId() DailyLivingExpenseId
-        +getUserId() UserId
+        +getUsername() Username
         +getTransactionDate() LocalDate
         +getLivingExpenseCategoryId() LivingExpenseCategoryId
         +getAmount() Money
@@ -120,12 +118,12 @@ classDiagram
     }
 
     class DailyPersonalExpense {
-        -UserId userId
+        -Username username
         -LocalDate transactionDate
         -SequenceNumber sequenceNo
         -Money amount
         -Description description
-        +getUserId() UserId
+        +getUsername() Username
         +getTransactionDate() LocalDate
         +getSequenceNo() SequenceNumber
         +getAmount() Money
@@ -174,13 +172,13 @@ classDiagram
     }
 
     class MonthlySaving {
-        -UserId userId
+        -Username username
         -Year year
         -Month month
         -Money savingAmount
         -FinancialAccountId financialAccountId
         -Description memo
-        +getUserId() UserId
+        +getUsername() Username
         +getYear() Year
         +getMonth() Month
         +getSavingAmount() Money
@@ -302,12 +300,6 @@ classDiagram
         +getValue() String
         +isValid() boolean
         +length() int
-    }
-
-    class UserId {
-        -Long value
-        +getValue() Long
-        +isValid() boolean
     }
 
     class UserGroupId {
@@ -527,19 +519,19 @@ classDiagram
 
     class UserGroupRepository {
         <<interface>>
-        +findByCreatedByUserId(Long) Optional~UserGroup~
+        +findByCreatedByUsername(Long) Optional~UserGroup~
     }
 
     class GroupInvitationRepository {
         <<interface>>
-        +findByInvitedUserIdAndStatus(Long, String) List~GroupInvitation~
-        +findByUserGroupIdAndInvitedUserId(Long, Long) Optional~GroupInvitation~
+        +findByInvitedUsernameAndStatus(Long, String) List~GroupInvitation~
+        +findByUserGroupIdAndInvitedUsername(Long, Long) Optional~GroupInvitation~
     }
 
     class FinancialAccountRepository {
         <<interface>>
-        +findByUserId(Long) List~FinancialAccount~
-        +findByUserIdAndIsMainAccount(Long, Boolean) Optional~FinancialAccount~
+        +findByUsername(Long) List~FinancialAccount~
+        +findByUsernameAndIsMainAccount(Long, Boolean) Optional~FinancialAccount~
     }
 
     class BalanceEditHistoryRepository {
@@ -560,20 +552,20 @@ classDiagram
 
     class DailyTransactionRepository {
         <<interface>>
-        +findByUserIdAndTransactionDate(Long, LocalDate) Optional~DailyTransaction~
-        +findByUserIdAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyTransaction~
+        +findByUsernameAndTransactionDate(Long, LocalDate) Optional~DailyTransaction~
+        +findByUsernameAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyTransaction~
     }
 
     class DailyLivingExpenseRepository {
         <<interface>>
-        +findByUserIdAndTransactionDate(Long, LocalDate) List~DailyLivingExpense~
-        +findByUserIdAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyLivingExpense~
+        +findByUsernameAndTransactionDate(Long, LocalDate) List~DailyLivingExpense~
+        +findByUsernameAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyLivingExpense~
     }
 
     class DailyPersonalExpenseRepository {
         <<interface>>
-        +findByUserIdAndTransactionDate(Long, LocalDate) List~DailyPersonalExpense~
-        +findByUserIdAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyPersonalExpense~
+        +findByUsernameAndTransactionDate(Long, LocalDate) List~DailyPersonalExpense~
+        +findByUsernameAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyPersonalExpense~
     }
 
     class DailyBudgetBalanceRepository {
@@ -595,23 +587,19 @@ classDiagram
 
     class MonthlySavingRepository {
         <<interface>>
-        +findByUserIdAndYearAndMonth(Long, Integer, Integer) Optional~MonthlySaving~
-        +findByUserIdAndYear(Long, Integer) List~MonthlySaving~
+        +findByUsernameAndYearAndMonth(Long, Integer, Integer) Optional~MonthlySaving~
+        +findByUsernameAndYear(Long, Integer) List~MonthlySaving~
     }
 
     %% 値オブジェクトとの関係性
-    User o-- UserId
     User o-- Username
     User o-- UserGroupId
     UserGroup o-- UserGroupId
     UserGroup o-- GroupName
     UserGroup o-- Day
-    UserGroup o-- UserId
     GroupInvitation o-- UserGroupId
-    GroupInvitation o-- UserId
     GroupInvitation o-- InvitationStatus
     FinancialAccount o-- FinancialAccountId
-    FinancialAccount o-- UserId
     FinancialAccount o-- AccountName
     FinancialAccount o-- Money
     BalanceEditHistory o-- BalanceEditHistoryId
@@ -624,19 +612,15 @@ classDiagram
     MonthlyBudget o-- Year
     MonthlyBudget o-- Month
     MonthlyBudget o-- Money
-    MonthlyBudget o-- UserId
     LivingExpenseCategory o-- LivingExpenseCategoryId
     LivingExpenseCategory o-- UserGroupId
     LivingExpenseCategory o-- CategoryName
     LivingExpenseCategory o-- Description
-    DailyTransaction o-- UserId
     DailyTransaction o-- Money
     DailyLivingExpense o-- DailyLivingExpenseId
-    DailyLivingExpense o-- UserId
     DailyLivingExpense o-- LivingExpenseCategoryId
     DailyLivingExpense o-- Money
     DailyLivingExpense o-- Description
-    DailyPersonalExpense o-- UserId
     DailyPersonalExpense o-- SequenceNumber
     DailyPersonalExpense o-- Money
     DailyPersonalExpense o-- Description
@@ -653,7 +637,6 @@ classDiagram
     FixedExpenseHistory o-- Month
     FixedExpenseHistory o-- Money
     FixedExpenseHistory o-- Description
-    MonthlySaving o-- UserId
     MonthlySaving o-- Year
     MonthlySaving o-- Month
     MonthlySaving o-- Money
