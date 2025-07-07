@@ -186,33 +186,33 @@ classDiagram
         +getMemo() Description
     }
 
-    %% DTOクラス
-    class UserRegistrationDto {
+    %% リクエストクラス
+    class UserRegistrationRequest {
         -Username username
         -String password
         +getUsername() Username
         +getPassword() String
     }
 
-    class UserLoginDto {
+    class UserLoginRequest {
         -Username username
         -String password
         +getUsername() Username
         +getPassword() String
     }
 
-    class DailyTransactionDto {
+    class DailyTransactionRequest {
         -LocalDate transactionDate
         -Money income
-        -List~DailyLivingExpenseDto~ livingExpenses
-        -List~DailyPersonalExpenseDto~ personalExpenses
+        -List~DailyLivingExpenseRequest~ livingExpenses
+        -List~DailyPersonalExpenseRequest~ personalExpenses
         +getTransactionDate() LocalDate
         +getIncome() Money
-        +getLivingExpenses() List~DailyLivingExpenseDto~
-        +getPersonalExpenses() List~DailyPersonalExpenseDto~
+        +getLivingExpenses() List~DailyLivingExpenseRequest~
+        +getPersonalExpenses() List~DailyPersonalExpenseRequest~
     }
 
-    class DailyLivingExpenseDto {
+    class DailyLivingExpenseRequest {
         -Long categoryId
         -Money amount
         -Description memo
@@ -221,14 +221,14 @@ classDiagram
         +getMemo() Description
     }
 
-    class DailyPersonalExpenseDto {
+    class DailyPersonalExpenseRequest {
         -Money amount
         -Description description
         +getAmount() Money
         +getDescription() Description
     }
 
-    class MonthlyBudgetDto {
+    class MonthlyBudgetRequest {
         -Year year
         -Month month
         -Money budgetAmount
@@ -237,14 +237,14 @@ classDiagram
         +getBudgetAmount() Money
     }
 
-    class GroupInvitationDto {
+    class GroupInvitationRequest {
         -Username invitedUsername
         +getInvitedUsername() Username
     }
 
-    %% DTO間の関係性
-    DailyTransactionDto o-- DailyLivingExpenseDto
-    DailyTransactionDto o-- DailyPersonalExpenseDto
+    %% リクエスト間の関係性
+    DailyTransactionRequest o-- DailyLivingExpenseRequest
+    DailyTransactionRequest o-- DailyPersonalExpenseRequest
 
     %% 値オブジェクトクラス
     class Money {
@@ -381,8 +381,8 @@ classDiagram
         -UserRepository userRepository
         -GroupInvitationRepository groupInvitationRepository
         -PasswordEncoder passwordEncoder
-        +registerUser(UserRegistrationDto) User
-        +authenticateUser(UserLoginDto) User
+        +registerUser(UserRegistrationRequest) User
+        +authenticateUser(UserLoginRequest) User
         +getCurrentUser() User
         +findByUsername(String) Optional~User~
         +acceptGroupInvitation(Long) void
@@ -394,7 +394,7 @@ classDiagram
         -GroupInvitationRepository groupInvitationRepository
         -UserRepository userRepository
         +createGroup(String) UserGroup
-        +inviteUser(GroupInvitationDto) GroupInvitation
+        +inviteUser(GroupInvitationRequest) GroupInvitation
         +leaveGroup(Long) void
         +getGroupMembers(Long) List~User~
     }
@@ -404,17 +404,17 @@ classDiagram
         -DailyLivingExpenseRepository dailyLivingExpenseRepository
         -DailyPersonalExpenseRepository dailyPersonalExpenseRepository
         -BudgetService budgetService
-        +recordDailyTransaction(DailyTransactionDto) DailyTransaction
-        +calculateTotalExpense(List~DailyLivingExpenseDto~, List~DailyPersonalExpenseDto~, Integer) BigDecimal
+        +recordDailyTransaction(DailyTransactionRequest) DailyTransaction
+        +calculateTotalExpense(List~DailyLivingExpenseRequest~, List~DailyPersonalExpenseRequest~, Integer) BigDecimal
         +getDailyTransaction(Long, LocalDate) DailyTransaction
-        +updateDailyTransaction(Long, LocalDate, DailyTransactionDto) DailyTransaction
+        +updateDailyTransaction(Long, LocalDate, DailyTransactionRequest) DailyTransaction
         +deleteDailyTransaction(Long, LocalDate) void
     }
 
     class BudgetService {
         -MonthlyBudgetRepository monthlyBudgetRepository
         -DailyBudgetBalanceRepository dailyBudgetBalanceRepository
-        +setMonthlyBudget(MonthlyBudgetDto) MonthlyBudget
+        +setMonthlyBudget(MonthlyBudgetRequest) MonthlyBudget
         +getMonthlyBudget(Long, Integer, Integer) MonthlyBudget
         +calculateBudgetBalance(Long, LocalDate, BigDecimal) BigDecimal
         +updateDailyBudgetBalance(Long, LocalDate, BigDecimal) DailyBudgetBalance
@@ -453,8 +453,8 @@ classDiagram
     %% コントローラークラス
     class UserController {
         -UserService userService
-        +register(UserRegistrationDto) ResponseEntity~User~
-        +login(UserLoginDto) ResponseEntity~String~
+        +register(UserRegistrationRequest) ResponseEntity~User~
+        +login(UserLoginRequest) ResponseEntity~String~
         +getCurrentUser() ResponseEntity~User~
         +logout() ResponseEntity~Void~
         +acceptGroupInvitation(Long) ResponseEntity~Void~
@@ -464,22 +464,22 @@ classDiagram
     class UserGroupController {
         -UserGroupService userGroupService
         +createGroup(String) ResponseEntity~UserGroup~
-        +inviteUser(GroupInvitationDto) ResponseEntity~GroupInvitation~
+        +inviteUser(GroupInvitationRequest) ResponseEntity~GroupInvitation~
         +leaveGroup() ResponseEntity~Void~
         +getGroupMembers() ResponseEntity~List~User~~
     }
 
     class TransactionController {
         -TransactionService transactionService
-        +recordTransaction(DailyTransactionDto) ResponseEntity~DailyTransaction~
+        +recordTransaction(DailyTransactionRequest) ResponseEntity~DailyTransaction~
         +getTransaction(LocalDate) ResponseEntity~DailyTransaction~
-        +updateTransaction(LocalDate, DailyTransactionDto) ResponseEntity~DailyTransaction~
+        +updateTransaction(LocalDate, DailyTransactionRequest) ResponseEntity~DailyTransaction~
         +deleteTransaction(LocalDate) ResponseEntity~Void~
     }
 
     class BudgetController {
         -BudgetService budgetService
-        +setMonthlyBudget(MonthlyBudgetDto) ResponseEntity~MonthlyBudget~
+        +setMonthlyBudget(MonthlyBudgetRequest) ResponseEntity~MonthlyBudget~
         +getMonthlyBudget(Integer, Integer) ResponseEntity~MonthlyBudget~
         +getBudgetBalance(LocalDate) ResponseEntity~DailyBudgetBalance~
     }
@@ -695,9 +695,9 @@ classDiagram
 - JPA/Hibernateアノテーションを使用したエンティティクラス
 - ER図の各テーブルに対応
 
-### DTOクラス
-- データ転送用オブジェクト
-- クライアントとサーバー間のデータ交換に使用
+### リクエストクラス
+- REST APIのリクエストボディを表現
+- クライアントからサーバーへのデータ送信に使用
 - バリデーションアノテーション対応
 
 ### サービスクラス
