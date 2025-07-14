@@ -4,8 +4,9 @@
 erDiagram
     %% ユーザー
     USERS {
-        varchar username PK "ユーザー名"
-        varchar password "パスワード"
+        bigint id PK "ユーザーID"
+        varchar username "ユーザー名 (UNIQUE)"
+        varchar password_hash "パスワードハッシュ"
         bigint user_group_id FK "所属グループID（NULL可）"
         timestamp created_at
         timestamp updated_at
@@ -23,7 +24,7 @@ erDiagram
         bigint id PK
         varchar group_name "グループ名"
         int month_start_day "月の始まり日"
-        varchar created_by_username FK
+        bigint created_by_user_id FK
         timestamp created_at
         timestamp updated_at
     }
@@ -32,8 +33,8 @@ erDiagram
     %% グループ招待
     GROUP_INVITATION {
         bigint user_group_id PK,FK
-        varchar invited_username PK,FK
-        varchar invited_by_username FK
+        bigint invited_user_id PK,FK
+        bigint invited_by_user_id FK
         varchar status "pending/accepted/rejected"
         timestamp invited_at
         timestamp responded_at
@@ -44,9 +45,9 @@ erDiagram
     %% 金融口座
     FINANCIAL_ACCOUNT {
         bigint id PK
-        varchar username FK
+        bigint user_id FK
         varchar account_name "口座名"
-        decimal balance "残高"
+        integer balance "残高"
         boolean is_main_account "メイン口座フラグ"
         timestamp created_at
         timestamp updated_at
@@ -56,8 +57,8 @@ erDiagram
     BALANCE_EDIT_HISTORY {
         bigint id PK
         bigint financial_account_id FK
-        decimal old_balance "変更前残高"
-        decimal new_balance "変更後残高"
+        integer old_balance "変更前残高"
+        integer new_balance "変更後残高"
         varchar edit_reason "編集理由"
         timestamp created_at
     }
@@ -67,8 +68,8 @@ erDiagram
         bigint user_group_id PK,FK
         int year PK "年"
         int month PK "月"
-        decimal budget_amount "予算額"
-        varchar set_by_username FK
+        integer budget_amount "予算額"
+        bigint set_by_user_id FK
         timestamp created_at
         timestamp updated_at
     }
@@ -86,11 +87,11 @@ erDiagram
 
     %% 日次収支
     DAILY_TRANSACTION {
-        varchar username PK,FK
+        bigint user_id PK,FK
         date transaction_date PK "取引日"
-        decimal income "収入"
-        decimal total_expense "支出合計"
-        decimal personal_expense "個人支出"
+        integer income "収入"
+        integer total_expense "支出合計"
+        integer personal_expense "個人支出"
         bigint financial_account_id FK
         timestamp created_at
         timestamp updated_at
@@ -99,10 +100,10 @@ erDiagram
     %% 日次生活費
     DAILY_LIVING_EXPENSE {
         bigint id PK
-        varchar username FK
+        bigint user_id FK
         date transaction_date FK
         bigint living_expense_category_id FK
-        decimal amount "金額"
+        integer amount "金額"
         varchar memo "メモ"
         timestamp created_at
         timestamp updated_at
@@ -110,10 +111,10 @@ erDiagram
 
     %% 日次個人支出
     DAILY_PERSONAL_EXPENSE {
-        varchar username PK,FK
+        bigint user_id PK,FK
         date transaction_date PK,FK
         int sequence_no PK "連番"
-        decimal amount "金額"
+        integer amount "金額"
         varchar description "使用目的"
         timestamp created_at
         timestamp updated_at
@@ -123,8 +124,8 @@ erDiagram
     DAILY_BUDGET_BALANCE {
         bigint user_group_id PK,FK
         date transaction_date PK "取引日"
-        decimal total_living_expense "生活費合計"
-        decimal budget_balance "予算残金"
+        integer total_living_expense "生活費合計"
+        integer budget_balance "予算残金"
         timestamp created_at
         timestamp updated_at
     }
@@ -135,7 +136,7 @@ erDiagram
         bigint user_group_id FK
         varchar category_name "分類名"
         varchar description "説明"
-        decimal default_amount "デフォルト金額"
+        integer default_amount "デフォルト金額"
         timestamp created_at
         timestamp updated_at
     }
@@ -146,7 +147,7 @@ erDiagram
         bigint fixed_expense_category_id FK
         int year "年"
         int month "月"
-        decimal amount "金額"
+        integer amount "金額"
         date effective_date "適用開始日"
         varchar memo "メモ"
         timestamp created_at
@@ -155,10 +156,10 @@ erDiagram
 
     %% 月次貯金
     MONTHLY_SAVING {
-        varchar username PK,FK
+        bigint user_id PK,FK
         int year PK "年"
         int month PK "月"
-        decimal saving_amount "貯金額"
+        integer saving_amount "貯金額"
         bigint financial_account_id FK
         varchar memo "メモ"
         timestamp created_at
@@ -174,6 +175,7 @@ erDiagram
     USERS ||--o{ MONTHLY_BUDGET : "設定"
     USERS ||--o{ GROUP_INVITATION : "招待"
     USERS ||--o{ GROUP_INVITATION : "被招待"
+    USERS ||--o{ DAILY_LIVING_EXPENSE : "生活費記録"
     
     USER_GROUP ||--o{ GROUP_INVITATION : "招待管理"
     USER_GROUP ||--o{ MONTHLY_BUDGET : "予算管理"
@@ -266,8 +268,8 @@ erDiagram
 ### MONTHLY_SAVING（月次貯金）
 - ユーザーごとの月次貯金実績を記録
 - 非共有データ（記録者のみ閲覧可能）
-- **設計補足**: 複合主キーは`username + year + month`を採用
-  - `username`を含む理由: 同一口座を複数ユーザーが使用する場合でも、各ユーザーの貯金記録を個別に管理するため
+- **設計補足**: 複合主キーは`user_id + year + month`を採用
+  - `user_id`を含む理由: 同一口座を複数ユーザーが使用する場合でも、各ユーザーの貯金記録を個別に管理するため
   - 権限制御: 貯金額は非共有データであり、記録者本人のみが閲覧可能
   - `financial_account_id`は外部キーとして貯金先口座を特定
 
