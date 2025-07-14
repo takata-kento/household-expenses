@@ -6,14 +6,15 @@ CREATE TABLE user_group (
     id BIGSERIAL PRIMARY KEY,
     group_name VARCHAR(255) NOT NULL,
     month_start_day INTEGER NOT NULL DEFAULT 1 CHECK (month_start_day >= 1 AND month_start_day <= 31),
-    created_by_username VARCHAR(255),
+    created_by_user_id BIGINT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE
 );
 
 -- ユーザーテーブル
 CREATE TABLE "users" (
-    username VARCHAR(255) PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     user_group_id BIGINT REFERENCES user_group(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -22,7 +23,7 @@ CREATE TABLE "users" (
 );
 
 -- ユーザーグループの作成者外部キー制約を追加
-ALTER TABLE user_group ADD FOREIGN KEY (created_by_username) REFERENCES "users"(username) ON DELETE SET NULL;
+ALTER TABLE user_group ADD FOREIGN KEY (created_by_user_id) REFERENCES "users"(id) ON DELETE SET NULL;
 
 CREATE TABLE "authorities" (
     username VARCHAR(255) not null,
@@ -34,20 +35,20 @@ CREATE UNIQUE INDEX ix_auth_username ON authorities (username,authority);
 -- グループ招待テーブル
 CREATE TABLE group_invitation (
     user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
-    invited_username VARCHAR(255) NOT NULL REFERENCES "users"(username) ON DELETE CASCADE,
-    invited_by_username VARCHAR(255) NOT NULL REFERENCES "users"(username) ON DELETE CASCADE,
+    invited_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    invited_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
     invited_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     responded_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    PRIMARY KEY (user_group_id, invited_username)
+    PRIMARY KEY (user_group_id, invited_user_id)
 );
 
 -- 金融口座テーブル
 CREATE TABLE financial_account (
     id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL REFERENCES "users"(username) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     account_name VARCHAR(255) NOT NULL,
     balance INTEGER NOT NULL DEFAULT 0,
     is_main_account BOOLEAN NOT NULL DEFAULT FALSE,
@@ -71,7 +72,7 @@ CREATE TABLE monthly_budget (
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     budget_amount INTEGER NOT NULL,
-    set_by_username VARCHAR(255) NOT NULL REFERENCES "users"(username) ON DELETE CASCADE,
+    set_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     PRIMARY KEY (user_group_id, year, month)
@@ -90,7 +91,7 @@ CREATE TABLE living_expense_category (
 
 -- 日次収支テーブル
 CREATE TABLE daily_transaction (
-    username VARCHAR(255) NOT NULL REFERENCES "users"(username) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     transaction_date DATE NOT NULL,
     income INTEGER NOT NULL DEFAULT 0,
     total_expense INTEGER NOT NULL DEFAULT 0,
@@ -98,33 +99,33 @@ CREATE TABLE daily_transaction (
     financial_account_id BIGINT NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    PRIMARY KEY (username, transaction_date)
+    PRIMARY KEY (user_id, transaction_date)
 );
 
 -- 日次生活費テーブル
 CREATE TABLE daily_living_expense (
     id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL REFERENCES "users"(username) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     transaction_date DATE NOT NULL,
     living_expense_category_id BIGINT NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
     amount INTEGER NOT NULL,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    FOREIGN KEY (username, transaction_date) REFERENCES daily_transaction(username, transaction_date) ON DELETE CASCADE
+    FOREIGN KEY (user_id, transaction_date) REFERENCES daily_transaction(user_id, transaction_date) ON DELETE CASCADE
 );
 
 -- 日次個人支出テーブル
 CREATE TABLE daily_personal_expense (
-    username VARCHAR(255) NOT NULL REFERENCES "users"(username) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     transaction_date DATE NOT NULL,
     sequence_no INTEGER NOT NULL,
-    amount DECIMAL(15, 2) NOT NULL,
+    amount INTEGER NOT NULL,
     description TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    PRIMARY KEY (username, transaction_date, sequence_no),
-    FOREIGN KEY (username, transaction_date) REFERENCES daily_transaction(username, transaction_date) ON DELETE CASCADE
+    PRIMARY KEY (user_id, transaction_date, sequence_no),
+    FOREIGN KEY (user_id, transaction_date) REFERENCES daily_transaction(user_id, transaction_date) ON DELETE CASCADE
 );
 
 -- 日次予算残高テーブル
@@ -164,7 +165,7 @@ CREATE TABLE fixed_expense_history (
 
 -- 月次貯金テーブル
 CREATE TABLE monthly_saving (
-    username VARCHAR(255) NOT NULL REFERENCES "users"(username) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     saving_amount INTEGER NOT NULL,
@@ -172,14 +173,14 @@ CREATE TABLE monthly_saving (
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    PRIMARY KEY (username, year, month)
+    PRIMARY KEY (user_id, year, month)
 );
 
 -- インデックスの作成（パフォーマンス向上のため）
 CREATE INDEX idx_user_username ON "users"(username);
 CREATE INDEX idx_user_group_id ON "users"(user_group_id);
-CREATE INDEX idx_financial_account_user_id ON financial_account(username);
-CREATE INDEX idx_financial_account_main ON financial_account(username, is_main_account) WHERE is_main_account = TRUE;
+CREATE INDEX idx_financial_account_user_id ON financial_account(user_id);
+CREATE INDEX idx_financial_account_main ON financial_account(user_id, is_main_account) WHERE is_main_account = TRUE;
 CREATE INDEX idx_daily_transaction_date ON daily_transaction(transaction_date);
 CREATE INDEX idx_daily_living_expense_date ON daily_living_expense(transaction_date);
 CREATE INDEX idx_daily_personal_expense_date ON daily_personal_expense(transaction_date);
