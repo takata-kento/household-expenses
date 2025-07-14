@@ -4,186 +4,175 @@
 classDiagram
     %% エンティティクラス
     class User {
+        -UserId id
         -Username username
         -UserGroupId userGroupId
-        +getUsername() Username
-        +getUserGroupId() UserGroupId
+        -List~FinancialAccount~ accounts
+        -FinancialAccountId mainAccountId
+        -List~MonthlySaving~ savings
+        +addAccount(FinancialAccount) void
+        +removeAccount(FinancialAccountId) void
+        +setMainAccount(FinancialAccountId) void
+        +hasAccount(FinancialAccountId) boolean
+        +getAccountCount() int
+        +canRemoveAccount(FinancialAccountId) boolean
+        +ensureMainAccountConsistency() void
+        +recordMonthlySaving(Year, Month, Money, FinancialAccountId, Description) void
+        +getMonthlySaving(Year, Month) MonthlySaving
+        +getSavingsByYear(Year) List~MonthlySaving~
+        +updateMonthlySaving(Year, Month, Money, Description) void
+        +deleteMonthlySaving(Year, Month) void
     }
 
     class UserGroup {
         -UserGroupId id
         -GroupName groupName
         -Day monthStartDay
-        -Username createdByUsername
-        +getId() UserGroupId
-        +getGroupName() GroupName
-        +getMonthStartDay() Day
-        +getCreatedByUsername() Username
+        -UserId createdByUserId
+        -List~UserId~ memberIds
+        -List~GroupInvitation~ invitations
+        -List~LivingExpenseCategory~ expenseCategories
+        -List~MonthlyBudget~ monthlyBudgets
+        -List~FixedExpenseCategory~ fixedExpenseCategories
+        -List~FixedExpenseHistory~ fixedExpenseHistories
+        +addMember(UserId) void
+        +removeMember(UserId) void
+        +inviteUser(UserId, UserId) GroupInvitation
+        +processInvitationAcceptance(UserId) void
+        +processInvitationRejection(UserId) void
+        +canUserLeave(UserId) boolean
+        +isUserMember(UserId) boolean
+        +getMemberCount() int
+        +addExpenseCategory(CategoryName, Description, Boolean) LivingExpenseCategory
+        +updateExpenseCategory(LivingExpenseCategoryId, CategoryName, Description) void
+        +removeExpenseCategory(LivingExpenseCategoryId) void
+        +getExpenseCategory(LivingExpenseCategoryId) LivingExpenseCategory
+        +getDefaultCategories() List~LivingExpenseCategory~
+        +hasExpenseCategory(LivingExpenseCategoryId) boolean
+        +setMonthlyBudget(Year, Month, Money, UserId) MonthlyBudget
+        +getMonthlyBudget(Year, Month) MonthlyBudget
+        +hasMonthlyBudget(Year, Month) boolean
+        +addFixedExpenseCategory(CategoryName, Description, Money) FixedExpenseCategory
+        +removeFixedExpenseCategory(FixedExpenseCategoryId) void
+        +getFixedExpenseCategory(FixedExpenseCategoryId) FixedExpenseCategory
+        +addFixedExpenseHistory(FixedExpenseCategoryId, Year, Month, Money, LocalDate, Description) FixedExpenseHistory
+        +getFixedExpenseHistories(Year, Month) List~FixedExpenseHistory~
+        +getFixedExpenseHistory(FixedExpenseCategoryId, Year, Month) FixedExpenseHistory
+        +calculateRemainingBudget(Year, Month, LocalDate, List~DailyLivingExpense~) Money
+        +getTotalFixedExpenses(Year, Month) Money
+        +ensureFixedExpenseCategoryExists(FixedExpenseCategoryId) boolean
+        +isOverBudget(Year, Month, LocalDate, List~DailyLivingExpense~) boolean
     }
 
     class GroupInvitation {
         -UserGroupId userGroupId
-        -Username invitedUsername
-        -Username invitedByUsername
+        -UserId invitedUserId
+        -UserId invitedByUserId
         -InvitationStatus status
         -LocalDateTime invitedAt
         -LocalDateTime respondedAt
-        +getUserGroupId() UserGroupId
-        +getInvitedUsername() Username
-        +getInvitedByUsername() Username
-        +getStatus() InvitationStatus
     }
 
     class FinancialAccount {
         -FinancialAccountId id
-        -Username username
         -AccountName accountName
         -Money balance
         -Boolean isMainAccount
-        +getId() FinancialAccountId
-        +getUsername() Username
-        +getAccountName() AccountName
-        +getBalance() Money
-        +getIsMainAccount() Boolean
+        -List~BalanceEditHistory~ editHistories
+        +addEditHistory(Money, Money, Description) void
+        +getLatestEditHistory() BalanceEditHistory
+        +updateBalance(Money, Description) void
     }
 
     class BalanceEditHistory {
         -BalanceEditHistoryId id
-        -FinancialAccountId financialAccountId
         -Money oldBalance
         -Money newBalance
         -Description editReason
         -LocalDateTime createdAt
-        +getId() BalanceEditHistoryId
-        +getFinancialAccountId() FinancialAccountId
-        +getOldBalance() Money
-        +getNewBalance() Money
-        +getEditReason() Description
     }
 
     class MonthlyBudget {
-        -UserGroupId userGroupId
         -Year year
         -Month month
         -Money budgetAmount
-        -Username setByUsername
-        +getUserGroupId() UserGroupId
-        +getYear() Year
-        +getMonth() Month
-        +getBudgetAmount() Money
-        +getSetByUsername() Username
+        -UserId setByUserId
+        +updateBudgetAmount(Money, UserId) void
     }
 
     class LivingExpenseCategory {
         -LivingExpenseCategoryId id
-        -UserGroupId userGroupId
         -CategoryName categoryName
         -Description description
         -Boolean isDefault
-        +getId() LivingExpenseCategoryId
-        +getUserGroupId() UserGroupId
-        +getCategoryName() CategoryName
-        +getDescription() Description
-        +getIsDefault() Boolean
-    }
-
-    class DailyTransaction {
-        -Username username
-        -LocalDate transactionDate
-        -Money income
-        -Money totalExpense
-        -Money personalExpense
-        -FinancialAccountId financialAccountId
-        +getUsername() Username
-        +getTransactionDate() LocalDate
-        +getIncome() Money
-        +getTotalExpense() Money
-        +getPersonalExpense() Money
-        +getFinancialAccountId() FinancialAccountId
     }
 
     class DailyLivingExpense {
         -DailyLivingExpenseId id
-        -Username username
+        -UserId userId
         -LocalDate transactionDate
         -LivingExpenseCategoryId livingExpenseCategoryId
         -Money amount
         -Description memo
-        +getId() DailyLivingExpenseId
-        +getUsername() Username
-        +getTransactionDate() LocalDate
-        +getLivingExpenseCategoryId() LivingExpenseCategoryId
-        +getAmount() Money
-        +getMemo() Description
     }
 
     class DailyPersonalExpense {
-        -Username username
+        -UserId userId
         -LocalDate transactionDate
         -SequenceNumber sequenceNo
         -Money amount
         -Description description
-        +getUsername() Username
-        +getTransactionDate() LocalDate
-        +getSequenceNo() SequenceNumber
-        +getAmount() Money
-        +getDescription() Description
     }
 
-    class DailyBudgetBalance {
+    class DailyGroupTransaction {
         -UserGroupId userGroupId
         -LocalDate transactionDate
+        -List~DailyLivingExpense~ livingExpenses
         -Money totalLivingExpense
         -Money budgetBalance
-        +getUserGroupId() UserGroupId
-        +getTransactionDate() LocalDate
-        +getTotalLivingExpense() Money
-        +getBudgetBalance() Money
+        +addLivingExpense(UserId, LivingExpenseCategoryId, Money, Description) void
+        +calculateTotalLivingExpense() Money
+        +updateBudgetBalance(Money) void
+        +getPersonalShareOfLivingExpense(int) Money
+    }
+
+    class DailyPersonalTransaction {
+        -UserId userId
+        -LocalDate transactionDate
+        -Money income
+        -Money totalExpense
+        -List~DailyPersonalExpense~ personalExpenses
+        +addPersonalExpense(Money, Description) void
+        +calculateTotalExpense(Money) void
+        +getTotalPersonalExpense() Money
     }
 
     class FixedExpenseCategory {
         -FixedExpenseCategoryId id
-        -UserGroupId userGroupId
         -CategoryName categoryName
         -Description description
         -Money defaultAmount
-        +getId() FixedExpenseCategoryId
-        +getUserGroupId() UserGroupId
-        +getCategoryName() CategoryName
-        +getDescription() Description
-        +getDefaultAmount() Money
+        +updateCategoryName(CategoryName) void
+        +updateDescription(Description) void
+        +updateDefaultAmount(Money) void
     }
 
     class FixedExpenseHistory {
         -FixedExpenseHistoryId id
-        -FixedExpenseCategoryId fixedExpenseCategoryId
+        -FixedExpenseCategoryId categoryId
         -Year year
         -Month month
         -Money amount
         -LocalDate effectiveDate
         -Description memo
-        +getId() FixedExpenseHistoryId
-        +getFixedExpenseCategoryId() FixedExpenseCategoryId
-        +getYear() Year
-        +getMonth() Month
-        +getAmount() Money
-        +getEffectiveDate() LocalDate
-        +getMemo() Description
     }
 
     class MonthlySaving {
-        -Username username
         -Year year
         -Month month
         -Money savingAmount
         -FinancialAccountId financialAccountId
         -Description memo
-        +getUsername() Username
-        +getYear() Year
-        +getMonth() Month
-        +getSavingAmount() Money
-        +getFinancialAccountId() FinancialAccountId
-        +getMemo() Description
     }
 
     %% リクエストクラス
@@ -279,7 +268,6 @@ classDiagram
         +length() int
     }
 
-
     class CategoryName {
         -String value
         +getValue() String
@@ -300,6 +288,12 @@ classDiagram
         +getValue() String
         +isValid() boolean
         +length() int
+    }
+
+    class UserId {
+        -Long value
+        +getValue() Long
+        +isValid() boolean
     }
 
     class UserGroupId {
@@ -376,6 +370,7 @@ classDiagram
         +isRejected() boolean
     }
 
+
     %% サービスクラス
     class UserService {
         -UserRepository userRepository
@@ -384,19 +379,23 @@ classDiagram
         +registerUser(UserRegistrationRequest) User
         +authenticateUser(UserLoginRequest) User
         +getCurrentUser() User
-        +findByUsername(String) Optional~User~
-        +acceptGroupInvitation(Long) void
-        +rejectGroupInvitation(Long) void
+        +findByUsername(Username) Optional~User~
+        +acceptGroupInvitation(UserId) void
+        +rejectGroupInvitation(UserId) void
+        +addAccountToUser(UserId, FinancialAccount) void
+        +removeAccountFromUser(UserId, FinancialAccountId) void
+        +setMainAccount(UserId, FinancialAccountId) void
+        +canRemoveAccount(UserId, FinancialAccountId) boolean
     }
 
     class UserGroupService {
         -UserGroupRepository userGroupRepository
         -GroupInvitationRepository groupInvitationRepository
         -UserRepository userRepository
-        +createGroup(String) UserGroup
+        +createGroup(GroupName) UserGroup
         +inviteUser(GroupInvitationRequest) GroupInvitation
-        +leaveGroup(Long) void
-        +getGroupMembers(Long) List~User~
+        +leaveGroup(UserGroupId) void
+        +getGroupMembers(UserGroupId) List~User~
     }
 
     class TransactionService {
@@ -413,11 +412,9 @@ classDiagram
 
     class BudgetService {
         -MonthlyBudgetRepository monthlyBudgetRepository
-        -DailyBudgetBalanceRepository dailyBudgetBalanceRepository
         +setMonthlyBudget(MonthlyBudgetRequest) MonthlyBudget
         +getMonthlyBudget(Long, Integer, Integer) MonthlyBudget
         +calculateBudgetBalance(Long, LocalDate, BigDecimal) BigDecimal
-        +updateDailyBudgetBalance(Long, LocalDate, BigDecimal) DailyBudgetBalance
     }
 
     class ExpenseService {
@@ -435,19 +432,22 @@ classDiagram
     class AccountService {
         -FinancialAccountRepository financialAccountRepository
         -BalanceEditHistoryRepository balanceEditHistoryRepository
-        +createAccount(Long, String, BigDecimal, Boolean) FinancialAccount
-        +updateBalance(Long, BigDecimal) FinancialAccount
-        +editBalance(Long, BigDecimal, String) FinancialAccount
-        +calculateNewBalance(Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal) BigDecimal
-        +getUserAccounts(Long) List~FinancialAccount~
+        -UserRepository userRepository
+        +createAccount(UserId, AccountName, Money, Boolean) FinancialAccount
+        +updateBalance(FinancialAccountId, Money) FinancialAccount
+        +editBalance(FinancialAccountId, Money, Description) FinancialAccount
+        +calculateNewBalance(FinancialAccountId, Money, Money, Money, Money) Money
+        +getUserAccounts(UserId) List~FinancialAccount~
     }
 
     class SavingService {
+        -UserRepository userRepository
         -MonthlySavingRepository monthlySavingRepository
-        +recordMonthlySaving(Long, Integer, Integer, BigDecimal, Long, String) MonthlySaving
-        +getMonthlySaving(Long, Integer, Integer) MonthlySaving
-        +updateMonthlySaving(Long, Integer, Integer, BigDecimal, String) MonthlySaving
-        +deleteMonthlySaving(Long, Integer, Integer) void
+        +recordMonthlySaving(UserId, Year, Month, Money, FinancialAccountId, Description) MonthlySaving
+        +getMonthlySaving(UserId, Year, Month) MonthlySaving
+        +updateMonthlySaving(UserId, Year, Month, Money, Description) MonthlySaving
+        +deleteMonthlySaving(UserId, Year, Month) void
+        +getSavingsByYear(UserId, Year) List~MonthlySaving~
     }
 
     %% コントローラークラス
@@ -457,13 +457,13 @@ classDiagram
         +login(UserLoginRequest) ResponseEntity~String~
         +getCurrentUser() ResponseEntity~User~
         +logout() ResponseEntity~Void~
-        +acceptGroupInvitation(Long) ResponseEntity~Void~
-        +rejectGroupInvitation(Long) ResponseEntity~Void~
+        +acceptGroupInvitation(UserId) ResponseEntity~Void~
+        +rejectGroupInvitation(UserId) ResponseEntity~Void~
     }
 
     class UserGroupController {
         -UserGroupService userGroupService
-        +createGroup(String) ResponseEntity~UserGroup~
+        +createGroup(GroupName) ResponseEntity~UserGroup~
         +inviteUser(GroupInvitationRequest) ResponseEntity~GroupInvitation~
         +leaveGroup() ResponseEntity~Void~
         +getGroupMembers() ResponseEntity~List~User~~
@@ -481,7 +481,6 @@ classDiagram
         -BudgetService budgetService
         +setMonthlyBudget(MonthlyBudgetRequest) ResponseEntity~MonthlyBudget~
         +getMonthlyBudget(Integer, Integer) ResponseEntity~MonthlyBudget~
-        +getBudgetBalance(LocalDate) ResponseEntity~DailyBudgetBalance~
     }
 
     class ExpenseController {
@@ -496,42 +495,45 @@ classDiagram
 
     class AccountController {
         -AccountService accountService
-        +createAccount(String, BigDecimal, Boolean) ResponseEntity~FinancialAccount~
-        +updateBalance(Long, BigDecimal) ResponseEntity~FinancialAccount~
-        +editBalance(Long, BigDecimal, String) ResponseEntity~FinancialAccount~
+        +createAccount(AccountName, Money, Boolean) ResponseEntity~FinancialAccount~
+        +updateBalance(FinancialAccountId, Money) ResponseEntity~FinancialAccount~
+        +editBalance(FinancialAccountId, Money, Description) ResponseEntity~FinancialAccount~
         +getUserAccounts() ResponseEntity~List~FinancialAccount~~
     }
 
     class SavingController {
         -SavingService savingService
-        +recordMonthlySaving(Integer, Integer, BigDecimal, Long, String) ResponseEntity~MonthlySaving~
-        +getMonthlySaving(Integer, Integer) ResponseEntity~MonthlySaving~
-        +updateMonthlySaving(Integer, Integer, BigDecimal, String) ResponseEntity~MonthlySaving~
-        +deleteMonthlySaving(Integer, Integer) ResponseEntity~Void~
+        +recordMonthlySaving(Year, Month, Money, FinancialAccountId, Description) ResponseEntity~MonthlySaving~
+        +getMonthlySaving(Year, Month) ResponseEntity~MonthlySaving~
+        +updateMonthlySaving(Year, Month, Money, Description) ResponseEntity~MonthlySaving~
+        +deleteMonthlySaving(Year, Month) ResponseEntity~Void~
+        +getSavingsByYear(Year) ResponseEntity~List~MonthlySaving~~
     }
 
     %% リポジトリインターフェース
     class UserRepository {
         <<interface>>
-        +findByUsername(String) Optional~User~
-        +existsByUsername(String) boolean
+        +findByUserId(UserId) Optional~User~
+        +findByUsername(Username) Optional~User~
+        +existsByUsername(Username) boolean
     }
 
     class UserGroupRepository {
         <<interface>>
-        +findByCreatedByUsername(Long) Optional~UserGroup~
+        +findByCreatedByUserId(UserId) Optional~UserGroup~
     }
 
     class GroupInvitationRepository {
         <<interface>>
-        +findByInvitedUsernameAndStatus(Long, String) List~GroupInvitation~
-        +findByUserGroupIdAndInvitedUsername(Long, Long) Optional~GroupInvitation~
+        +findByInvitedUserIdAndStatus(UserId, InvitationStatus) List~GroupInvitation~
+        +findByUserGroupIdAndInvitedUserId(UserGroupId, UserId) Optional~GroupInvitation~
     }
 
     class FinancialAccountRepository {
         <<interface>>
-        +findByUsername(Long) List~FinancialAccount~
-        +findByUsernameAndIsMainAccount(Long, Boolean) Optional~FinancialAccount~
+        +findById(FinancialAccountId) Optional~FinancialAccount~
+        +save(FinancialAccount) FinancialAccount
+        +deleteById(FinancialAccountId) void
     }
 
     class BalanceEditHistoryRepository {
@@ -552,26 +554,20 @@ classDiagram
 
     class DailyTransactionRepository {
         <<interface>>
-        +findByUsernameAndTransactionDate(Long, LocalDate) Optional~DailyTransaction~
-        +findByUsernameAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyTransaction~
+        +findByUserIdAndTransactionDate(UserId, LocalDate) Optional~DailyTransaction~
+        +findByUserIdAndTransactionDateBetween(UserId, LocalDate, LocalDate) List~DailyTransaction~
     }
 
     class DailyLivingExpenseRepository {
         <<interface>>
-        +findByUsernameAndTransactionDate(Long, LocalDate) List~DailyLivingExpense~
-        +findByUsernameAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyLivingExpense~
+        +findByUserIdAndTransactionDate(UserId, LocalDate) List~DailyLivingExpense~
+        +findByUserIdAndTransactionDateBetween(UserId, LocalDate, LocalDate) List~DailyLivingExpense~
     }
 
     class DailyPersonalExpenseRepository {
         <<interface>>
-        +findByUsernameAndTransactionDate(Long, LocalDate) List~DailyPersonalExpense~
-        +findByUsernameAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyPersonalExpense~
-    }
-
-    class DailyBudgetBalanceRepository {
-        <<interface>>
-        +findByUserGroupIdAndTransactionDate(Long, LocalDate) Optional~DailyBudgetBalance~
-        +findByUserGroupIdAndTransactionDateBetween(Long, LocalDate, LocalDate) List~DailyBudgetBalance~
+        +findByUserIdAndTransactionDate(UserId, LocalDate) List~DailyPersonalExpense~
+        +findByUserIdAndTransactionDateBetween(UserId, LocalDate, LocalDate) List~DailyPersonalExpense~
     }
 
     class FixedExpenseCategoryRepository {
@@ -587,47 +583,51 @@ classDiagram
 
     class MonthlySavingRepository {
         <<interface>>
-        +findByUsernameAndYearAndMonth(Long, Integer, Integer) Optional~MonthlySaving~
-        +findByUsernameAndYear(Long, Integer) List~MonthlySaving~
+        +findByUserIdAndYearAndMonth(UserId, Year, Month) Optional~MonthlySaving~
+        +findByUserIdAndYear(UserId, Year) List~MonthlySaving~
     }
 
     %% 値オブジェクトとの関係性
+    User o-- UserId
     User o-- Username
     User o-- UserGroupId
+    User o-- FinancialAccountId
     UserGroup o-- UserGroupId
     UserGroup o-- GroupName
     UserGroup o-- Day
+    UserGroup o-- UserId
     GroupInvitation o-- UserGroupId
+    GroupInvitation o-- UserId
     GroupInvitation o-- InvitationStatus
     FinancialAccount o-- FinancialAccountId
     FinancialAccount o-- AccountName
     FinancialAccount o-- Money
     BalanceEditHistory o-- BalanceEditHistoryId
-    BalanceEditHistory o-- FinancialAccountId
     BalanceEditHistory o-- Money
     BalanceEditHistory o-- Description
-    DailyTransaction o-- FinancialAccountId
     MonthlySaving o-- FinancialAccountId
+    DailyGroupTransaction o-- UserGroupId
+    DailyPersonalTransaction o-- UserId
     MonthlyBudget o-- UserGroupId
+    MonthlyBudget o-- UserId
     MonthlyBudget o-- Year
     MonthlyBudget o-- Month
     MonthlyBudget o-- Money
     LivingExpenseCategory o-- LivingExpenseCategoryId
-    LivingExpenseCategory o-- UserGroupId
     LivingExpenseCategory o-- CategoryName
     LivingExpenseCategory o-- Description
-    DailyTransaction o-- Money
+    DailyGroupTransaction o-- Money
+    DailyPersonalTransaction o-- Money
     DailyLivingExpense o-- DailyLivingExpenseId
+    DailyLivingExpense o-- UserId
     DailyLivingExpense o-- LivingExpenseCategoryId
     DailyLivingExpense o-- Money
     DailyLivingExpense o-- Description
+    DailyPersonalExpense o-- UserId
     DailyPersonalExpense o-- SequenceNumber
     DailyPersonalExpense o-- Money
     DailyPersonalExpense o-- Description
-    DailyBudgetBalance o-- UserGroupId
-    DailyBudgetBalance o-- Money
     FixedExpenseCategory o-- FixedExpenseCategoryId
-    FixedExpenseCategory o-- UserGroupId
     FixedExpenseCategory o-- CategoryName
     FixedExpenseCategory o-- Description
     FixedExpenseCategory o-- Money
@@ -637,31 +637,26 @@ classDiagram
     FixedExpenseHistory o-- Month
     FixedExpenseHistory o-- Money
     FixedExpenseHistory o-- Description
+    MonthlySaving o-- UserId
     MonthlySaving o-- Year
     MonthlySaving o-- Month
     MonthlySaving o-- Money
     MonthlySaving o-- Description
 
     %% エンティティ間の関係性
-    User o-- UserGroup
     User o-- FinancialAccount
-    User o-- DailyTransaction
     User o-- MonthlySaving
 
     UserGroup o-- GroupInvitation
-    UserGroup o-- MonthlyBudget
     UserGroup o-- LivingExpenseCategory
+    UserGroup o-- MonthlyBudget
     UserGroup o-- FixedExpenseCategory
+    UserGroup o-- FixedExpenseHistory
 
     FinancialAccount o-- BalanceEditHistory
-    FinancialAccount o-- DailyTransaction
-    FinancialAccount o-- MonthlySaving
 
-    DailyTransaction o-- DailyLivingExpense
-    DailyTransaction o-- DailyPersonalExpense
-
-    LivingExpenseCategory o-- DailyLivingExpense
-    FixedExpenseCategory o-- FixedExpenseHistory
+    DailyGroupTransaction o-- DailyLivingExpense
+    DailyPersonalTransaction o-- DailyPersonalExpense
 
     %% サービス層の依存関係
     UserController ..> UserService
@@ -680,12 +675,13 @@ classDiagram
     TransactionService ..> DailyLivingExpenseRepository
     TransactionService ..> DailyPersonalExpenseRepository
     BudgetService ..> MonthlyBudgetRepository
-    BudgetService ..> DailyBudgetBalanceRepository
     ExpenseService ..> LivingExpenseCategoryRepository
     ExpenseService ..> FixedExpenseCategoryRepository
     ExpenseService ..> FixedExpenseHistoryRepository
     AccountService ..> FinancialAccountRepository
     AccountService ..> BalanceEditHistoryRepository
+    AccountService ..> UserRepository
+    SavingService ..> UserRepository
     SavingService ..> MonthlySavingRepository
 ```
 
