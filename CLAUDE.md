@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### アーキテクチャ構成
 - **バックエンド**: Spring Boot 3.5.3 + Java 21 + PostgreSQL
+- **データアクセス**: Spring Data JDBC（JPAではない）
 - **フロントエンド**: Next.js 15.3.5 + React 19 + Tailwind CSS 4
 - **データベース**: PostgreSQL 15
 
@@ -51,7 +52,8 @@ docker-compose down             # コンテナ停止
 com.takata_kento.household_expenses/
 ├── presentation/        # Controller
 ├── application/         # Service
-├── domain/             # Entity, ValueObject, Repository Interface
+├── domain/             # Entity, Repository Interface
+│   └── valueobject/    # Value Object
 └── infrastructure/     # Repository Implementation
 ```
 
@@ -107,9 +109,32 @@ com.takata_kento.household_expenses/
 
 ### テスト戦略
 - Kent BeckのTDDサイクルに従った開発
-- 単体テスト: JUnit + Mockito
+- 単体テスト: JUnit + AssertJ（JUnit標準のAssertionsではない）
 - 統合テスト: Testcontainers + PostgreSQL
 - ドメインロジックの重点的なテスト
+
+### テストコーディング規約
+- **検証ライブラリ**: AssertJを使用（`import static org.assertj.core.api.Assertions.*;`）
+- **テスト構造**: Given/When/Thenコメントを必ず記述
+  - `// Given`: テストの実行条件部分
+  - `// When`: どのような操作を行うかを表す
+  - `// Then`: 結果の検証部分
+- **検証対象変数**: 検証する変数名は`actual`とする
+- **例**:
+```java
+@Test
+void testAdd() {
+    // Given
+    Money money1 = new Money(1000);
+    Money money2 = new Money(500);
+    
+    // When
+    Money actual = money1.add(money2);
+    
+    // Then
+    assertThat(actual.amount()).isEqualTo(1500);
+}
+```
 
 ### コード品質
 - 設計文書（クラス図・ER図）との整合性確保
