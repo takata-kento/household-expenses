@@ -237,12 +237,11 @@ classDiagram
 
     %% 値オブジェクトクラス
     class Money {
-        -BigDecimal amount
-        +getAmount() BigDecimal
+        <<record>>
+        -int amount
+        +amount() int
         +add(Money) Money
         +subtract(Money) Money
-        +isPositive() boolean
-        +isZero() boolean
     }
 
     class Year {
@@ -688,7 +687,7 @@ classDiagram
 ## クラス設計の特徴
 
 ### エンティティクラス
-- JPA/Hibernateアノテーションを使用したエンティティクラス
+- Spring Data JDBCアノテーションを使用したエンティティクラス
 - ER図の各テーブルに対応
 
 ### リクエストクラス
@@ -708,5 +707,5 @@ classDiagram
 
 ### リポジトリインターフェース
 - データアクセス層
-- Spring Data JPAを使用
+- Spring Data JDBCを使用
 - カスタムクエリメソッドを定義
