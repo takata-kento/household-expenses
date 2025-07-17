@@ -244,22 +244,6 @@ classDiagram
         +subtract(Money) Money
     }
 
-    class Year {
-        -Integer value
-        +getValue() Integer
-        +isValid() boolean
-        +next() Year
-        +previous() Year
-    }
-
-    class Month {
-        -Integer value
-        +getValue() Integer
-        +isValid() boolean
-        +next() Month
-        +previous() Month
-    }
-
     class Username {
         -String value
         +getValue() String
