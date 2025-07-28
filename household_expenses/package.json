@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "prettier-diffcheck": "^1.0.0",
+    "prettier-plugin-java": "^2.7.3"
+  }
+}
