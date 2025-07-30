@@ -257,11 +257,9 @@ classDiagram
     }
 
     class Description {
+        <<record>>
         -String value
-        +getValue() String
-        +isValid() boolean
-        +length() int
-        +isEmpty() boolean
+        +value() String
     }
 
     class AccountName {
