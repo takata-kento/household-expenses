@@ -287,10 +287,9 @@ classDiagram
     }
 
     class Day {
-        -Integer value
-        +getValue() Integer
-        +isValid() boolean
-        +isValidForMonth(Month) boolean
+        <<record>>
+        -int value
+        +value() int
     }
 
     class GroupName {
