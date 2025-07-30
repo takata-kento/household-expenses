@@ -1,7 +1,8 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
-import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class UsernameTest {
 
@@ -24,8 +25,8 @@ class UsernameTest {
 
         // When & Then
         assertThatThrownBy(() -> new Username(value))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Username cannot be null");
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Username cannot be null");
     }
 
     @Test
@@ -35,8 +36,8 @@ class UsernameTest {
 
         // When & Then
         assertThatThrownBy(() -> new Username(value))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Username cannot be empty");
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Username cannot be empty");
     }
 
     @Test
@@ -46,8 +47,8 @@ class UsernameTest {
 
         // When & Then
         assertThatThrownBy(() -> new Username(value))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Username cannot be longer than 50 characters");
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Username cannot be longer than 50 characters");
     }
 
     @Test
