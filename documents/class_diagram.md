@@ -251,10 +251,9 @@ classDiagram
     }
 
     class CategoryName {
+        <<record>>
         -String value
-        +getValue() String
-        +isValid() boolean
-        +length() int
+        +value() String
     }
 
     class Description {
