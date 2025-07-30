@@ -1,7 +1,8 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
-import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class MoneyTest {
 
