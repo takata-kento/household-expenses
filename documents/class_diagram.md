@@ -269,9 +269,9 @@ classDiagram
     }
 
     class UserId {
-        -Long value
-        +getValue() Long
-        +isValid() boolean
+        <<record>>
+        -long value
+        +value() long
     }
 
     class UserGroupId {
