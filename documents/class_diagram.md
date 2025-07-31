@@ -293,10 +293,9 @@ classDiagram
     }
 
     class GroupName {
+        <<record>>
         -String value
-        +getValue() String
-        +isValid() boolean
-        +length() int
+        +value() String
     }
 
     class SequenceNumber {
