@@ -307,9 +307,9 @@ classDiagram
     }
 
     class LivingExpenseCategoryId {
-        -Long value
-        +getValue() Long
-        +isValid() boolean
+        <<record>>
+        -long value
+        +value() long
     }
 
     class FixedExpenseCategoryId {
