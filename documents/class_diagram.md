@@ -331,9 +331,9 @@ classDiagram
     }
 
     class FixedExpenseHistoryId {
-        -Long value
-        +getValue() Long
-        +isValid() boolean
+        <<record>>
+        -long value
+        +value() long
     }
 
     %% Enumクラス
