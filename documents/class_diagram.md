@@ -299,10 +299,9 @@ classDiagram
     }
 
     class SequenceNumber {
-        -Integer value
-        +getValue() Integer
-        +isValid() boolean
-        +isPositive() boolean
+        <<record>>
+        -int value
+        +value() int
     }
 
     class LivingExpenseCategoryId {
