@@ -313,9 +313,9 @@ classDiagram
     }
 
     class FixedExpenseCategoryId {
-        -Long value
-        +getValue() Long
-        +isValid() boolean
+        <<record>>
+        -long value
+        +value() long
     }
 
     class BalanceEditHistoryId {
