@@ -7,21 +7,6 @@ classDiagram
         -UserId id
         -Username username
         -UserGroupId userGroupId
-        -List~FinancialAccount~ accounts
-        -FinancialAccountId mainAccountId
-        -List~MonthlySaving~ savings
-        +addAccount(FinancialAccount) void
-        +removeAccount(FinancialAccountId) void
-        +setMainAccount(FinancialAccountId) void
-        +hasAccount(FinancialAccountId) boolean
-        +getAccountCount() int
-        +canRemoveAccount(FinancialAccountId) boolean
-        +ensureMainAccountConsistency() void
-        +recordMonthlySaving(Year, Month, Money, FinancialAccountId, Description) void
-        +getMonthlySaving(Year, Month) MonthlySaving
-        +getSavingsByYear(Year) List~MonthlySaving~
-        +updateMonthlySaving(Year, Month, Money, Description) void
-        +deleteMonthlySaving(Year, Month) void
     }
 
     class UserGroup {
@@ -31,10 +16,6 @@ classDiagram
         -UserId createdByUserId
         -List~UserId~ memberIds
         -List~GroupInvitation~ invitations
-        -List~LivingExpenseCategory~ expenseCategories
-        -List~MonthlyBudget~ monthlyBudgets
-        -List~FixedExpenseCategory~ fixedExpenseCategories
-        -List~FixedExpenseHistory~ fixedExpenseHistories
         +addMember(UserId) void
         +removeMember(UserId) void
         +inviteUser(UserId, UserId) GroupInvitation
@@ -43,25 +24,6 @@ classDiagram
         +canUserLeave(UserId) boolean
         +isUserMember(UserId) boolean
         +getMemberCount() int
-        +addExpenseCategory(CategoryName, Description, Boolean) LivingExpenseCategory
-        +updateExpenseCategory(LivingExpenseCategoryId, CategoryName, Description) void
-        +removeExpenseCategory(LivingExpenseCategoryId) void
-        +getExpenseCategory(LivingExpenseCategoryId) LivingExpenseCategory
-        +getDefaultCategories() List~LivingExpenseCategory~
-        +hasExpenseCategory(LivingExpenseCategoryId) boolean
-        +setMonthlyBudget(Year, Month, Money, UserId) MonthlyBudget
-        +getMonthlyBudget(Year, Month) MonthlyBudget
-        +hasMonthlyBudget(Year, Month) boolean
-        +addFixedExpenseCategory(CategoryName, Description, Money) FixedExpenseCategory
-        +removeFixedExpenseCategory(FixedExpenseCategoryId) void
-        +getFixedExpenseCategory(FixedExpenseCategoryId) FixedExpenseCategory
-        +addFixedExpenseHistory(FixedExpenseCategoryId, Year, Month, Money, LocalDate, Description) FixedExpenseHistory
-        +getFixedExpenseHistories(Year, Month) List~FixedExpenseHistory~
-        +getFixedExpenseHistory(FixedExpenseCategoryId, Year, Month) FixedExpenseHistory
-        +calculateRemainingBudget(Year, Month, LocalDate, List~DailyLivingExpense~) Money
-        +getTotalFixedExpenses(Year, Month) Money
-        +ensureFixedExpenseCategoryExists(FixedExpenseCategoryId) boolean
-        +isOverBudget(Year, Month, LocalDate, List~DailyLivingExpense~) boolean
     }
 
     class GroupInvitation {
@@ -93,18 +55,33 @@ classDiagram
     }
 
     class MonthlyBudget {
+        -UserGroupId userGroupId
         -Year year
         -Month month
         -Money budgetAmount
         -UserId setByUserId
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
         +updateBudgetAmount(Money, UserId) void
+        +validateBudgetAmount(Money) boolean
+        +isCurrentMonth(LocalDate) boolean
+        +isBudgetSetBy(UserId) boolean
+        +calculateRemainingBudget(Money) Money
+        +isOverBudget(Money) boolean
     }
 
     class LivingExpenseCategory {
         -LivingExpenseCategoryId id
+        -UserGroupId userGroupId
         -CategoryName categoryName
         -Description description
         -Boolean isDefault
+        +updateCategoryName(CategoryName) void
+        +updateDescription(Description) void
+        +markAsDefault() void
+        +unmarkAsDefault() void
+        +validateCategoryName(CategoryName) boolean
+        +isValidForUserGroup(UserGroupId) boolean
     }
 
     class DailyLivingExpense {
@@ -149,12 +126,17 @@ classDiagram
 
     class FixedExpenseCategory {
         -FixedExpenseCategoryId id
+        -UserGroupId userGroupId
         -CategoryName categoryName
         -Description description
         -Money defaultAmount
         +updateCategoryName(CategoryName) void
         +updateDescription(Description) void
         +updateDefaultAmount(Money) void
+        +validateCategoryName(CategoryName) boolean
+        +validateDefaultAmount(Money) boolean
+        +isValidForUserGroup(UserGroupId) boolean
+        +canBeDeleted() boolean
     }
 
     class FixedExpenseHistory {
@@ -165,14 +147,33 @@ classDiagram
         -Money amount
         -LocalDate effectiveDate
         -Description memo
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        +updateAmount(Money, Description) void
+        +updateEffectiveDate(LocalDate) void
+        +updateMemo(Description) void
+        +validateAmount(Money) boolean
+        +isForCategory(FixedExpenseCategoryId) boolean
+        +isForPeriod(Year, Month) boolean
+        +canBeModified() boolean
     }
 
     class MonthlySaving {
+        -UserId userId
         -Year year
         -Month month
         -Money savingAmount
         -FinancialAccountId financialAccountId
         -Description memo
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        +updateSavingAmount(Money) void
+        +updateFinancialAccount(FinancialAccountId) void
+        +updateMemo(Description) void
+        +validateSavingAmount(Money) boolean
+        +isForUser(UserId) boolean
+        +isForPeriod(Year, Month) boolean
+        +canBeDeleted() boolean
     }
 
     %% リクエストクラス
@@ -619,14 +620,7 @@ classDiagram
     MonthlySaving o-- Description
 
     %% エンティティ間の関係性
-    User o-- FinancialAccount
-    User o-- MonthlySaving
-
     UserGroup o-- GroupInvitation
-    UserGroup o-- LivingExpenseCategory
-    UserGroup o-- MonthlyBudget
-    UserGroup o-- FixedExpenseCategory
-    UserGroup o-- FixedExpenseHistory
 
     FinancialAccount o-- BalanceEditHistory
 
