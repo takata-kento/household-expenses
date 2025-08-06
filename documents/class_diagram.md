@@ -489,7 +489,7 @@ classDiagram
     %% リポジトリインターフェース
     class UserRepository {
         <<interface>>
-        +findByUserId(UserId) Optional~User~
+        <<extends CrudRepository~User, UserId~>>
         +findByUsername(Username) Optional~User~
         +existsByUsername(Username) boolean
     }
