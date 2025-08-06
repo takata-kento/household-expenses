@@ -108,12 +108,19 @@ com.takata_kento.household_expenses/
 4. **Presentation層**: Controller
 
 ### テスト戦略
-- Kent BeckのTDDサイクルに従った開発
+- Kent Beckとt-wadaのTDDサイクルに従った開発
 - 単体テスト: JUnit + AssertJ（JUnit標準のAssertionsではない）
 - 統合テスト: Testcontainers + PostgreSQL
 - ドメインロジックの重点的なテスト
 
-### テストコーディング規約
+#### TDD実装の具体的遵守事項
+Red-Green-Refactorサイクルの実践
+
+- **実装前にテストを作成**: 機能実装する前に、まずテストを書いて失敗させる（Red）
+- **最小限の実装で通す**: テストが通る最小限の実装を行う（Green）  
+- **リファクタリング**: コードの品質を向上させる（Refactor）
+
+#### テストコーディング規約
 - **検証ライブラリ**: AssertJを使用（`import static org.assertj.core.api.Assertions.*;`）
 - **テスト構造**: Given/When/Thenコメントを必ず記述
   - `// Given`: テストの実行条件部分
@@ -136,7 +143,52 @@ void testAdd() {
 }
 ```
 
+#### Given部分の明確化
+- **期待値の明示**: テストのGiven部分で予想される数値やデータを明確に変数として定義
+```java
+// Given
+long expectedId = 1L;
+String expectedUsername = "testuser";
+Long expectedUserGroupId = 100L;
+```
+
+#### テスト対象クラスの利用原則
+テスト対象クラスはWhenおよびThenでしか使用してはいけない
+つまりテスト対象クラスの使用は確認したい動作の実行か状態の検証のみで使用される
+
+例：
+repositoryクラスをテストしたい場合、Givenでデータの挿入をしたい場面がある。このような時にテスト対象のrepositoryクラスを使用してデータを挿入してはいけない。
+この場合は`JdbcClient`クラスのようなフレームワークにデフォルトで備わっているクラスを使用したり、`@SQL`を使用してデータベースの初期化をする。
+
 ### コード品質
 - 設計文書（クラス図・ER図）との整合性確保
 - Eric EvansのDDD原則に基づいたモデリング
 - Robert C.MartinのClean Codeの実践
+
+### コーディング規約の具体的指導
+
+#### メソッド命名規則
+- **getプレフィックス禁止**: プロパティの取得メソッドにgetをつけない
+```java
+// ❌ 禁止
+public String getUsername() { return username; }
+
+// ✅ 正しい
+public String username() { return username; }
+```
+
+#### null安全性
+- **Optionalの活用**: nullable なフィールドはOptionalを使用してnull安全にする
+```java
+// user_group_id がnullableの場合
+private Optional<UserGroupId> userGroupId;
+```
+
+### リファクタリングの判断基準
+- **重複コード**: 既存フレームワーク機能との重複を避ける
+  - 例: `findByUserId`は`CrudRepository.findById`と重複するため削除
+- **TDDサイクルでのリファクタリング**: 機能追加や変更時もテストファーストで実装
+
+### Spring Data JDBC値オブジェクト設定
+- **設定クラスの配置**: フレームワーク設定は`config`パッケージに分離
+- **AbstractJdbcConfiguration継承**: カスタムコンバーターの登録に必要
