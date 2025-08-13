@@ -34,6 +34,7 @@ CREATE UNIQUE INDEX ix_auth_username ON authorities (username,authority);
 
 -- グループ招待テーブル
 CREATE TABLE group_invitation (
+    id BIGSERIAL PRIMARY KEY,
     user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     invited_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     invited_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
@@ -42,7 +43,7 @@ CREATE TABLE group_invitation (
     responded_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    PRIMARY KEY (user_group_id, invited_user_id)
+    UNIQUE (user_group_id, invited_user_id)
 );
 
 -- 金融口座テーブル

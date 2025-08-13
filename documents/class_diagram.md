@@ -7,6 +7,18 @@ classDiagram
         -UserId id
         -Username username
         -UserGroupId userGroupId
+        -List~GroupInvitation~ receivedInvitations
+        +create(GroupName) UserGroupId
+        +join(UserGroupId) void
+        +leaveGroup() void
+        +canCreateGroup() boolean
+        +canJoinGroup(UserGroupId) boolean
+        +canLeaveGroup() boolean
+        +invite(UserId, UserGroupId) GroupInvitationId
+        +canInvite(UserId) boolean
+        +accept(GroupInvitationId) void
+        +reject(GroupInvitationId) void
+        +getPendingInvitations() List~GroupInvitationInfo~
     }
 
     class UserGroup {
@@ -14,25 +26,26 @@ classDiagram
         -GroupName groupName
         -Day monthStartDay
         -UserId createdByUserId
-        -List~UserId~ memberIds
-        -List~GroupInvitation~ invitations
-        +addMember(UserId) void
-        +removeMember(UserId) void
-        +inviteUser(UserId, UserId) GroupInvitation
-        +processInvitationAcceptance(UserId) void
-        +processInvitationRejection(UserId) void
-        +canUserLeave(UserId) boolean
-        +isUserMember(UserId) boolean
-        +getMemberCount() int
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        +updateGroupName(GroupName) void
+        +updateMonthStartDay(Day) void
+        +canBeModifiedBy(UserId) boolean
     }
 
     class GroupInvitation {
+        -GroupInvitationId id
         -UserGroupId userGroupId
-        -UserId invitedUserId
         -UserId invitedByUserId
         -InvitationStatus status
         -LocalDateTime invitedAt
         -LocalDateTime respondedAt
+        +accept() void
+        +reject() void
+        +isExpired() boolean
+        +canRespond() boolean
+        +isPending() boolean
+        +isFrom(UserGroupId) boolean
     }
 
     class FinancialAccount {
@@ -232,6 +245,15 @@ classDiagram
         +getInvitedUsername() Username
     }
 
+    class GroupInvitationInfo {
+        -GroupInvitationId groupInvitationId
+        -UserGroupId userGroupId
+        -UserId invitedByUserId
+        +getGroupInvitationId() GroupInvitationId
+        +getUserGroupId() UserGroupId
+        +getInvitedByUserId() UserId
+    }
+
     %% リクエスト間の関係性
     DailyTransactionRequest o-- DailyLivingExpenseRequest
     DailyTransactionRequest o-- DailyPersonalExpenseRequest
@@ -276,6 +298,12 @@ classDiagram
     }
 
     class UserGroupId {
+        <<record>>
+        -long value
+        +value() long
+    }
+
+    class GroupInvitationId {
         <<record>>
         -long value
         +value() long
@@ -572,9 +600,13 @@ classDiagram
     UserGroup o-- GroupName
     UserGroup o-- Day
     UserGroup o-- UserId
+    GroupInvitation o-- GroupInvitationId
     GroupInvitation o-- UserGroupId
     GroupInvitation o-- UserId
     GroupInvitation o-- InvitationStatus
+    GroupInvitationInfo o-- GroupInvitationId
+    GroupInvitationInfo o-- UserGroupId
+    GroupInvitationInfo o-- UserId
     FinancialAccount o-- FinancialAccountId
     FinancialAccount o-- AccountName
     FinancialAccount o-- Money
@@ -620,7 +652,7 @@ classDiagram
     MonthlySaving o-- Description
 
     %% エンティティ間の関係性
-    UserGroup o-- GroupInvitation
+    User o-- GroupInvitation
 
     FinancialAccount o-- BalanceEditHistory
 
