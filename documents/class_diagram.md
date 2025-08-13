@@ -8,19 +8,17 @@ classDiagram
         -Username username
         -UserGroupId userGroupId
         -List~GroupInvitation~ receivedInvitations
-        +createGroup(GroupName, Day) UserGroupId
-        +joinGroup(UserGroupId) void
+        +create(GroupName) UserGroupId
+        +join(UserGroupId) void
         +leaveGroup() void
         +canCreateGroup() boolean
         +canJoinGroup(UserGroupId) boolean
         +canLeaveGroup() boolean
-        +inviteUser(UserId, UserGroupId) GroupInvitation
-        +canInviteUser(UserId) boolean
-        +acceptInvitation(UserGroupId) void
-        +rejectInvitation(UserGroupId) void
-        +getPendingInvitations() List~GroupInvitation~
-        +hasPendingInvitation(UserGroupId) boolean
-        +getInvitation(UserGroupId) GroupInvitation
+        +invite(UserId, UserGroupId) GroupInvitationId
+        +canInvite(UserId) boolean
+        +accept(GroupInvitationId) void
+        +reject(GroupInvitationId) void
+        +getPendingInvitations() List~GroupInvitationInfo~
     }
 
     class UserGroup {
@@ -247,6 +245,15 @@ classDiagram
     class GroupInvitationRequest {
         -Username invitedUsername
         +getInvitedUsername() Username
+    }
+
+    class GroupInvitationInfo {
+        -GroupInvitationId groupInvitationId
+        -UserGroupId userGroupId
+        -UserId invitedByUserId
+        +getGroupInvitationId() GroupInvitationId
+        +getUserGroupId() UserGroupId
+        +getInvitedByUserId() UserId
     }
 
     %% リクエスト間の関係性
@@ -599,6 +606,9 @@ classDiagram
     GroupInvitation o-- UserGroupId
     GroupInvitation o-- UserId
     GroupInvitation o-- InvitationStatus
+    GroupInvitationInfo o-- GroupInvitationId
+    GroupInvitationInfo o-- UserGroupId
+    GroupInvitationInfo o-- UserId
     FinancialAccount o-- FinancialAccountId
     FinancialAccount o-- AccountName
     FinancialAccount o-- Money
