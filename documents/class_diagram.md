@@ -7,6 +7,20 @@ classDiagram
         -UserId id
         -Username username
         -UserGroupId userGroupId
+        -List~GroupInvitation~ receivedInvitations
+        +createGroup(GroupName, Day) UserGroupId
+        +joinGroup(UserGroupId) void
+        +leaveGroup() void
+        +canCreateGroup() boolean
+        +canJoinGroup(UserGroupId) boolean
+        +canLeaveGroup() boolean
+        +inviteUser(UserId, UserGroupId) GroupInvitation
+        +canInviteUser(UserId) boolean
+        +acceptInvitation(UserGroupId) void
+        +rejectInvitation(UserGroupId) void
+        +getPendingInvitations() List~GroupInvitation~
+        +hasPendingInvitation(UserGroupId) boolean
+        +getInvitation(UserGroupId) GroupInvitation
     }
 
     class UserGroup {
@@ -14,25 +28,27 @@ classDiagram
         -GroupName groupName
         -Day monthStartDay
         -UserId createdByUserId
-        -List~UserId~ memberIds
-        -List~GroupInvitation~ invitations
-        +addMember(UserId) void
-        +removeMember(UserId) void
-        +inviteUser(UserId, UserId) GroupInvitation
-        +processInvitationAcceptance(UserId) void
-        +processInvitationRejection(UserId) void
-        +canUserLeave(UserId) boolean
-        +isUserMember(UserId) boolean
-        +getMemberCount() int
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        +updateGroupName(GroupName) void
+        +updateMonthStartDay(Day) void
+        +validateGroupSettings() boolean
+        +isCreatedBy(UserId) boolean
+        +canBeModifiedBy(UserId) boolean
     }
 
     class GroupInvitation {
         -UserGroupId userGroupId
-        -UserId invitedUserId
         -UserId invitedByUserId
         -InvitationStatus status
         -LocalDateTime invitedAt
         -LocalDateTime respondedAt
+        +accept() void
+        +reject() void
+        +isExpired() boolean
+        +canRespond() boolean
+        +isPending() boolean
+        +isFrom(UserGroupId) boolean
     }
 
     class FinancialAccount {
@@ -620,7 +636,7 @@ classDiagram
     MonthlySaving o-- Description
 
     %% エンティティ間の関係性
-    UserGroup o-- GroupInvitation
+    User o-- GroupInvitation
 
     FinancialAccount o-- BalanceEditHistory
 
