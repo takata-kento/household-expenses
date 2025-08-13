@@ -30,8 +30,6 @@ classDiagram
         -LocalDateTime updatedAt
         +updateGroupName(GroupName) void
         +updateMonthStartDay(Day) void
-        +validateGroupSettings() boolean
-        +isCreatedBy(UserId) boolean
         +canBeModifiedBy(UserId) boolean
     }
 
