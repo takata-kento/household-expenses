@@ -32,8 +32,9 @@ erDiagram
 
     %% グループ招待
     GROUP_INVITATION {
-        bigint user_group_id PK,FK
-        bigint invited_user_id PK,FK
+        bigint id PK "招待ID"
+        bigint user_group_id FK
+        bigint invited_user_id FK
         bigint invited_by_user_id FK
         varchar status "pending/accepted/rejected"
         timestamp invited_at

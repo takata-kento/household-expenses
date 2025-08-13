@@ -38,6 +38,7 @@ classDiagram
     }
 
     class GroupInvitation {
+        -GroupInvitationId id
         -UserGroupId userGroupId
         -UserId invitedByUserId
         -InvitationStatus status
@@ -292,6 +293,12 @@ classDiagram
     }
 
     class UserGroupId {
+        <<record>>
+        -long value
+        +value() long
+    }
+
+    class GroupInvitationId {
         <<record>>
         -long value
         +value() long
@@ -588,6 +595,7 @@ classDiagram
     UserGroup o-- GroupName
     UserGroup o-- Day
     UserGroup o-- UserId
+    GroupInvitation o-- GroupInvitationId
     GroupInvitation o-- UserGroupId
     GroupInvitation o-- UserId
     GroupInvitation o-- InvitationStatus
