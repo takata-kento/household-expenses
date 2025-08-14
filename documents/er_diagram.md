@@ -11,6 +11,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
         boolean enabled
+        integer version "バージョン"
     }
 
     %% オーソリティ
@@ -27,6 +28,7 @@ erDiagram
         bigint created_by_user_id FK
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
 
@@ -41,6 +43,7 @@ erDiagram
         timestamp responded_at
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 金融口座
@@ -52,6 +55,7 @@ erDiagram
         boolean is_main_account "メイン口座フラグ"
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 預金残高編集履歴
@@ -62,6 +66,7 @@ erDiagram
         integer new_balance "変更後残高"
         varchar edit_reason "編集理由"
         timestamp created_at
+        integer version "バージョン"
     }
 
     %% 月次予算
@@ -73,6 +78,7 @@ erDiagram
         bigint set_by_user_id FK
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 生活費分類
@@ -84,6 +90,7 @@ erDiagram
         boolean is_default "デフォルト分類フラグ"
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 日次収支
@@ -96,6 +103,7 @@ erDiagram
         bigint financial_account_id FK
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 日次生活費
@@ -108,6 +116,7 @@ erDiagram
         varchar memo "メモ"
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 日次個人支出
@@ -119,6 +128,7 @@ erDiagram
         varchar description "使用目的"
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 日次予算残高
@@ -129,6 +139,7 @@ erDiagram
         integer budget_balance "予算残金"
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 固定費分類
@@ -140,6 +151,7 @@ erDiagram
         integer default_amount "デフォルト金額"
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 固定費履歴
@@ -153,6 +165,7 @@ erDiagram
         varchar memo "メモ"
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% 月次貯金
@@ -165,6 +178,7 @@ erDiagram
         varchar memo "メモ"
         timestamp created_at
         timestamp updated_at
+        integer version "バージョン"
     }
 
     %% リレーションシップ
