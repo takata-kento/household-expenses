@@ -8,7 +8,8 @@ CREATE TABLE user_group (
     month_start_day INTEGER NOT NULL DEFAULT 1 CHECK (month_start_day >= 1 AND month_start_day <= 31),
     created_by_user_id BIGINT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE
+    updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0
 );
 
 -- ユーザーテーブル
@@ -19,7 +20,8 @@ CREATE TABLE "users" (
     user_group_id BIGINT REFERENCES user_group(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    enabled boolean
+    enabled boolean,
+    version INTEGER DEFAULT 0
 );
 
 -- ユーザーグループの作成者外部キー制約を追加
@@ -43,6 +45,7 @@ CREATE TABLE group_invitation (
     responded_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0,
     UNIQUE (user_group_id, invited_user_id)
 );
 
@@ -54,7 +57,8 @@ CREATE TABLE financial_account (
     balance INTEGER NOT NULL DEFAULT 0,
     is_main_account BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE
+    updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0
 );
 
 -- 預金残高編集履歴テーブル
@@ -64,7 +68,8 @@ CREATE TABLE balance_edit_history (
     old_balance INTEGER NOT NULL,
     new_balance INTEGER NOT NULL,
     edit_reason TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    version INTEGER DEFAULT 0
 );
 
 -- 月次予算テーブル
@@ -76,6 +81,7 @@ CREATE TABLE monthly_budget (
     set_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0,
     PRIMARY KEY (user_group_id, year, month)
 );
 
@@ -87,7 +93,8 @@ CREATE TABLE living_expense_category (
     description TEXT,
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE
+    updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0
 );
 
 -- 日次収支テーブル
@@ -100,6 +107,7 @@ CREATE TABLE daily_transaction (
     financial_account_id BIGINT NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0,
     PRIMARY KEY (user_id, transaction_date)
 );
 
@@ -113,6 +121,7 @@ CREATE TABLE daily_living_expense (
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0,
     FOREIGN KEY (user_id, transaction_date) REFERENCES daily_transaction(user_id, transaction_date) ON DELETE CASCADE
 );
 
@@ -125,6 +134,7 @@ CREATE TABLE daily_personal_expense (
     description TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0,
     PRIMARY KEY (user_id, transaction_date, sequence_no),
     FOREIGN KEY (user_id, transaction_date) REFERENCES daily_transaction(user_id, transaction_date) ON DELETE CASCADE
 );
@@ -137,6 +147,7 @@ CREATE TABLE daily_budget_balance (
     budget_balance INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0,
     PRIMARY KEY (user_group_id, transaction_date)
 );
 
@@ -148,7 +159,8 @@ CREATE TABLE fixed_expense_category (
     description TEXT,
     default_amount INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE
+    updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0
 );
 
 -- 固定費履歴テーブル
@@ -161,7 +173,8 @@ CREATE TABLE fixed_expense_history (
     effective_date DATE,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE
+    updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0
 );
 
 -- 月次貯金テーブル
@@ -174,6 +187,7 @@ CREATE TABLE monthly_saving (
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
+    version INTEGER DEFAULT 0,
     PRIMARY KEY (user_id, year, month)
 );
 
