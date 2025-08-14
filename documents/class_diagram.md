@@ -8,6 +8,7 @@ classDiagram
         -Username username
         -UserGroupId userGroupId
         -List~GroupInvitation~ receivedInvitations
+        -Integer version
         +create(GroupName) UserGroupId
         +join(UserGroupId) void
         +leaveGroup() void
@@ -28,6 +29,7 @@ classDiagram
         -UserId createdByUserId
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
+        -Integer version
         +updateGroupName(GroupName) void
         +updateMonthStartDay(Day) void
         +canBeModifiedBy(UserId) boolean
@@ -36,13 +38,16 @@ classDiagram
     class GroupInvitation {
         -GroupInvitationId id
         -UserGroupId userGroupId
+        -UserId invitedUserId
         -UserId invitedByUserId
         -InvitationStatus status
         -LocalDateTime invitedAt
         -LocalDateTime respondedAt
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        -Integer version
         +accept() void
         +reject() void
-        +isExpired() boolean
         +canRespond() boolean
         +isPending() boolean
         +isFrom(UserGroupId) boolean
@@ -54,6 +59,7 @@ classDiagram
         -Money balance
         -Boolean isMainAccount
         -List~BalanceEditHistory~ editHistories
+        -Integer version
         +addEditHistory(Money, Money, Description) void
         +getLatestEditHistory() BalanceEditHistory
         +updateBalance(Money, Description) void
@@ -65,6 +71,7 @@ classDiagram
         -Money newBalance
         -Description editReason
         -LocalDateTime createdAt
+        -Integer version
     }
 
     class MonthlyBudget {
@@ -75,6 +82,7 @@ classDiagram
         -UserId setByUserId
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
+        -Integer version
         +updateBudgetAmount(Money, UserId) void
         +validateBudgetAmount(Money) boolean
         +isCurrentMonth(LocalDate) boolean
@@ -89,6 +97,7 @@ classDiagram
         -CategoryName categoryName
         -Description description
         -Boolean isDefault
+        -Integer version
         +updateCategoryName(CategoryName) void
         +updateDescription(Description) void
         +markAsDefault() void
@@ -104,6 +113,7 @@ classDiagram
         -LivingExpenseCategoryId livingExpenseCategoryId
         -Money amount
         -Description memo
+        -Integer version
     }
 
     class DailyPersonalExpense {
@@ -112,6 +122,7 @@ classDiagram
         -SequenceNumber sequenceNo
         -Money amount
         -Description description
+        -Integer version
     }
 
     class DailyGroupTransaction {
@@ -120,6 +131,7 @@ classDiagram
         -List~DailyLivingExpense~ livingExpenses
         -Money totalLivingExpense
         -Money budgetBalance
+        -Integer version
         +addLivingExpense(UserId, LivingExpenseCategoryId, Money, Description) void
         +calculateTotalLivingExpense() Money
         +updateBudgetBalance(Money) void
@@ -132,6 +144,7 @@ classDiagram
         -Money income
         -Money totalExpense
         -List~DailyPersonalExpense~ personalExpenses
+        -Integer version
         +addPersonalExpense(Money, Description) void
         +calculateTotalExpense(Money) void
         +getTotalPersonalExpense() Money
@@ -143,6 +156,7 @@ classDiagram
         -CategoryName categoryName
         -Description description
         -Money defaultAmount
+        -Integer version
         +updateCategoryName(CategoryName) void
         +updateDescription(Description) void
         +updateDefaultAmount(Money) void
@@ -162,6 +176,7 @@ classDiagram
         -Description memo
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
+        -Integer version
         +updateAmount(Money, Description) void
         +updateEffectiveDate(LocalDate) void
         +updateMemo(Description) void
@@ -180,6 +195,7 @@ classDiagram
         -Description memo
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
+        -Integer version
         +updateSavingAmount(Money) void
         +updateFinancialAccount(FinancialAccountId) void
         +updateMemo(Description) void
