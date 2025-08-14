@@ -51,15 +51,7 @@ public class UserGroup {
 
     public static UserGroup create(GroupName groupName, Day monthStartDay, UserId createdByUserId) {
         LocalDateTime now = LocalDateTime.now();
-        return new UserGroup(
-            null,
-            groupName,
-            monthStartDay,
-            createdByUserId,
-            now,
-            now,
-            null
-        );
+        return new UserGroup(null, groupName, monthStartDay, createdByUserId, now, now, null);
     }
 
     public UserGroupId id() {
