@@ -1,5 +1,6 @@
 package com.takata_kento.household_expenses.config;
 
+import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
@@ -24,7 +25,9 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new UsernameToStringConverter(),
             new StringToUsernameConverter(),
             new UserGroupIdToLongConverter(),
-            new LongToUserGroupIdConverter()
+            new LongToUserGroupIdConverter(),
+            new GroupInvitationIdToLongConverter(),
+            new LongToGroupInvitationIdConverter()
         );
     }
 
@@ -79,6 +82,24 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public UserGroupId convert(@NonNull Long source) {
             return new UserGroupId(source);
+        }
+    }
+
+    @WritingConverter
+    static class GroupInvitationIdToLongConverter implements Converter<GroupInvitationId, Long> {
+
+        @Override
+        public Long convert(@NonNull GroupInvitationId source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class LongToGroupInvitationIdConverter implements Converter<Long, GroupInvitationId> {
+
+        @Override
+        public GroupInvitationId convert(@NonNull Long source) {
+            return new GroupInvitationId(source);
         }
     }
 }

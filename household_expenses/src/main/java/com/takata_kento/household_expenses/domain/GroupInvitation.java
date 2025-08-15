@@ -2,7 +2,6 @@ package com.takata_kento.household_expenses.domain;
 
 import com.takata_kento.household_expenses.domain.valueobject.*;
 import java.time.LocalDateTime;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -10,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("group_invitation")
 public class GroupInvitation {
 
-    @Id
+    @Column("id")
     private GroupInvitationId id;
 
     @Column("user_group_id")
@@ -22,6 +21,7 @@ public class GroupInvitation {
     @Column("invited_by_user_id")
     private final UserId invitedByUserId;
 
+    @Column("status")
     private InvitationStatus status;
 
     @Column("invited_at")
