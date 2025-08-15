@@ -35,14 +35,14 @@ public class User {
 
     public User(
         UserId id,
-        Username username,
-        Optional<UserGroupId> userGroup,
+        Username name,
+        Optional<UserGroupId> userGroupId,
         Set<GroupInvitation> receivedInvitations,
         Integer version
     ) {
         this.id = id;
-        this.name = username;
-        this.userGroupId = userGroup != null ? userGroup : Optional.empty();
+        this.name = name;
+        this.userGroupId = userGroupId != null ? userGroupId : Optional.empty();
         this.receivedInvitations = receivedInvitations;
         this.version = version;
     }
