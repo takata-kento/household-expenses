@@ -38,12 +38,11 @@ erDiagram
         bigint user_group_id FK
         bigint invited_user_id FK
         bigint invited_by_user_id FK
-        varchar status "pending/accepted/rejected"
+        varchar status "PENDING/ACCEPTED/REJECTED"
         timestamp invited_at
         timestamp responded_at
         timestamp created_at
         timestamp updated_at
-        integer version "バージョン"
     }
 
     %% 金融口座
