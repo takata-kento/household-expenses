@@ -2,7 +2,6 @@ package com.takata_kento.household_expenses.domain;
 
 import com.takata_kento.household_expenses.domain.valueobject.*;
 import java.time.LocalDateTime;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -36,9 +35,6 @@ public class GroupInvitation {
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
-    @Version
-    private Integer version;
-
     public GroupInvitation(
         GroupInvitationId id,
         UserGroupId userGroupId,
@@ -48,8 +44,7 @@ public class GroupInvitation {
         LocalDateTime invitedAt,
         LocalDateTime respondedAt,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        Integer version
+        LocalDateTime updatedAt
     ) {
         this.id = id;
         this.userGroupId = userGroupId;
@@ -60,13 +55,14 @@ public class GroupInvitation {
         this.respondedAt = respondedAt;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.version = version;
     }
 
     public static GroupInvitation create(UserGroupId userGroupId, UserId invitedUserId, UserId invitedByUserId) {
         LocalDateTime now = LocalDateTime.now();
+        Long invitationId = Long.parseLong(String.valueOf(userGroupId.value()) + String.valueOf(invitedUserId.value()));
+        GroupInvitationId id = new GroupInvitationId(invitationId);
         return new GroupInvitation(
-            null,
+            id,
             userGroupId,
             invitedUserId,
             invitedByUserId,
@@ -74,8 +70,7 @@ public class GroupInvitation {
             now,
             null,
             now,
-            now,
-            null
+            now
         );
     }
 
@@ -113,10 +108,6 @@ public class GroupInvitation {
 
     public LocalDateTime updatedAt() {
         return updatedAt;
-    }
-
-    public Integer version() {
-        return version;
     }
 
     public void accept() {

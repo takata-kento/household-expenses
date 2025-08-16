@@ -120,8 +120,7 @@ class UserTest {
             now,
             null,
             now,
-            now,
-            null
+            now
         );
 
         GroupInvitation acceptedInvitation = new GroupInvitation(
@@ -133,8 +132,7 @@ class UserTest {
             now,
             now,
             now,
-            now,
-            null
+            now
         );
 
         Set<GroupInvitation> invitations = Set.of(pendingInvitation, acceptedInvitation);
@@ -174,8 +172,7 @@ class UserTest {
             now,
             null,
             now,
-            now,
-            null
+            now
         );
 
         GroupInvitation invitation2 = new GroupInvitation(
@@ -187,8 +184,7 @@ class UserTest {
             now,
             now,
             now,
-            now,
-            null
+            now
         );
 
         Set<GroupInvitation> invitations = Set.of(invitation1, invitation2);
@@ -434,8 +430,7 @@ class UserTest {
             now,
             null,
             now,
-            now,
-            null
+            now
         );
         Set<GroupInvitation> invitations = Set.of(pendingInvitation);
         Integer expectedVersion = null;
@@ -469,8 +464,7 @@ class UserTest {
             now,
             null,
             now,
-            now,
-            null
+            now
         );
         Set<GroupInvitation> invitations = Set.of(pendingInvitation);
         Integer expectedVersion = null;

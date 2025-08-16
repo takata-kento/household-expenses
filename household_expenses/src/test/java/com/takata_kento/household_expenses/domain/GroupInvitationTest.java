@@ -20,7 +20,6 @@ class GroupInvitationTest {
         LocalDateTime expectedRespondedAt = null;
         LocalDateTime expectedCreatedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
         LocalDateTime expectedUpdatedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
-        Integer expectedVersion = 1;
 
         // When
         GroupInvitation actual = new GroupInvitation(
@@ -32,8 +31,7 @@ class GroupInvitationTest {
             expectedInvitedAt,
             expectedRespondedAt,
             expectedCreatedAt,
-            expectedUpdatedAt,
-            expectedVersion
+            expectedUpdatedAt
         );
 
         // Then
@@ -46,7 +44,6 @@ class GroupInvitationTest {
         assertThat(actual.respondedAt()).isNull();
         assertThat(actual.createdAt()).isEqualTo(expectedCreatedAt);
         assertThat(actual.updatedAt()).isEqualTo(expectedUpdatedAt);
-        assertThat(actual.version()).isEqualTo(expectedVersion);
     }
 
     @Test
@@ -55,6 +52,7 @@ class GroupInvitationTest {
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserId expectedInvitedUserId = new UserId(200L);
         UserId expectedInvitedByUserId = new UserId(300L);
+        GroupInvitationId expectedInvitationId = new GroupInvitationId(100200L);
 
         // When
         GroupInvitation actual = GroupInvitation.create(
@@ -64,7 +62,7 @@ class GroupInvitationTest {
         );
 
         // Then
-        assertThat(actual.id()).isNull();
+        assertThat(actual.id()).isEqualTo(expectedInvitationId);
         assertThat(actual.userGroupId()).isEqualTo(expectedUserGroupId);
         assertThat(actual.invitedUserId()).isEqualTo(expectedInvitedUserId);
         assertThat(actual.invitedByUserId()).isEqualTo(expectedInvitedByUserId);
@@ -73,7 +71,6 @@ class GroupInvitationTest {
         assertThat(actual.respondedAt()).isNull();
         assertThat(actual.createdAt()).isNotNull();
         assertThat(actual.updatedAt()).isNotNull();
-        assertThat(actual.version()).isNull();
     }
 
     @Test
@@ -86,7 +83,6 @@ class GroupInvitationTest {
         LocalDateTime expectedInvitedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
         LocalDateTime expectedCreatedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
         LocalDateTime expectedUpdatedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
-        Integer expectedVersion = 1;
 
         GroupInvitation invitation = new GroupInvitation(
             expectedId,
@@ -97,8 +93,7 @@ class GroupInvitationTest {
             expectedInvitedAt,
             null,
             expectedCreatedAt,
-            expectedUpdatedAt,
-            expectedVersion
+            expectedUpdatedAt
         );
 
         // When
@@ -114,7 +109,6 @@ class GroupInvitationTest {
         assertThat(invitation.respondedAt()).isNotNull();
         assertThat(invitation.createdAt()).isEqualTo(expectedCreatedAt);
         assertThat(invitation.updatedAt()).isNotNull();
-        assertThat(invitation.version()).isEqualTo(expectedVersion);
     }
 
     @Test
@@ -127,7 +121,6 @@ class GroupInvitationTest {
         LocalDateTime expectedInvitedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
         LocalDateTime expectedCreatedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
         LocalDateTime expectedUpdatedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
-        Integer expectedVersion = 1;
 
         GroupInvitation invitation = new GroupInvitation(
             expectedId,
@@ -138,8 +131,7 @@ class GroupInvitationTest {
             expectedInvitedAt,
             null,
             expectedCreatedAt,
-            expectedUpdatedAt,
-            expectedVersion
+            expectedUpdatedAt
         );
 
         // When
@@ -155,7 +147,6 @@ class GroupInvitationTest {
         assertThat(invitation.respondedAt()).isNotNull();
         assertThat(invitation.createdAt()).isEqualTo(expectedCreatedAt);
         assertThat(invitation.updatedAt()).isNotNull();
-        assertThat(invitation.version()).isEqualTo(expectedVersion);
     }
 
     @Test
@@ -167,7 +158,6 @@ class GroupInvitationTest {
         UserId expectedInvitedUserId = new UserId(200L);
         UserId expectedInvitedByUserId = new UserId(300L);
         LocalDateTime expectedDateTime = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
-        Integer expectedVersion = 1;
 
         GroupInvitation pendingInvitation = new GroupInvitation(
             expectedId1,
@@ -178,8 +168,7 @@ class GroupInvitationTest {
             expectedDateTime,
             null,
             expectedDateTime,
-            expectedDateTime,
-            expectedVersion
+            expectedDateTime
         );
 
         GroupInvitation acceptedInvitation = new GroupInvitation(
@@ -191,8 +180,7 @@ class GroupInvitationTest {
             expectedDateTime,
             expectedDateTime,
             expectedDateTime,
-            expectedDateTime,
-            expectedVersion
+            expectedDateTime
         );
 
         // When / Then
@@ -206,7 +194,6 @@ class GroupInvitationTest {
         assertThat(pendingInvitation.respondedAt()).isNull();
         assertThat(pendingInvitation.createdAt()).isEqualTo(expectedDateTime);
         assertThat(pendingInvitation.updatedAt()).isEqualTo(expectedDateTime);
-        assertThat(pendingInvitation.version()).isEqualTo(expectedVersion);
 
         assertThat(acceptedInvitation.isPending()).isFalse();
         assertThat(acceptedInvitation.id()).isEqualTo(expectedId2);
@@ -218,7 +205,6 @@ class GroupInvitationTest {
         assertThat(acceptedInvitation.respondedAt()).isEqualTo(expectedDateTime);
         assertThat(acceptedInvitation.createdAt()).isEqualTo(expectedDateTime);
         assertThat(acceptedInvitation.updatedAt()).isEqualTo(expectedDateTime);
-        assertThat(acceptedInvitation.version()).isEqualTo(expectedVersion);
     }
 
     @Test
@@ -230,7 +216,6 @@ class GroupInvitationTest {
         UserId expectedInvitedUserId = new UserId(200L);
         UserId expectedInvitedByUserId = new UserId(300L);
         LocalDateTime expectedDateTime = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
-        Integer expectedVersion = 1;
 
         GroupInvitation pendingInvitation = new GroupInvitation(
             expectedId1,
@@ -241,8 +226,7 @@ class GroupInvitationTest {
             expectedDateTime,
             null,
             expectedDateTime,
-            expectedDateTime,
-            expectedVersion
+            expectedDateTime
         );
 
         GroupInvitation acceptedInvitation = new GroupInvitation(
@@ -254,8 +238,7 @@ class GroupInvitationTest {
             expectedDateTime,
             expectedDateTime,
             expectedDateTime,
-            expectedDateTime,
-            expectedVersion
+            expectedDateTime
         );
 
         // When / Then
@@ -269,7 +252,6 @@ class GroupInvitationTest {
         assertThat(pendingInvitation.respondedAt()).isNull();
         assertThat(pendingInvitation.createdAt()).isEqualTo(expectedDateTime);
         assertThat(pendingInvitation.updatedAt()).isEqualTo(expectedDateTime);
-        assertThat(pendingInvitation.version()).isEqualTo(expectedVersion);
 
         assertThat(acceptedInvitation.canRespond()).isFalse();
         assertThat(acceptedInvitation.id()).isEqualTo(expectedId2);
@@ -281,7 +263,6 @@ class GroupInvitationTest {
         assertThat(acceptedInvitation.respondedAt()).isEqualTo(expectedDateTime);
         assertThat(acceptedInvitation.createdAt()).isEqualTo(expectedDateTime);
         assertThat(acceptedInvitation.updatedAt()).isEqualTo(expectedDateTime);
-        assertThat(acceptedInvitation.version()).isEqualTo(expectedVersion);
     }
 
     @Test
@@ -293,7 +274,6 @@ class GroupInvitationTest {
         UserId expectedInvitedUserId = new UserId(200L);
         UserId expectedInvitedByUserId = new UserId(300L);
         LocalDateTime expectedDateTime = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
-        Integer expectedVersion = 1;
 
         GroupInvitation invitation = new GroupInvitation(
             expectedId,
@@ -304,8 +284,7 @@ class GroupInvitationTest {
             expectedDateTime,
             null,
             expectedDateTime,
-            expectedDateTime,
-            expectedVersion
+            expectedDateTime
         );
 
         // When / Then
@@ -320,6 +299,5 @@ class GroupInvitationTest {
         assertThat(invitation.respondedAt()).isNull();
         assertThat(invitation.createdAt()).isEqualTo(expectedDateTime);
         assertThat(invitation.updatedAt()).isEqualTo(expectedDateTime);
-        assertThat(invitation.version()).isEqualTo(expectedVersion);
     }
 }

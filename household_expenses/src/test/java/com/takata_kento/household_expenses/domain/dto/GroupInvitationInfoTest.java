@@ -30,8 +30,7 @@ class GroupInvitationInfoTest {
             now,
             null,
             now,
-            now,
-            null
+            now
         );
 
         // When
