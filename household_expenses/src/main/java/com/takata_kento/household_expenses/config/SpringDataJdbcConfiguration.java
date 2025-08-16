@@ -1,10 +1,12 @@
 package com.takata_kento.household_expenses.config;
 
+import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
@@ -24,7 +26,11 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new UsernameToStringConverter(),
             new StringToUsernameConverter(),
             new UserGroupIdToLongConverter(),
-            new LongToUserGroupIdConverter()
+            new LongToUserGroupIdConverter(),
+            new GroupInvitationIdToLongConverter(),
+            new LongToGroupInvitationIdConverter(),
+            new OptionalUserGroupIdToLongConverter(),
+            new LongToOptionalUserGroupIdConverter()
         );
     }
 
@@ -79,6 +85,42 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public UserGroupId convert(@NonNull Long source) {
             return new UserGroupId(source);
+        }
+    }
+
+    @WritingConverter
+    static class GroupInvitationIdToLongConverter implements Converter<GroupInvitationId, Long> {
+
+        @Override
+        public Long convert(@NonNull GroupInvitationId source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class LongToGroupInvitationIdConverter implements Converter<Long, GroupInvitationId> {
+
+        @Override
+        public GroupInvitationId convert(@NonNull Long source) {
+            return new GroupInvitationId(source);
+        }
+    }
+
+    @WritingConverter
+    static class OptionalUserGroupIdToLongConverter implements Converter<Optional<UserGroupId>, Long> {
+
+        @Override
+        public Long convert(@NonNull Optional<UserGroupId> source) {
+            return source.map(UserGroupId::value).orElse(null);
+        }
+    }
+
+    @ReadingConverter
+    static class LongToOptionalUserGroupIdConverter implements Converter<Long, Optional<UserGroupId>> {
+
+        @Override
+        public Optional<UserGroupId> convert(@NonNull Long source) {
+            return source != null ? Optional.of(new UserGroupId(source)) : Optional.empty();
         }
     }
 }

@@ -40,12 +40,11 @@ CREATE TABLE group_invitation (
     user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     invited_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     invited_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED')),
     invited_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     responded_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    version INTEGER DEFAULT 0,
     UNIQUE (user_group_id, invited_user_id)
 );
 

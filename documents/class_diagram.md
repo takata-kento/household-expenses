@@ -5,21 +5,19 @@ classDiagram
     %% エンティティクラス
     class User {
         -UserId id
-        -Username username
+        -Username name
         -UserGroupId userGroupId
-        -List~GroupInvitation~ receivedInvitations
+        -Set~GroupInvitation~ receivedInvitations
         -Integer version
-        +create(GroupName) UserGroupId
-        +join(UserGroupId) void
         +leaveGroup() void
         +canCreateGroup() boolean
-        +canJoinGroup(UserGroupId) boolean
         +canLeaveGroup() boolean
-        +invite(UserId, UserGroupId) GroupInvitationId
+        +invite(User) GroupInvitationId
+        +addInvitation(GroupInvitation) void
         +canInvite(UserId) boolean
         +accept(GroupInvitationId) void
         +reject(GroupInvitationId) void
-        +getPendingInvitations() List~GroupInvitationInfo~
+        +getPendingInvitations() Set~GroupInvitationInfo~
     }
 
     class UserGroup {
@@ -30,6 +28,7 @@ classDiagram
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
         -Integer version
+        +create(GroupName) UserGroupId
         +updateGroupName(GroupName) void
         +updateMonthStartDay(Day) void
         +canBeModifiedBy(UserId) boolean
@@ -45,7 +44,6 @@ classDiagram
         -LocalDateTime respondedAt
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
-        -Integer version
         +accept() void
         +reject() void
         +canRespond() boolean
