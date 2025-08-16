@@ -2,6 +2,8 @@ package com.takata_kento.household_expenses.domain;
 
 import com.takata_kento.household_expenses.domain.valueobject.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -59,7 +61,7 @@ public class GroupInvitation {
 
     public static GroupInvitation create(UserGroupId userGroupId, UserId invitedUserId, UserId invitedByUserId) {
         LocalDateTime now = LocalDateTime.now();
-        Long invitationId = Long.parseLong(String.valueOf(userGroupId.value()) + String.valueOf(invitedUserId.value()));
+        Long invitationId = Math.abs(UUID.randomUUID().getLeastSignificantBits());
         GroupInvitationId id = new GroupInvitationId(invitationId);
         return new GroupInvitation(
             id,

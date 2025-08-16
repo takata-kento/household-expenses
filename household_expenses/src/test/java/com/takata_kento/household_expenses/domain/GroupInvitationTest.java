@@ -52,7 +52,6 @@ class GroupInvitationTest {
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserId expectedInvitedUserId = new UserId(200L);
         UserId expectedInvitedByUserId = new UserId(300L);
-        GroupInvitationId expectedInvitationId = new GroupInvitationId(100200L);
 
         // When
         GroupInvitation actual = GroupInvitation.create(
@@ -62,7 +61,7 @@ class GroupInvitationTest {
         );
 
         // Then
-        assertThat(actual.id()).isEqualTo(expectedInvitationId);
+        assertThat(actual.id()).isNotNull();
         assertThat(actual.userGroupId()).isEqualTo(expectedUserGroupId);
         assertThat(actual.invitedUserId()).isEqualTo(expectedInvitedUserId);
         assertThat(actual.invitedByUserId()).isEqualTo(expectedInvitedByUserId);
