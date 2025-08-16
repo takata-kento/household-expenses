@@ -107,7 +107,6 @@ class UserRepositoryTest {
                     responded_at TIMESTAMP WITH TIME ZONE,
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP WITH TIME ZONE,
-                    version INTEGER DEFAULT 0,
                     UNIQUE (user_group_id, invited_user_id)
                 )
                 """
@@ -306,9 +305,9 @@ class UserRepositoryTest {
         // 招待データを挿入
         jdbcClient
             .sql(
-                "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status, version) VALUES (?, ?, ?, ?, ?, ?)"
+                "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)"
             )
-            .params(invitationId, userGroupId, expectedId, inviterUserId, "PENDING", 0)
+            .params(invitationId, userGroupId, expectedId, inviterUserId, "PENDING")
             .update();
 
         // When
@@ -398,5 +397,92 @@ class UserRepositoryTest {
             .optional()
             .orElse(null);
         assertThat(userGroupIdFromDb).isNull();
+    }
+
+    @Test
+    void testInviteUserAndSave() {
+        // Given
+        long inviterUserId = 9L;
+        long inviteeUserId = 10L;
+        long userGroupId = 500L;
+        String inviterUsername = "inviter";
+        String inviteeUsername = "invitee";
+
+        // user_groupデータを挿入
+        jdbcClient
+            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
+            .params(userGroupId, "Test Group 5", 1, 1)
+            .update();
+
+        // 招待者（グループに所属）を挿入
+        jdbcClient
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
+            .params(inviterUserId, inviterUsername, "dummy_hash", userGroupId, true, 1)
+            .update();
+
+        // 招待を受ける側（グループに未所属）を挿入
+        jdbcClient
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
+            .params(inviteeUserId, inviteeUsername, "dummy_hash", null, true, 1)
+            .update();
+
+        // When
+        Optional<User> inviterOptional = userRepository.findById(new UserId(inviterUserId));
+        Optional<User> inviteeOptional = userRepository.findById(new UserId(inviteeUserId));
+
+        assertThat(inviterOptional).isPresent();
+        assertThat(inviteeOptional).isPresent();
+
+        User inviter = inviterOptional.get();
+        User invitee = inviteeOptional.get();
+
+        // 招待前の状態確認
+        assertThat(inviter.isBelongsToGroup()).isTrue();
+        assertThat(invitee.isBelongsToGroup()).isFalse();
+        assertThat(invitee.receivedInvitations()).isEmpty();
+
+        // 招待実行
+        GroupInvitationId invitationId = inviter.invite(invitee);
+
+        // 招待されたユーザーの状態を永続化
+        userRepository.save(invitee);
+
+        // Then
+        // 永続化後の招待されたユーザーの状態確認
+        Optional<User> savedInviteeOptional = userRepository.findById(new UserId(inviteeUserId));
+        assertThat(savedInviteeOptional).isPresent();
+
+        User savedInvitee = savedInviteeOptional.get();
+        assertThat(savedInvitee.isBelongsToGroup()).isFalse(); // まだグループに所属していない
+
+        Set<GroupInvitationInfo> receivedInvitations = savedInvitee.receivedInvitations();
+        assertThat(receivedInvitations).hasSize(1);
+
+        GroupInvitationInfo invitation = receivedInvitations.iterator().next();
+        assertThat(invitation.userGroupId()).isEqualTo(new UserGroupId(userGroupId));
+        assertThat(invitation.invitedByUserId()).isEqualTo(new UserId(inviterUserId));
+
+        // DBから直接確認
+        Integer invitationCount = jdbcClient
+            .sql(
+                "SELECT COUNT(*) FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
+            )
+            .params(invitationId.value(), inviteeUserId, inviterUserId, userGroupId)
+            .query(Integer.class)
+            .single();
+        assertThat(invitationCount).isEqualTo(1);
+
+        String status = jdbcClient
+            .sql(
+                "SELECT status FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
+            )
+            .params(invitationId.value(), inviteeUserId, inviterUserId, userGroupId)
+            .query(String.class)
+            .single();
+        assertThat(status).isEqualTo("PENDING");
     }
 }
