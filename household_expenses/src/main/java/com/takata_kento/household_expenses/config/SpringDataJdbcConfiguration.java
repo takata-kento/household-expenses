@@ -1,6 +1,8 @@
 package com.takata_kento.household_expenses.config;
 
+import com.takata_kento.household_expenses.domain.valueobject.Day;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
+import com.takata_kento.household_expenses.domain.valueobject.GroupName;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
@@ -30,7 +32,11 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new GroupInvitationIdToLongConverter(),
             new LongToGroupInvitationIdConverter(),
             new OptionalUserGroupIdToLongConverter(),
-            new LongToOptionalUserGroupIdConverter()
+            new LongToOptionalUserGroupIdConverter(),
+            new GroupNameToStringConverter(),
+            new StringToGroupNameConverter(),
+            new DayToIntegerConverter(),
+            new IntegerToDayConverter()
         );
     }
 
@@ -121,6 +127,42 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public Optional<UserGroupId> convert(@NonNull Long source) {
             return source != null ? Optional.of(new UserGroupId(source)) : Optional.empty();
+        }
+    }
+
+    @WritingConverter
+    static class GroupNameToStringConverter implements Converter<GroupName, String> {
+
+        @Override
+        public String convert(@NonNull GroupName source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToGroupNameConverter implements Converter<String, GroupName> {
+
+        @Override
+        public GroupName convert(@NonNull String source) {
+            return new GroupName(source);
+        }
+    }
+
+    @WritingConverter
+    static class DayToIntegerConverter implements Converter<Day, Integer> {
+
+        @Override
+        public Integer convert(@NonNull Day source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class IntegerToDayConverter implements Converter<Integer, Day> {
+
+        @Override
+        public Day convert(@NonNull Integer source) {
+            return new Day(source);
         }
     }
 }
