@@ -485,4 +485,183 @@ class UserRepositoryTest {
             .single();
         assertThat(status).isEqualTo("PENDING");
     }
+
+    @Test
+    void testAcceptInvitationAndSave() {
+        // Given
+        long invitedUserId = 11L;
+        long inviterUserId = 12L;
+        long userGroupId = 600L;
+        long invitationId = 1L;
+        String invitedUsername = "inviteduser";
+        String inviterUsername = "inviteruser";
+
+        // user_groupデータを挿入
+        jdbcClient
+            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
+            .params(userGroupId, "Test Group 6", 1, 1)
+            .update();
+
+        // 招待者（グループに所属）を挿入
+        jdbcClient
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
+            .params(inviterUserId, inviterUsername, "dummy_hash", userGroupId, true, 1)
+            .update();
+
+        // 招待を受けるユーザー（グループに未所属）を挿入
+        jdbcClient
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
+            .params(invitedUserId, invitedUsername, "dummy_hash", null, true, 1)
+            .update();
+
+        // 招待データを挿入
+        jdbcClient
+            .sql(
+                "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)"
+            )
+            .params(invitationId, userGroupId, invitedUserId, inviterUserId, "PENDING")
+            .update();
+
+        // When
+        Optional<User> invitedUserOptional = userRepository.findById(new UserId(invitedUserId));
+        assertThat(invitedUserOptional).isPresent();
+
+        User invitedUser = invitedUserOptional.get();
+
+        // 招待承認前の状態確認
+        assertThat(invitedUser.isBelongsToGroup()).isFalse();
+        Set<GroupInvitationInfo> receivedInvitations = invitedUser.receivedInvitations();
+        assertThat(receivedInvitations).hasSize(1);
+
+        GroupInvitationInfo invitation = receivedInvitations.iterator().next();
+        assertThat(invitation.groupInvitationId()).isEqualTo(new GroupInvitationId(invitationId));
+
+        // 招待を承認
+        invitedUser.accept(new GroupInvitationId(invitationId));
+
+        // 承認したユーザーの状態を永続化
+        userRepository.save(invitedUser);
+
+        // Then
+        // 永続化後のユーザーの状態確認
+        Optional<User> savedInvitedUserOptional = userRepository.findById(new UserId(invitedUserId));
+        assertThat(savedInvitedUserOptional).isPresent();
+
+        User savedInvitedUser = savedInvitedUserOptional.get();
+        assertThat(savedInvitedUser.isBelongsToGroup()).isTrue(); // グループに所属
+        assertThat(savedInvitedUser.userGroupId()).isEqualTo(Optional.of(new UserGroupId(userGroupId)));
+
+        // DBから直接確認
+        Long userGroupIdFromDb = jdbcClient
+            .sql("SELECT user_group_id FROM users WHERE id = ?")
+            .param(invitedUserId)
+            .query(Long.class)
+            .single();
+        assertThat(userGroupIdFromDb).isEqualTo(userGroupId);
+
+        String statusFromDb = jdbcClient
+            .sql("SELECT status FROM group_invitation WHERE id = ?")
+            .param(invitationId)
+            .query(String.class)
+            .single();
+        assertThat(statusFromDb).isEqualTo("ACCEPTED");
+
+        Boolean respondedAtIsNotNull = jdbcClient
+            .sql("SELECT responded_at IS NOT NULL FROM group_invitation WHERE id = ?")
+            .param(invitationId)
+            .query(Boolean.class)
+            .single();
+        assertThat(respondedAtIsNotNull).isTrue();
+    }
+
+    @Test
+    void testRejectInvitationAndSave() {
+        // Given
+        long invitedUserId = 13L;
+        long inviterUserId = 14L;
+        long userGroupId = 700L;
+        long invitationId = 2L;
+        String invitedUsername = "rejectuser";
+        String inviterUsername = "inviteragain";
+
+        // user_groupデータを挿入
+        jdbcClient
+            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
+            .params(userGroupId, "Test Group 7", 1, 1)
+            .update();
+
+        // 招待者（グループに所属）を挿入
+        jdbcClient
+            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .params(inviterUserId, inviterUsername, "dummy_hash", userGroupId, true, 1)
+            .update();
+
+        // 招待を受けるユーザー（グループに未所属）を挿入
+        jdbcClient
+            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .params(invitedUserId, invitedUsername, "dummy_hash", null, true, 1)
+            .update();
+
+        // 招待データを挿入
+        jdbcClient
+            .sql("INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)")
+            .params(invitationId, userGroupId, invitedUserId, inviterUserId, "PENDING")
+            .update();
+
+        // When
+        Optional<User> invitedUserOptional = userRepository.findById(new UserId(invitedUserId));
+        assertThat(invitedUserOptional).isPresent();
+        
+        User invitedUser = invitedUserOptional.get();
+        
+        // 招待拒否前の状態確認
+        assertThat(invitedUser.isBelongsToGroup()).isFalse();
+        Set<GroupInvitationInfo> receivedInvitations = invitedUser.receivedInvitations();
+        assertThat(receivedInvitations).hasSize(1);
+        
+        GroupInvitationInfo invitation = receivedInvitations.iterator().next();
+        assertThat(invitation.groupInvitationId()).isEqualTo(new GroupInvitationId(invitationId));
+        
+        // 招待を拒否
+        invitedUser.reject(new GroupInvitationId(invitationId));
+        
+        // 拒否したユーザーの状態を永続化
+        userRepository.save(invitedUser);
+
+        // Then
+        // 永続化後のユーザーの状態確認
+        Optional<User> savedInvitedUserOptional = userRepository.findById(new UserId(invitedUserId));
+        assertThat(savedInvitedUserOptional).isPresent();
+        
+        User savedInvitedUser = savedInvitedUserOptional.get();
+        assertThat(savedInvitedUser.isBelongsToGroup()).isFalse(); // グループに所属していない
+        assertThat(savedInvitedUser.userGroupId()).isEqualTo(Optional.empty());
+        
+        // DBから直接確認
+        Long userGroupIdFromDb = jdbcClient
+            .sql("SELECT user_group_id FROM users WHERE id = ?")
+            .param(invitedUserId)
+            .query(Long.class)
+            .optional()
+            .orElse(null);
+        assertThat(userGroupIdFromDb).isNull();
+        
+        String statusFromDb = jdbcClient
+            .sql("SELECT status FROM group_invitation WHERE id = ?")
+            .param(invitationId)
+            .query(String.class)
+            .single();
+        assertThat(statusFromDb).isEqualTo("REJECTED");
+        
+        Boolean respondedAtIsNotNull = jdbcClient
+            .sql("SELECT responded_at IS NOT NULL FROM group_invitation WHERE id = ?")
+            .param(invitationId)
+            .query(Boolean.class)
+            .single();
+        assertThat(respondedAtIsNotNull).isTrue();
+    }
 }
