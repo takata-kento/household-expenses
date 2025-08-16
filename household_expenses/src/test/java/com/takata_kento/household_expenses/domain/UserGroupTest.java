@@ -51,12 +51,12 @@ class UserGroupTest {
         UserGroup actual = UserGroup.create(expectedGroupName, expectedMonthStartDay, expectedCreatedByUserId);
 
         // Then
-        assertThat(actual.id()).isNull();
+        assertThat(actual.id()).isNotNull();
         assertThat(actual.groupName()).isEqualTo(expectedGroupName);
         assertThat(actual.monthStartDay()).isEqualTo(expectedMonthStartDay);
         assertThat(actual.createdByUserId()).isEqualTo(expectedCreatedByUserId);
         assertThat(actual.createdAt()).isNotNull();
-        assertThat(actual.updatedAt()).isNotNull();
+        assertThat(actual.updatedAt()).isNull();
         assertThat(actual.version()).isNull();
     }
 
