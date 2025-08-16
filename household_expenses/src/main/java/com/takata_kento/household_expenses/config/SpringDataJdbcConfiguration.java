@@ -119,7 +119,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class LongToOptionalUserGroupIdConverter implements Converter<Long, Optional<UserGroupId>> {
 
         @Override
-        public Optional<UserGroupId> convert(Long source) {
+        public Optional<UserGroupId> convert(@NonNull Long source) {
             return source != null ? Optional.of(new UserGroupId(source)) : Optional.empty();
         }
     }
