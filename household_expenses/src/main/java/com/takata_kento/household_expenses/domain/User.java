@@ -97,14 +97,14 @@ public class User {
         return this.isBelongsToGroup() && !this.id.equals(inviteeUserId);
     }
 
-    public void invite(User invitee) {
+    public GroupInvitationId invite(User invitee) {
         if (!this.canInvite(invitee.id())) {
             throw new IllegalStateException("Cannot invite user");
         }
 
         GroupInvitation invitation = GroupInvitation.create(this.userGroupId.orElseThrow(), invitee.id(), this.id);
-
         invitee.addInvitation(invitation);
+        return invitation.id();
     }
 
     void addInvitation(GroupInvitation invitation) {
