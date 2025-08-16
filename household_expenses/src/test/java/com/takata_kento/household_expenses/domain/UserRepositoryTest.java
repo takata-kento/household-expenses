@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.takata_kento.household_expenses.domain.dto.GroupInvitationInfo;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
-import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
+import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
 import java.util.Optional;
 import java.util.Set;
@@ -50,7 +50,7 @@ class UserRepositoryTest {
         jdbcClient.sql("DROP TABLE IF EXISTS group_invitation CASCADE").update();
         jdbcClient.sql("DROP TABLE IF EXISTS users CASCADE").update();
         jdbcClient.sql("DROP TABLE IF EXISTS user_group CASCADE").update();
-        
+
         // user_groupテーブル作成（外部キー制約なし）
         jdbcClient
             .sql(
@@ -67,7 +67,7 @@ class UserRepositoryTest {
                 """
             )
             .update();
-        
+
         // usersテーブル作成
         jdbcClient
             .sql(
@@ -85,12 +85,14 @@ class UserRepositoryTest {
                 """
             )
             .update();
-        
+
         // user_groupのcreated_by_user_idに外部キー制約を追加
         jdbcClient
-            .sql("ALTER TABLE user_group ADD FOREIGN KEY (created_by_user_id) REFERENCES \"users\"(id) ON DELETE SET NULL")
+            .sql(
+                "ALTER TABLE user_group ADD FOREIGN KEY (created_by_user_id) REFERENCES \"users\"(id) ON DELETE SET NULL"
+            )
             .update();
-        
+
         // group_invitationテーブル作成
         jdbcClient
             .sql(
@@ -128,7 +130,9 @@ class UserRepositoryTest {
             .update();
 
         jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
             .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
             .update();
 
@@ -162,15 +166,17 @@ class UserRepositoryTest {
         String expectedUsername = "finduser";
         Long expectedUserGroupId = 200L;
         Username username = new Username(expectedUsername);
-        
+
         // user_groupデータを挿入
         jdbcClient
             .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
             .params(expectedUserGroupId, "Test Group 2", 1, 0)
             .update();
-            
+
         jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
             .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
             .update();
 
@@ -204,15 +210,17 @@ class UserRepositoryTest {
         String expectedUsername = "existsuser";
         Long expectedUserGroupId = 300L;
         Username username = new Username(expectedUsername);
-        
+
         // user_groupデータを挿入
         jdbcClient
             .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
             .params(expectedUserGroupId, "Test Group 3", 1, 0)
             .update();
-            
+
         jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
             .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
             .update();
 
@@ -244,7 +252,9 @@ class UserRepositoryTest {
         Long expectedUserGroupId = null;
         UserId userId = new UserId(expectedId);
         jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
             .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
             .update();
 
@@ -279,19 +289,25 @@ class UserRepositoryTest {
 
         // 招待者ユーザーを挿入
         jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
             .params(inviterUserId, "inviter", "dummy_hash", userGroupId, true, 0)
             .update();
 
         // 招待を受けるユーザーを挿入
         jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
             .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
             .update();
 
         // 招待データを挿入
         jdbcClient
-            .sql("INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .sql(
+                "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
             .params(invitationId, userGroupId, expectedId, inviterUserId, "PENDING", 0)
             .update();
 
@@ -303,10 +319,10 @@ class UserRepositoryTest {
         assertThat(actual.get().id()).isEqualTo(new UserId(expectedId));
         assertThat(actual.get().name()).isEqualTo(new Username(expectedUsername));
         assertThat(actual.get().isBelongsToGroup()).isFalse();
-        
+
         Set<GroupInvitationInfo> receivedInvitations = actual.get().receivedInvitations();
         assertThat(receivedInvitations).hasSize(1);
-        
+
         GroupInvitationInfo invitation = receivedInvitations.iterator().next();
         assertThat(invitation.groupInvitationId()).isEqualTo(new GroupInvitationId(invitationId));
         assertThat(invitation.userGroupId()).isEqualTo(new UserGroupId(userGroupId));
@@ -322,7 +338,9 @@ class UserRepositoryTest {
         UserId userId = new UserId(expectedId);
 
         jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)")
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
             .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
             .update();
 
@@ -333,5 +351,52 @@ class UserRepositoryTest {
         assertThat(actual).isPresent();
         Set<GroupInvitationInfo> receivedInvitations = actual.get().receivedInvitations();
         assertThat(receivedInvitations).isEmpty();
+    }
+
+    @Test
+    void testLeaveGroupAndSave() {
+        // Given
+        long expectedId = 8L;
+        String expectedUsername = "leavegroupuser";
+        Long expectedUserGroupId = 400L;
+        UserId userId = new UserId(expectedId);
+
+        // user_groupデータを挿入
+        jdbcClient
+            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
+            .params(expectedUserGroupId, "Test Group 4", 1, 1)
+            .update();
+
+        // グループに所属しているユーザーを挿入
+        jdbcClient
+            .sql(
+                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
+            )
+            .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 1)
+            .update();
+
+        // When
+        Optional<User> userOptional = userRepository.findById(userId);
+        assertThat(userOptional).isPresent();
+
+        User user = userOptional.get();
+        assertThat(user.isBelongsToGroup()).isTrue();
+
+        user.leaveGroup();
+        userRepository.save(user);
+
+        // Then
+        Optional<User> actualUser = userRepository.findById(userId);
+        assertThat(actualUser).isPresent();
+        assertThat(actualUser.get().isBelongsToGroup()).isFalse();
+
+        // DBから直接確認
+        Integer userGroupIdFromDb = jdbcClient
+            .sql("SELECT user_group_id FROM users WHERE id = ?")
+            .param(expectedId)
+            .query(Integer.class)
+            .optional()
+            .orElse(null);
+        assertThat(userGroupIdFromDb).isNull();
     }
 }
