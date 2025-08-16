@@ -2,6 +2,7 @@ package com.takata_kento.household_expenses.domain;
 
 import com.takata_kento.household_expenses.domain.valueobject.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
@@ -51,7 +52,8 @@ public class UserGroup {
 
     public static UserGroup create(GroupName groupName, Day monthStartDay, UserId createdByUserId) {
         LocalDateTime now = LocalDateTime.now();
-        return new UserGroup(null, groupName, monthStartDay, createdByUserId, now, now, null);
+        UserGroupId userGroupId = new UserGroupId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
+        return new UserGroup(userGroupId, groupName, monthStartDay, createdByUserId, now, null, null);
     }
 
     public UserGroupId id() {
