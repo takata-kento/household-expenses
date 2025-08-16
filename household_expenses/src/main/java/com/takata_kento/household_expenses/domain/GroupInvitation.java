@@ -3,7 +3,6 @@ package com.takata_kento.household_expenses.domain;
 import com.takata_kento.household_expenses.domain.valueobject.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
