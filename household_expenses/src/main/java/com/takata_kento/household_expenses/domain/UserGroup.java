@@ -15,7 +15,7 @@ public class UserGroup {
     private UserGroupId id;
 
     @Column("group_name")
-    private GroupName groupName;
+    private GroupName name;
 
     @Column("month_start_day")
     private Day monthStartDay;
@@ -34,7 +34,7 @@ public class UserGroup {
 
     public UserGroup(
         UserGroupId id,
-        GroupName groupName,
+        GroupName name,
         Day monthStartDay,
         UserId createdByUserId,
         LocalDateTime createdAt,
@@ -42,7 +42,7 @@ public class UserGroup {
         Integer version
     ) {
         this.id = id;
-        this.groupName = groupName;
+        this.name = name;
         this.monthStartDay = monthStartDay;
         this.createdByUserId = createdByUserId;
         this.createdAt = createdAt;
@@ -50,18 +50,18 @@ public class UserGroup {
         this.version = version;
     }
 
-    public static UserGroup create(GroupName groupName, Day monthStartDay, UserId createdByUserId) {
+    public static UserGroup create(GroupName name, Day monthStartDay, UserId createdByUserId) {
         LocalDateTime now = LocalDateTime.now();
         UserGroupId userGroupId = new UserGroupId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
-        return new UserGroup(userGroupId, groupName, monthStartDay, createdByUserId, now, null, null);
+        return new UserGroup(userGroupId, name, monthStartDay, createdByUserId, now, null, null);
     }
 
     public UserGroupId id() {
         return id;
     }
 
-    public GroupName groupName() {
-        return groupName;
+    public GroupName name() {
+        return name;
     }
 
     public Day monthStartDay() {
@@ -85,7 +85,7 @@ public class UserGroup {
     }
 
     public void updateGroupName(GroupName groupName) {
-        this.groupName = groupName;
+        this.name = groupName;
         this.updatedAt = LocalDateTime.now();
     }
 
