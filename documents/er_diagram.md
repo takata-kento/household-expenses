@@ -70,9 +70,10 @@ erDiagram
 
     %% 月次予算
     MONTHLY_BUDGET {
-        bigint user_group_id PK,FK
-        int year PK "年"
-        int month PK "月"
+        bigint id PK "予算ID"
+        bigint user_group_id FK
+        int year "年"
+        int month "月"
         integer budget_amount "予算額"
         bigint set_by_user_id FK
         timestamp created_at
