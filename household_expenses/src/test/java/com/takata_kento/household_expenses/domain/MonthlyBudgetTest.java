@@ -10,10 +10,10 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Year;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.Test;
 
 class MonthlyBudgetTest {
+
     // Basic Given
     final MonthlyBudgetId EXPECTED_ID = new MonthlyBudgetId(1L);
     final UserGroupId EXPECTED_USER_GROUP_ID = new UserGroupId(1L);
