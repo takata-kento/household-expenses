@@ -73,6 +73,7 @@ CREATE TABLE balance_edit_history (
 
 -- 月次予算テーブル
 CREATE TABLE monthly_budget (
+    id BIGSERIAL PRIMARY KEY,
     user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
@@ -81,7 +82,7 @@ CREATE TABLE monthly_budget (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     version INTEGER DEFAULT 0,
-    PRIMARY KEY (user_group_id, year, month)
+    UNIQUE (user_group_id, year, month)
 );
 
 -- 生活費分類テーブル

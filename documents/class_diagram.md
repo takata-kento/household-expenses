@@ -22,7 +22,7 @@ classDiagram
 
     class UserGroup {
         -UserGroupId id
-        -GroupName groupName
+        -GroupName name
         -Day monthStartDay
         -UserId createdByUserId
         -LocalDateTime createdAt
@@ -73,6 +73,7 @@ classDiagram
     }
 
     class MonthlyBudget {
+        -MonthlyBudgetId id
         -UserGroupId userGroupId
         -Year year
         -Month month
@@ -81,10 +82,10 @@ classDiagram
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
         -Integer version
+        +create(UserGroupId, Year, Month, Money, UserId) MonthlyBudget
         +updateBudgetAmount(Money, UserId) void
-        +validateBudgetAmount(Money) boolean
         +isCurrentMonth(LocalDate) boolean
-        +isBudgetSetBy(UserId) boolean
+        +isSetBy(UserId) boolean
         +calculateRemainingBudget(Money) Money
         +isOverBudget(Money) boolean
     }
@@ -377,6 +378,12 @@ classDiagram
         +value() long
     }
 
+    class MonthlyBudgetId {
+        <<record>>
+        -long value
+        +value() long
+    }
+
     %% Enumクラス
     class InvitationStatus {
         <<enumeration>>
@@ -630,6 +637,7 @@ classDiagram
     MonthlySaving o-- FinancialAccountId
     DailyGroupTransaction o-- UserGroupId
     DailyPersonalTransaction o-- UserId
+    MonthlyBudget o-- MonthlyBudgetId
     MonthlyBudget o-- UserGroupId
     MonthlyBudget o-- UserId
     MonthlyBudget o-- Year
