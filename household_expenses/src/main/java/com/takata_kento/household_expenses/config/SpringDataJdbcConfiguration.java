@@ -3,9 +3,13 @@ package com.takata_kento.household_expenses.config;
 import com.takata_kento.household_expenses.domain.valueobject.Day;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.GroupName;
+import com.takata_kento.household_expenses.domain.valueobject.Money;
+import com.takata_kento.household_expenses.domain.valueobject.Month;
+import com.takata_kento.household_expenses.domain.valueobject.MonthlyBudgetId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
+import com.takata_kento.household_expenses.domain.valueobject.Year;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +40,15 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new GroupNameToStringConverter(),
             new StringToGroupNameConverter(),
             new DayToIntegerConverter(),
-            new IntegerToDayConverter()
+            new IntegerToDayConverter(),
+            new MonthlyBudgetIdToLongConverter(),
+            new LongToMonthlyBudgetIdConverter(),
+            new YearToIntegerConverter(),
+            new IntegerToYearConverter(),
+            new MonthToIntegerConverter(),
+            new IntegerToMonthConverter(),
+            new MoneyToIntegerConverter(),
+            new IntegerToMoneyConverter()
         );
     }
 
@@ -163,6 +175,78 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public Day convert(@NonNull Integer source) {
             return new Day(source);
+        }
+    }
+
+    @WritingConverter
+    static class MonthlyBudgetIdToLongConverter implements Converter<MonthlyBudgetId, Long> {
+
+        @Override
+        public Long convert(@NonNull MonthlyBudgetId source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class LongToMonthlyBudgetIdConverter implements Converter<Long, MonthlyBudgetId> {
+
+        @Override
+        public MonthlyBudgetId convert(@NonNull Long source) {
+            return new MonthlyBudgetId(source);
+        }
+    }
+
+    @WritingConverter
+    static class YearToIntegerConverter implements Converter<Year, Integer> {
+
+        @Override
+        public Integer convert(@NonNull Year source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class IntegerToYearConverter implements Converter<Integer, Year> {
+
+        @Override
+        public Year convert(@NonNull Integer source) {
+            return new Year(source);
+        }
+    }
+
+    @WritingConverter
+    static class MonthToIntegerConverter implements Converter<Month, Integer> {
+
+        @Override
+        public Integer convert(@NonNull Month source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class IntegerToMonthConverter implements Converter<Integer, Month> {
+
+        @Override
+        public Month convert(@NonNull Integer source) {
+            return new Month(source);
+        }
+    }
+
+    @WritingConverter
+    static class MoneyToIntegerConverter implements Converter<Money, Integer> {
+
+        @Override
+        public Integer convert(@NonNull Money source) {
+            return source.amount();
+        }
+    }
+
+    @ReadingConverter
+    static class IntegerToMoneyConverter implements Converter<Integer, Money> {
+
+        @Override
+        public Money convert(@NonNull Integer source) {
+            return new Money(source);
         }
     }
 }
