@@ -199,6 +199,27 @@ class MonthlyBudgetRepositoryTest {
     }
 
     @Test
+    void testUpdate() {
+        // Given
+        MonthlyBudgetId monthlyBudgetId = new MonthlyBudgetId(1L);
+        Money newBudgetAmount = new Money(120000);
+
+        // When
+        MonthlyBudget monthlyBudget = monthlyBudgetRepository.findById(monthlyBudgetId).orElseThrow();
+        monthlyBudget.updateBudgetAmount(newBudgetAmount, monthlyBudget.setByUserId());
+        monthlyBudgetRepository.save(monthlyBudget);
+
+        // Then
+        // DBから直接確認
+        Integer budgetAmountFromDb = jdbcClient
+            .sql("SELECT budget_amount FROM monthly_budget WHERE id = ?")
+            .param(monthlyBudgetId.value())
+            .query(Integer.class)
+            .single();
+        assertThat(budgetAmountFromDb).isEqualTo(120000);
+    }
+
+    @Test
     void testFindById() {
         // Given
         MonthlyBudgetId expectedId = new MonthlyBudgetId(1L);
