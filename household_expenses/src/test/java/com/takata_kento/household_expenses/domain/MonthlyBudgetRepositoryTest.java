@@ -114,6 +114,35 @@ class MonthlyBudgetRepositoryTest {
                 """
             )
             .update();
+
+        // ユーザーを挿入
+        jdbcClient
+            .sql("INSERT INTO users (id, username, password_hash, enabled, version) VALUES (?, ?, ?, ?, ?)")
+            .params(1, "testuser", "dummy_hash", true, 1)
+            .update();
+
+        // ユーザーグループを挿入
+        jdbcClient
+            .sql(
+                "INSERT INTO user_group (id, group_name, month_start_day, created_by_user_id, version) VALUES (?, ?, ?, ?, ?)"
+            )
+            .params(1, "Test Group", 1, 1, 1)
+            .update();
+
+        // 月予算情報を挿入
+        jdbcClient
+            .sql(
+                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            )
+            .params(1, 1, 2024, 7, 100000, 1, LocalDateTime.of(2024, 7, 1, 10, 0, 0), 1)
+            .update();
+
+        jdbcClient
+            .sql(
+                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            )
+            .params(2, 1, 2024, 11, 95000, 1, LocalDateTime.of(2024, 7, 1, 10, 0, 0), 1)
+            .update();
     }
 
     @Test
@@ -124,20 +153,6 @@ class MonthlyBudgetRepositoryTest {
         int year = 2024;
         int month = 6;
         int budgetAmount = 100000;
-
-        // ユーザーを先に挿入
-        jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, enabled, version) VALUES (?, ?, ?, ?, ?)")
-            .params(setByUserId, "testuser", "dummy_hash", true, 1)
-            .update();
-
-        // ユーザーグループを挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO user_group (id, group_name, month_start_day, created_by_user_id, version) VALUES (?, ?, ?, ?, ?)"
-            )
-            .params(userGroupId, "Test Group", 1, setByUserId, 1)
-            .update();
 
         MonthlyBudget monthlyBudget = MonthlyBudget.create(
             new UserGroupId(userGroupId),
@@ -186,45 +201,15 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testFindById() {
         // Given
-        MonthlyBudgetId expectedId = new MonthlyBudgetId(2L);
-        UserGroupId expectedUserGroupId = new UserGroupId(2L);
+        MonthlyBudgetId expectedId = new MonthlyBudgetId(1L);
+        UserGroupId expectedUserGroupId = new UserGroupId(1L);
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);
-        Money expectedBudgetAmount = new Money(120000);
-        UserId expectedSetByUserId = new UserId(20L);
+        Money expectedBudgetAmount = new Money(100000);
+        UserId expectedSetByUserId = new UserId(1L);
         LocalDateTime expectedCreatedAt = LocalDateTime.of(2024, 7, 1, 10, 0, 0);
         LocalDateTime expectedUpdatedAt = null;
-        Integer expectedVersion = 0;
-
-        // ユーザーを先に挿入
-        jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, enabled, version) VALUES (?, ?, ?, ?, ?)")
-            .params(expectedSetByUserId.value(), "testuser2", "dummy_hash", true, 1)
-            .update();
-
-        // ユーザーグループを挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO user_group (id, group_name, month_start_day, created_by_user_id, version) VALUES (?, ?, ?, ?, ?)"
-            )
-            .params(expectedUserGroupId.value(), "テストグループ2", 1, expectedSetByUserId.value(), 1)
-            .update();
-
-        jdbcClient
-            .sql(
-                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            )
-            .params(
-                expectedId.value(),
-                expectedUserGroupId.value(),
-                expectedYear.value(),
-                expectedMonth.value(),
-                expectedBudgetAmount.amount(),
-                expectedSetByUserId.value(),
-                expectedCreatedAt,
-                expectedVersion
-            )
-            .update();
+        Integer expectedVersion = 1;
 
         // When
         Optional<MonthlyBudget> actualOptional = monthlyBudgetRepository.findById(expectedId);
@@ -246,45 +231,15 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testFindByUserGroupIdAndYearAndMonth() {
         // Given
-        MonthlyBudgetId expectedId = new MonthlyBudgetId(3L);
-        UserGroupId expectedUserGroupId = new UserGroupId(3L);
+        MonthlyBudgetId expectedId = new MonthlyBudgetId(1L);
+        UserGroupId expectedUserGroupId = new UserGroupId(1L);
         Year expectedYear = new Year(2024);
-        Month expectedMonth = new Month(8);
-        Money expectedBudgetAmount = new Money(150000);
-        UserId expectedSetByUserId = new UserId(30L);
-        LocalDateTime expectedCreatedAt = LocalDateTime.of(2024, 8, 1, 10, 0, 0);
+        Month expectedMonth = new Month(7);
+        Money expectedBudgetAmount = new Money(100000);
+        UserId expectedSetByUserId = new UserId(1L);
+        LocalDateTime expectedCreatedAt = LocalDateTime.of(2024, 7, 1, 10, 0, 0);
         LocalDateTime expectedUpdatedAt = null;
-        Integer expectedVersion = 0;
-
-        // ユーザーを先に挿入
-        jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, enabled, version) VALUES (?, ?, ?, ?, ?)")
-            .params(expectedSetByUserId.value(), "testuser3", "dummy_hash", true, 1)
-            .update();
-
-        // ユーザーグループを挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO user_group (id, group_name, month_start_day, created_by_user_id, version) VALUES (?, ?, ?, ?, ?)"
-            )
-            .params(expectedUserGroupId.value(), "テストグループ3", 1, expectedSetByUserId.value(), 1)
-            .update();
-
-        jdbcClient
-            .sql(
-                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            )
-            .params(
-                expectedId.value(),
-                expectedUserGroupId.value(),
-                expectedYear.value(),
-                expectedMonth.value(),
-                expectedBudgetAmount.amount(),
-                expectedSetByUserId.value(),
-                expectedCreatedAt,
-                expectedVersion
-            )
-            .update();
+        Integer expectedVersion = 1;
 
         // When
         Optional<MonthlyBudget> actualOptional = monthlyBudgetRepository.findByUserGroupIdAndYearAndMonth(
@@ -310,46 +265,12 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testExistsByUserGroupIdAndYearAndMonth() {
         // Given
-        MonthlyBudgetId expectedId = new MonthlyBudgetId(4L);
-        UserGroupId expectedUserGroupId = new UserGroupId(4L);
+        UserGroupId expectedUserGroupId = new UserGroupId(1L);
         Year expectedYear = new Year(2024);
-        Month expectedMonth = new Month(9);
-        Money expectedBudgetAmount = new Money(80000);
-        UserId expectedSetByUserId = new UserId(40L);
-        LocalDateTime expectedCreatedAt = LocalDateTime.of(2024, 9, 1, 10, 0, 0);
-        Integer expectedVersion = 0;
+        Month expectedMonth = new Month(7);
+
         boolean expectedExists = true;
         boolean expectedNotExists = false;
-
-        // ユーザーを先に挿入
-        jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, enabled, version) VALUES (?, ?, ?, ?, ?)")
-            .params(expectedSetByUserId.value(), "testuser4", "dummy_hash", true, 1)
-            .update();
-
-        // ユーザーグループを挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO user_group (id, group_name, month_start_day, created_by_user_id, version) VALUES (?, ?, ?, ?, ?)"
-            )
-            .params(expectedUserGroupId.value(), "テストグループ4", 1, expectedSetByUserId.value(), 1)
-            .update();
-
-        jdbcClient
-            .sql(
-                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            )
-            .params(
-                expectedId.value(),
-                expectedUserGroupId.value(),
-                expectedYear.value(),
-                expectedMonth.value(),
-                expectedBudgetAmount.amount(),
-                expectedSetByUserId.value(),
-                expectedCreatedAt,
-                expectedVersion
-            )
-            .update();
 
         // When
         boolean actualExists = monthlyBudgetRepository.existsByUserGroupIdAndYearAndMonth(
@@ -371,65 +292,8 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testFindByUserGroupId() {
         // Given
-        MonthlyBudgetId expectedId1 = new MonthlyBudgetId(5L);
-        MonthlyBudgetId expectedId2 = new MonthlyBudgetId(6L);
-        UserGroupId expectedUserGroupId = new UserGroupId(5L);
-        Year expectedYear1 = new Year(2024);
-        Month expectedMonth1 = new Month(10);
-        Year expectedYear2 = new Year(2024);
-        Month expectedMonth2 = new Month(11);
-        Money expectedBudgetAmount1 = new Money(90000);
-        Money expectedBudgetAmount2 = new Money(95000);
-        UserId expectedSetByUserId = new UserId(50L);
-        LocalDateTime expectedCreatedAt = LocalDateTime.of(2024, 10, 1, 10, 0, 0);
-        Integer expectedVersion = 0;
+        UserGroupId expectedUserGroupId = new UserGroupId(1L);
         int expectedListSize = 2;
-
-        // ユーザーを先に挿入
-        jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, enabled, version) VALUES (?, ?, ?, ?, ?)")
-            .params(expectedSetByUserId.value(), "testuser5", "dummy_hash", true, 1)
-            .update();
-
-        // ユーザーグループを挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO user_group (id, group_name, month_start_day, created_by_user_id, version) VALUES (?, ?, ?, ?, ?)"
-            )
-            .params(expectedUserGroupId.value(), "テストグループ5", 1, expectedSetByUserId.value(), 1)
-            .update();
-
-        jdbcClient
-            .sql(
-                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            )
-            .params(
-                expectedId1.value(),
-                expectedUserGroupId.value(),
-                expectedYear1.value(),
-                expectedMonth1.value(),
-                expectedBudgetAmount1.amount(),
-                expectedSetByUserId.value(),
-                expectedCreatedAt,
-                expectedVersion
-            )
-            .update();
-
-        jdbcClient
-            .sql(
-                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            )
-            .params(
-                expectedId2.value(),
-                expectedUserGroupId.value(),
-                expectedYear2.value(),
-                expectedMonth2.value(),
-                expectedBudgetAmount2.amount(),
-                expectedSetByUserId.value(),
-                expectedCreatedAt,
-                expectedVersion
-            )
-            .update();
 
         // When
         List<MonthlyBudget> actualList = monthlyBudgetRepository.findByUserGroupId(expectedUserGroupId);
