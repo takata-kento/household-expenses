@@ -32,7 +32,7 @@ class UserGroupTest {
 
         // Then
         assertThat(actual.id()).isEqualTo(expectedId);
-        assertThat(actual.groupName()).isEqualTo(expectedGroupName);
+        assertThat(actual.name()).isEqualTo(expectedGroupName);
         assertThat(actual.monthStartDay()).isEqualTo(expectedMonthStartDay);
         assertThat(actual.createdByUserId()).isEqualTo(expectedCreatedByUserId);
         assertThat(actual.createdAt()).isEqualTo(expectedCreatedAt);
@@ -52,7 +52,7 @@ class UserGroupTest {
 
         // Then
         assertThat(actual.id()).isNotNull();
-        assertThat(actual.groupName()).isEqualTo(expectedGroupName);
+        assertThat(actual.name()).isEqualTo(expectedGroupName);
         assertThat(actual.monthStartDay()).isEqualTo(expectedMonthStartDay);
         assertThat(actual.createdByUserId()).isEqualTo(expectedCreatedByUserId);
         assertThat(actual.createdAt()).isNotNull();
@@ -78,7 +78,7 @@ class UserGroupTest {
         userGroup.updateGroupName(expectedNewGroupName);
 
         // Then
-        assertThat(userGroup.groupName()).isEqualTo(expectedNewGroupName);
+        assertThat(userGroup.name()).isEqualTo(expectedNewGroupName);
     }
 
     @Test

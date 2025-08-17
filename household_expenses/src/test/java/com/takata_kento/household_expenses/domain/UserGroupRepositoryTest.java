@@ -116,7 +116,7 @@ class UserGroupRepositoryTest {
 
         // Then
         assertThat(savedUserGroup.id()).isNotNull();
-        assertThat(savedUserGroup.groupName()).isEqualTo(new GroupName(groupName));
+        assertThat(savedUserGroup.name()).isEqualTo(new GroupName(groupName));
         assertThat(savedUserGroup.monthStartDay()).isEqualTo(new Day(monthStartDay));
         assertThat(savedUserGroup.createdByUserId()).isEqualTo(new UserId(createdByUserId));
         assertThat(savedUserGroup.createdAt()).isNotNull();
@@ -174,7 +174,7 @@ class UserGroupRepositoryTest {
         // Then
         assertThat(actual).isPresent();
         assertThat(actual.get().id()).isEqualTo(new UserGroupId(expectedId));
-        assertThat(actual.get().groupName()).isEqualTo(new GroupName(expectedGroupName));
+        assertThat(actual.get().name()).isEqualTo(new GroupName(expectedGroupName));
         assertThat(actual.get().monthStartDay()).isEqualTo(new Day(expectedMonthStartDay));
         assertThat(actual.get().createdByUserId()).isEqualTo(new UserId(expectedCreatedByUserId));
     }
@@ -208,7 +208,7 @@ class UserGroupRepositoryTest {
         // Then
         assertThat(actual).isPresent();
         assertThat(actual.get().id()).isEqualTo(new UserGroupId(expectedId));
-        assertThat(actual.get().groupName()).isEqualTo(new GroupName(expectedGroupName));
+        assertThat(actual.get().name()).isEqualTo(new GroupName(expectedGroupName));
     }
 
     @Test
@@ -278,7 +278,7 @@ class UserGroupRepositoryTest {
         // リポジトリから再取得して確認
         Optional<UserGroup> actualUserGroup = userGroupRepository.findById(new UserGroupId(userGroupId));
         assertThat(actualUserGroup).isPresent();
-        assertThat(actualUserGroup.get().groupName()).isEqualTo(new GroupName(updatedGroupName));
+        assertThat(actualUserGroup.get().name()).isEqualTo(new GroupName(updatedGroupName));
         assertThat(actualUserGroup.get().monthStartDay()).isEqualTo(new Day(updatedMonthStartDay));
         assertThat(actualUserGroup.get().updatedAt()).isNotNull();
 
