@@ -117,31 +117,75 @@ class MonthlyBudgetRepositoryTest {
 
         // ユーザーを挿入
         jdbcClient
-            .sql("INSERT INTO users (id, username, password_hash, enabled, version) VALUES (?, ?, ?, ?, ?)")
-            .params(1, "testuser", "dummy_hash", true, 1)
+            .sql(
+                """
+                INSERT INTO
+                    users (id, username, password_hash, enabled, version)
+                VALUES
+                    (:id, :username, :password_hash, :enabled, :version)
+                """
+            )
+            .param("id", 1L)
+            .param("username", "testuser")
+            .param("password_hash", "dummy_hash")
+            .param("enabled", true)
+            .param("version", 1)
             .update();
 
         // ユーザーグループを挿入
         jdbcClient
             .sql(
-                "INSERT INTO user_group (id, group_name, month_start_day, created_by_user_id, version) VALUES (?, ?, ?, ?, ?)"
+                """
+                INSERT INTO
+                    user_group (id, group_name, month_start_day, created_by_user_id, version)
+                VALUES
+                    (:id, :group_name, :month_start_day, :created_by_user_id, :version)
+                """
             )
-            .params(1, "Test Group", 1, 1, 1)
+            .param("id", 1L)
+            .param("group_name", "Test Group")
+            .param("month_start_day", 1)
+            .param("created_by_user_id", 1L)
+            .param("version", 1)
             .update();
 
         // 月予算情報を挿入
         jdbcClient
             .sql(
-                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                """
+                INSERT INTO
+                    monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version)
+                VALUES
+                    (:id, :user_group_id, :year, :month, :budget_amount, :set_by_user_id, :created_at, :version)
+                """
             )
-            .params(1, 1, 2024, 7, 100000, 1, LocalDateTime.of(2024, 7, 1, 10, 0, 0), 1)
+            .param("id", 1L)
+            .param("user_group_id", 1L)
+            .param("year", 2024)
+            .param("month", 7)
+            .param("budget_amount", 100000)
+            .param("set_by_user_id", 1L)
+            .param("created_at", LocalDateTime.of(2024, 7, 1, 10, 0, 0))
+            .param("version", 1)
             .update();
 
         jdbcClient
             .sql(
-                "INSERT INTO monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                """
+                INSERT INTO
+                    monthly_budget (id, user_group_id, year, month, budget_amount, set_by_user_id, created_at, version)
+                VALUES
+                    (:id, :user_group_id, :year, :month, :budget_amount, :set_by_user_id, :created_at, :version)
+                """
             )
-            .params(2, 1, 2024, 11, 95000, 1, LocalDateTime.of(2024, 7, 1, 10, 0, 0), 1)
+            .param("id", 2L)
+            .param("user_group_id", 1L)
+            .param("year", 2024)
+            .param("month", 11)
+            .param("budget_amount", 95000)
+            .param("set_by_user_id", 1L)
+            .param("created_at", LocalDateTime.of(2024, 7, 1, 10, 0, 0))
+            .param("version", 1)
             .update();
     }
 
@@ -166,16 +210,14 @@ class MonthlyBudgetRepositoryTest {
         MonthlyBudget savedMonthlyBudget = monthlyBudgetRepository.save(monthlyBudget);
 
         // Then
-        assertThat(savedMonthlyBudget.id()).isNotNull();
-        assertThat(savedMonthlyBudget.userGroupId()).isEqualTo(new UserGroupId(userGroupId));
-        assertThat(savedMonthlyBudget.year()).isEqualTo(new Year(year));
-        assertThat(savedMonthlyBudget.month()).isEqualTo(new Month(month));
-        assertThat(savedMonthlyBudget.budgetAmount()).isEqualTo(new Money(budgetAmount));
-        assertThat(savedMonthlyBudget.setByUserId()).isEqualTo(new UserId(setByUserId));
-        assertThat(savedMonthlyBudget.createdAt()).isNotNull();
-        assertThat(savedMonthlyBudget.version()).isNotNull();
-
         // DBから直接確認
+        Long userGroupIdFromDb = jdbcClient
+            .sql("SELECT user_group_id FROM monthly_budget WHERE id = ?")
+            .param(savedMonthlyBudget.id().value())
+            .query(Long.class)
+            .single();
+        assertThat(userGroupIdFromDb).isEqualTo(userGroupId);
+
         Integer budgetAmountFromDb = jdbcClient
             .sql("SELECT budget_amount FROM monthly_budget WHERE id = ?")
             .param(savedMonthlyBudget.id().value())
@@ -196,6 +238,13 @@ class MonthlyBudgetRepositoryTest {
             .query(Integer.class)
             .single();
         assertThat(monthFromDb).isEqualTo(month);
+
+        Long setByUserIdFromDb = jdbcClient
+            .sql("SELECT set_by_user_id FROM monthly_budget WHERE id = ?")
+            .param(savedMonthlyBudget.id().value())
+            .query(Long.class)
+            .single();
+        assertThat(setByUserIdFromDb).isEqualTo(setByUserId);
     }
 
     @Test

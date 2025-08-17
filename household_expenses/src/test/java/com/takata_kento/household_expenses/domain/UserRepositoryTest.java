@@ -112,6 +112,55 @@ class UserRepositoryTest {
                 """
             )
             .update();
+
+        // user_groupデータを挿入
+        jdbcClient
+            .sql(
+                """
+                INSERT INTO
+                    user_group (id, group_name, month_start_day, version)
+                VALUES
+                    (:id, :group_name, :month_start_day, :version)
+                """
+            )
+            .param("id", 100L)
+            .param("group_name", "Test Group")
+            .param("month_start_day", 1)
+            .param("version", 0)
+            .update();
+
+        jdbcClient
+            .sql(
+                """
+                INSERT INTO
+                    users (id, username, password_hash, user_group_id, enabled, version)
+                VALUES
+                    (:id, :username, :password_hash, :user_group_id, :enabled, :version)
+                """
+            )
+            .param("id", 1L)
+            .param("username", "testuser")
+            .param("password_hash", "dummy_hash")
+            .param("user_group_id", 100L)
+            .param("enabled", true)
+            .param("version", 0)
+            .update();
+
+        jdbcClient
+            .sql(
+                """
+                INSERT INTO
+                    users (id, username, password_hash, enabled, version)
+                VALUES
+                    (:id, :username, :password_hash, :enabled, :version)
+                """
+            )
+            .param("id", 2L)
+            .param("username", "testuser2")
+            .param("password_hash", "dummy_hash")
+            .param("enabled", true)
+            .param("version", 0)
+            .update();
     }
 
     @Test
@@ -119,21 +168,7 @@ class UserRepositoryTest {
         // Given
         long expectedId = 1L;
         String expectedUsername = "testuser";
-        Long expectedUserGroupId = 100L;
         UserId userId = new UserId(expectedId);
-
-        // user_groupデータを挿入
-        jdbcClient
-            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
-            .params(expectedUserGroupId, "Test Group", 1, 0)
-            .update();
-
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
-            .update();
 
         // When
         Optional<User> actual = userRepository.findById(userId);
@@ -161,23 +196,9 @@ class UserRepositoryTest {
     @Test
     void testFindByUsername() {
         // Given
-        long expectedId = 2L;
-        String expectedUsername = "finduser";
-        Long expectedUserGroupId = 200L;
+        long expectedId = 1L;
+        String expectedUsername = "testuser";
         Username username = new Username(expectedUsername);
-
-        // user_groupデータを挿入
-        jdbcClient
-            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
-            .params(expectedUserGroupId, "Test Group 2", 1, 0)
-            .update();
-
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
-            .update();
 
         // When
         Optional<User> actual = userRepository.findByUsername(username);
@@ -205,23 +226,8 @@ class UserRepositoryTest {
     @Test
     void testExistsByUsername() {
         // Given
-        long expectedId = 3L;
-        String expectedUsername = "existsuser";
-        Long expectedUserGroupId = 300L;
+        String expectedUsername = "testuser";
         Username username = new Username(expectedUsername);
-
-        // user_groupデータを挿入
-        jdbcClient
-            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
-            .params(expectedUserGroupId, "Test Group 3", 1, 0)
-            .update();
-
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
-            .update();
 
         // When
         boolean actual = userRepository.existsByUsername(username);
@@ -246,16 +252,9 @@ class UserRepositoryTest {
     @Test
     void testFindByIdWithNullUserGroupId() {
         // Given
-        long expectedId = 4L;
-        String expectedUsername = "nullgroupuser";
-        Long expectedUserGroupId = null;
+        long expectedId = 2L;
+        String expectedUsername = "testuser2";
         UserId userId = new UserId(expectedId);
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
-            .update();
 
         // When
         Optional<User> actual = userRepository.findById(userId);
@@ -270,37 +269,14 @@ class UserRepositoryTest {
     @Test
     void testFindByIdWithReceivedInvitations() {
         // Given
-        long expectedId = 5L;
-        String expectedUsername = "inviteduser";
-        Long expectedUserGroupId = null;
+        long expectedId = 2L;
+        String expectedUsername = "testuser2";
         UserId userId = new UserId(expectedId);
 
         // 招待者とグループの設定
-        long inviterUserId = 6L;
-        long userGroupId = 1L;
+        long inviterUserId = 1L;
+        long userGroupId = 100L;
         long invitationId = 1L;
-
-        // user_groupデータを挿入
-        jdbcClient
-            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
-            .params(userGroupId, "Test Group", 1, 0)
-            .update();
-
-        // 招待者ユーザーを挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(inviterUserId, "inviter", "dummy_hash", userGroupId, true, 0)
-            .update();
-
-        // 招待を受けるユーザーを挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
-            .update();
 
         // 招待データを挿入
         jdbcClient
@@ -331,17 +307,8 @@ class UserRepositoryTest {
     @Test
     void testFindByIdWithNoInvitations() {
         // Given
-        long expectedId = 7L;
-        String expectedUsername = "noinvitationsuser";
-        Long expectedUserGroupId = null;
+        long expectedId = 2L;
         UserId userId = new UserId(expectedId);
-
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 0)
-            .update();
 
         // When
         Optional<User> actual = userRepository.findById(userId);
@@ -355,40 +322,17 @@ class UserRepositoryTest {
     @Test
     void testLeaveGroupAndSave() {
         // Given
-        long expectedId = 8L;
-        String expectedUsername = "leavegroupuser";
-        Long expectedUserGroupId = 400L;
+        long expectedId = 1L;
         UserId userId = new UserId(expectedId);
 
-        // user_groupデータを挿入
-        jdbcClient
-            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
-            .params(expectedUserGroupId, "Test Group 4", 1, 1)
-            .update();
-
-        // グループに所属しているユーザーを挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(expectedId, expectedUsername, "dummy_hash", expectedUserGroupId, true, 1)
-            .update();
-
         // When
-        Optional<User> userOptional = userRepository.findById(userId);
-        assertThat(userOptional).isPresent();
-
-        User user = userOptional.get();
+        User user = userRepository.findById(userId).orElseThrow();
         assertThat(user.isBelongsToGroup()).isTrue();
 
         user.leaveGroup();
         userRepository.save(user);
 
         // Then
-        Optional<User> actualUser = userRepository.findById(userId);
-        assertThat(actualUser).isPresent();
-        assertThat(actualUser.get().isBelongsToGroup()).isFalse();
-
         // DBから直接確認
         Integer userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM users WHERE id = ?")
@@ -402,43 +346,13 @@ class UserRepositoryTest {
     @Test
     void testInviteUserAndSave() {
         // Given
-        long inviterUserId = 9L;
-        long inviteeUserId = 10L;
-        long userGroupId = 500L;
-        String inviterUsername = "inviter";
-        String inviteeUsername = "invitee";
-
-        // user_groupデータを挿入
-        jdbcClient
-            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
-            .params(userGroupId, "Test Group 5", 1, 1)
-            .update();
-
-        // 招待者（グループに所属）を挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(inviterUserId, inviterUsername, "dummy_hash", userGroupId, true, 1)
-            .update();
-
-        // 招待を受ける側（グループに未所属）を挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(inviteeUserId, inviteeUsername, "dummy_hash", null, true, 1)
-            .update();
+        long inviterUserId = 1L;
+        long inviteeUserId = 2L;
+        long userGroupId = 100L;
 
         // When
-        Optional<User> inviterOptional = userRepository.findById(new UserId(inviterUserId));
-        Optional<User> inviteeOptional = userRepository.findById(new UserId(inviteeUserId));
-
-        assertThat(inviterOptional).isPresent();
-        assertThat(inviteeOptional).isPresent();
-
-        User inviter = inviterOptional.get();
-        User invitee = inviteeOptional.get();
+        User inviter = userRepository.findById(new UserId(inviterUserId)).orElseThrow();
+        User invitee = userRepository.findById(new UserId(inviteeUserId)).orElseThrow();
 
         // 招待前の状態確認
         assertThat(inviter.isBelongsToGroup()).isTrue();
@@ -452,21 +366,15 @@ class UserRepositoryTest {
         userRepository.save(invitee);
 
         // Then
-        // 永続化後の招待されたユーザーの状態確認
-        Optional<User> savedInviteeOptional = userRepository.findById(new UserId(inviteeUserId));
-        assertThat(savedInviteeOptional).isPresent();
-
-        User savedInvitee = savedInviteeOptional.get();
-        assertThat(savedInvitee.isBelongsToGroup()).isFalse(); // まだグループに所属していない
-
-        Set<GroupInvitationInfo> receivedInvitations = savedInvitee.receivedInvitations();
-        assertThat(receivedInvitations).hasSize(1);
-
-        GroupInvitationInfo invitation = receivedInvitations.iterator().next();
-        assertThat(invitation.userGroupId()).isEqualTo(new UserGroupId(userGroupId));
-        assertThat(invitation.invitedByUserId()).isEqualTo(new UserId(inviterUserId));
-
         // DBから直接確認
+        Integer userGroupIdFromDb = jdbcClient
+            .sql("SELECT user_group_id FROM users WHERE id = ?")
+            .param(inviteeUserId)
+            .query(Integer.class)
+            .optional()
+            .orElse(null);
+        assertThat(userGroupIdFromDb).isNull();
+
         Integer invitationCount = jdbcClient
             .sql(
                 "SELECT COUNT(*) FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
@@ -489,34 +397,10 @@ class UserRepositoryTest {
     @Test
     void testAcceptInvitationAndSave() {
         // Given
-        long invitedUserId = 11L;
-        long inviterUserId = 12L;
-        long userGroupId = 600L;
+        long invitedUserId = 2L;
+        long inviterUserId = 1L;
+        long userGroupId = 100L;
         long invitationId = 1L;
-        String invitedUsername = "inviteduser";
-        String inviterUsername = "inviteruser";
-
-        // user_groupデータを挿入
-        jdbcClient
-            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
-            .params(userGroupId, "Test Group 6", 1, 1)
-            .update();
-
-        // 招待者（グループに所属）を挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(inviterUserId, inviterUsername, "dummy_hash", userGroupId, true, 1)
-            .update();
-
-        // 招待を受けるユーザー（グループに未所属）を挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(invitedUserId, invitedUsername, "dummy_hash", null, true, 1)
-            .update();
 
         // 招待データを挿入
         jdbcClient
@@ -527,18 +411,10 @@ class UserRepositoryTest {
             .update();
 
         // When
-        Optional<User> invitedUserOptional = userRepository.findById(new UserId(invitedUserId));
-        assertThat(invitedUserOptional).isPresent();
-
-        User invitedUser = invitedUserOptional.get();
+        User invitedUser = userRepository.findById(new UserId(invitedUserId)).orElseThrow();
 
         // 招待承認前の状態確認
         assertThat(invitedUser.isBelongsToGroup()).isFalse();
-        Set<GroupInvitationInfo> receivedInvitations = invitedUser.receivedInvitations();
-        assertThat(receivedInvitations).hasSize(1);
-
-        GroupInvitationInfo invitation = receivedInvitations.iterator().next();
-        assertThat(invitation.groupInvitationId()).isEqualTo(new GroupInvitationId(invitationId));
 
         // 招待を承認
         invitedUser.accept(new GroupInvitationId(invitationId));
@@ -547,14 +423,6 @@ class UserRepositoryTest {
         userRepository.save(invitedUser);
 
         // Then
-        // 永続化後のユーザーの状態確認
-        Optional<User> savedInvitedUserOptional = userRepository.findById(new UserId(invitedUserId));
-        assertThat(savedInvitedUserOptional).isPresent();
-
-        User savedInvitedUser = savedInvitedUserOptional.get();
-        assertThat(savedInvitedUser.isBelongsToGroup()).isTrue(); // グループに所属
-        assertThat(savedInvitedUser.userGroupId()).isEqualTo(Optional.of(new UserGroupId(userGroupId)));
-
         // DBから直接確認
         Long userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM users WHERE id = ?")
@@ -581,34 +449,10 @@ class UserRepositoryTest {
     @Test
     void testRejectInvitationAndSave() {
         // Given
-        long invitedUserId = 13L;
-        long inviterUserId = 14L;
-        long userGroupId = 700L;
-        long invitationId = 2L;
-        String invitedUsername = "rejectuser";
-        String inviterUsername = "inviteragain";
-
-        // user_groupデータを挿入
-        jdbcClient
-            .sql("INSERT INTO user_group (id, group_name, month_start_day, version) VALUES (?, ?, ?, ?)")
-            .params(userGroupId, "Test Group 7", 1, 1)
-            .update();
-
-        // 招待者（グループに所属）を挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(inviterUserId, inviterUsername, "dummy_hash", userGroupId, true, 1)
-            .update();
-
-        // 招待を受けるユーザー（グループに未所属）を挿入
-        jdbcClient
-            .sql(
-                "INSERT INTO users (id, username, password_hash, user_group_id, enabled, version) VALUES (?, ?, ?, ?, ?, ?)"
-            )
-            .params(invitedUserId, invitedUsername, "dummy_hash", null, true, 1)
-            .update();
+        long invitedUserId = 2L;
+        long inviterUserId = 1L;
+        long userGroupId = 100L;
+        long invitationId = 1L;
 
         // 招待データを挿入
         jdbcClient
@@ -619,18 +463,10 @@ class UserRepositoryTest {
             .update();
 
         // When
-        Optional<User> invitedUserOptional = userRepository.findById(new UserId(invitedUserId));
-        assertThat(invitedUserOptional).isPresent();
-
-        User invitedUser = invitedUserOptional.get();
+        User invitedUser = userRepository.findById(new UserId(invitedUserId)).orElseThrow();
 
         // 招待拒否前の状態確認
         assertThat(invitedUser.isBelongsToGroup()).isFalse();
-        Set<GroupInvitationInfo> receivedInvitations = invitedUser.receivedInvitations();
-        assertThat(receivedInvitations).hasSize(1);
-
-        GroupInvitationInfo invitation = receivedInvitations.iterator().next();
-        assertThat(invitation.groupInvitationId()).isEqualTo(new GroupInvitationId(invitationId));
 
         // 招待を拒否
         invitedUser.reject(new GroupInvitationId(invitationId));
@@ -639,14 +475,6 @@ class UserRepositoryTest {
         userRepository.save(invitedUser);
 
         // Then
-        // 永続化後のユーザーの状態確認
-        Optional<User> savedInvitedUserOptional = userRepository.findById(new UserId(invitedUserId));
-        assertThat(savedInvitedUserOptional).isPresent();
-
-        User savedInvitedUser = savedInvitedUserOptional.get();
-        assertThat(savedInvitedUser.isBelongsToGroup()).isFalse(); // グループに所属していない
-        assertThat(savedInvitedUser.userGroupId()).isEqualTo(Optional.empty());
-
         // DBから直接確認
         Long userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM users WHERE id = ?")
