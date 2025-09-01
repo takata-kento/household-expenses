@@ -1,8 +1,11 @@
 package com.takata_kento.household_expenses.config;
 
+import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.Day;
+import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.GroupName;
+import com.takata_kento.household_expenses.domain.valueobject.LivingExpenseCategoryId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
 import com.takata_kento.household_expenses.domain.valueobject.Month;
 import com.takata_kento.household_expenses.domain.valueobject.MonthlyBudgetId;
@@ -48,7 +51,13 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new MonthToIntegerConverter(),
             new IntegerToMonthConverter(),
             new MoneyToIntegerConverter(),
-            new IntegerToMoneyConverter()
+            new IntegerToMoneyConverter(),
+            new LivingExpenseCategoryIdToLongConverter(),
+            new LongToLivingExpenseCategoryIdConverter(),
+            new CategoryNameToStringConverter(),
+            new StringToCategoryNameConverter(),
+            new DescriptionToStringConverter(),
+            new StringToDescriptionConverter()
         );
     }
 
@@ -247,6 +256,60 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public Money convert(@NonNull Integer source) {
             return new Money(source);
+        }
+    }
+
+    @WritingConverter
+    static class LivingExpenseCategoryIdToLongConverter implements Converter<LivingExpenseCategoryId, Long> {
+
+        @Override
+        public Long convert(@NonNull LivingExpenseCategoryId source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class LongToLivingExpenseCategoryIdConverter implements Converter<Long, LivingExpenseCategoryId> {
+
+        @Override
+        public LivingExpenseCategoryId convert(@NonNull Long source) {
+            return new LivingExpenseCategoryId(source);
+        }
+    }
+
+    @WritingConverter
+    static class CategoryNameToStringConverter implements Converter<CategoryName, String> {
+
+        @Override
+        public String convert(@NonNull CategoryName source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToCategoryNameConverter implements Converter<String, CategoryName> {
+
+        @Override
+        public CategoryName convert(@NonNull String source) {
+            return new CategoryName(source);
+        }
+    }
+
+    @WritingConverter
+    static class DescriptionToStringConverter implements Converter<Description, String> {
+
+        @Override
+        public String convert(@NonNull Description source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToDescriptionConverter implements Converter<String, Description> {
+
+        @Override
+        public Description convert(@NonNull String source) {
+            return new Description(source);
         }
     }
 }
