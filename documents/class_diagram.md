@@ -97,12 +97,11 @@ classDiagram
         -Description description
         -Boolean isDefault
         -Integer version
+        +create(CategoryName, Description, UserGroupId) LivingExpenseCategory
         +updateCategoryName(CategoryName) void
         +updateDescription(Description) void
         +markAsDefault() void
         +unmarkAsDefault() void
-        +validateCategoryName(CategoryName) boolean
-        +isValidForUserGroup(UserGroupId) boolean
     }
 
     class DailyLivingExpense {
