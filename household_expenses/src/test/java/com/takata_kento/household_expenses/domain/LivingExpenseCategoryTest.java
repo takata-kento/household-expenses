@@ -6,20 +6,37 @@ import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.LivingExpenseCategoryId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class LivingExpenseCategoryTest {
 
-    @Test
-    void testConstructor() {
-        // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        CategoryName expectedCategoryName = new CategoryName("食費");
-        Description expectedDescription = new Description("食材・外食費");
-        Boolean expectedIsDefault = true;
-        Integer expectedVersion = 1;
+    static Stream<Arguments> provideLivingExpenseCategoryData() {
+        return Stream.of(
+            Arguments.of(
+                new LivingExpenseCategoryId(1L),
+                new UserGroupId(100L),
+                new CategoryName("食費"),
+                new Description("食材・外食費"),
+                true,
+                1
+            )
+        );
+    }
 
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testConstructor(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName expectedCategoryName,
+        Description expectedDescription,
+        Boolean expectedIsDefault,
+        Integer expectedVersion
+    ) {
         // When
         LivingExpenseCategory actual = new LivingExpenseCategory(
             expectedId,
@@ -39,15 +56,17 @@ class LivingExpenseCategoryTest {
         assertThat(actual.version()).isEqualTo(expectedVersion);
     }
 
-    @Test
-    void testId() {
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testId(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName expectedCategoryName,
+        Description expectedDescription,
+        Boolean expectedIsDefault,
+        Integer expectedVersion
+    ) {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        CategoryName expectedCategoryName = new CategoryName("食費");
-        Description expectedDescription = new Description("食材・外食費");
-        Boolean expectedIsDefault = true;
-        Integer expectedVersion = 1;
         LivingExpenseCategory category = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
@@ -69,15 +88,17 @@ class LivingExpenseCategoryTest {
         assertThat(category.version()).isEqualTo(expectedVersion);
     }
 
-    @Test
-    void testUserGroupId() {
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testUserGroupId(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName expectedCategoryName,
+        Description expectedDescription,
+        Boolean expectedIsDefault,
+        Integer expectedVersion
+    ) {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        CategoryName expectedCategoryName = new CategoryName("食費");
-        Description expectedDescription = new Description("食材・外食費");
-        Boolean expectedIsDefault = true;
-        Integer expectedVersion = 1;
         LivingExpenseCategory category = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
@@ -99,15 +120,17 @@ class LivingExpenseCategoryTest {
         assertThat(category.version()).isEqualTo(expectedVersion);
     }
 
-    @Test
-    void testCategoryName() {
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testCategoryName(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName expectedCategoryName,
+        Description expectedDescription,
+        Boolean expectedIsDefault,
+        Integer expectedVersion
+    ) {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        CategoryName expectedCategoryName = new CategoryName("食費");
-        Description expectedDescription = new Description("食材・外食費");
-        Boolean expectedIsDefault = true;
-        Integer expectedVersion = 1;
         LivingExpenseCategory category = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
@@ -129,15 +152,17 @@ class LivingExpenseCategoryTest {
         assertThat(category.version()).isEqualTo(expectedVersion);
     }
 
-    @Test
-    void testDescription() {
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testDescription(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName expectedCategoryName,
+        Description expectedDescription,
+        Boolean expectedIsDefault,
+        Integer expectedVersion
+    ) {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        CategoryName expectedCategoryName = new CategoryName("食費");
-        Description expectedDescription = new Description("食材・外食費");
-        Boolean expectedIsDefault = true;
-        Integer expectedVersion = 1;
         LivingExpenseCategory category = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
@@ -159,15 +184,17 @@ class LivingExpenseCategoryTest {
         assertThat(category.version()).isEqualTo(expectedVersion);
     }
 
-    @Test
-    void testIsDefault() {
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testIsDefault(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName expectedCategoryName,
+        Description expectedDescription,
+        Boolean expectedIsDefault,
+        Integer expectedVersion
+    ) {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        CategoryName expectedCategoryName = new CategoryName("食費");
-        Description expectedDescription = new Description("食材・外食費");
-        Boolean expectedIsDefault = true;
-        Integer expectedVersion = 1;
         LivingExpenseCategory category = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
@@ -189,18 +216,21 @@ class LivingExpenseCategoryTest {
         assertThat(category.version()).isEqualTo(expectedVersion);
     }
 
-    @Test
-    void testUpdateCategoryName() {
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testUpdateCategoryName(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName currentCategoryName,
+        Description expectedDescription,
+        Boolean expectedIsDefault,
+        Integer expectedVersion
+    ) {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        Description expectedDescription = new Description("元の説明");
-        Boolean expectedIsDefault = true;
-        Integer expectedVersion = 1;
         LivingExpenseCategory category = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
-            new CategoryName("元の分類名"),
+            currentCategoryName,
             expectedDescription,
             expectedIsDefault,
             expectedVersion
@@ -219,19 +249,22 @@ class LivingExpenseCategoryTest {
         assertThat(category.version()).isEqualTo(expectedVersion);
     }
 
-    @Test
-    void testUpdateDescription() {
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testUpdateDescription(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName expectedCategoryName,
+        Description currentDescription,
+        Boolean expectedIsDefault,
+        Integer expectedVersion
+    ) {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        CategoryName expectedCategoryName = new CategoryName("食費");
-        Boolean expectedIsDefault = true;
-        Integer expectedVersion = 1;
         LivingExpenseCategory category = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
             expectedCategoryName,
-            new Description("元の説明"),
+            currentDescription,
             expectedIsDefault,
             expectedVersion
         );
@@ -278,20 +311,23 @@ class LivingExpenseCategoryTest {
         assertThat(category.version()).isEqualTo(expectedVersion);
     }
 
-    @Test
-    void testUnmarkAsDefault() {
+    @ParameterizedTest
+    @MethodSource("provideLivingExpenseCategoryData")
+    void testUnmarkAsDefault(
+        LivingExpenseCategoryId expectedId,
+        UserGroupId expectedUserGroupId,
+        CategoryName expectedCategoryName,
+        Description expectedDescription,
+        Boolean currentIsDefault,
+        Integer expectedVersion
+    ) {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        CategoryName expectedCategoryName = new CategoryName("食費");
-        Description expectedDescription = new Description("食材・外食費");
-        Integer expectedVersion = 1;
         LivingExpenseCategory category = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
             expectedCategoryName,
             expectedDescription,
-            true, // 初期状態はデフォルト
+            currentIsDefault, // 初期状態はデフォルト
             expectedVersion
         );
 
