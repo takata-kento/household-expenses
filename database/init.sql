@@ -97,46 +97,31 @@ CREATE TABLE living_expense_category (
     version INTEGER DEFAULT 0
 );
 
--- 日次収支テーブル
-CREATE TABLE daily_transaction (
-    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    transaction_date DATE NOT NULL,
-    income INTEGER NOT NULL DEFAULT 0,
-    total_expense INTEGER NOT NULL DEFAULT 0,
-    personal_expense INTEGER NOT NULL DEFAULT 0,
-    financial_account_id BIGINT NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE,
-    version INTEGER DEFAULT 0,
-    PRIMARY KEY (user_id, transaction_date)
-);
 
 -- 日次生活費テーブル
 CREATE TABLE daily_living_expense (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    transaction_date DATE NOT NULL,
+    user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     living_expense_category_id BIGINT NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
+    transaction_date DATE NOT NULL,
     amount INTEGER NOT NULL,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    version INTEGER DEFAULT 0,
-    FOREIGN KEY (user_id, transaction_date) REFERENCES daily_transaction(user_id, transaction_date) ON DELETE CASCADE
+    version INTEGER DEFAULT 0
 );
 
 -- 日次個人支出テーブル
 CREATE TABLE daily_personal_expense (
+    id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     transaction_date DATE NOT NULL,
-    sequence_no INTEGER NOT NULL,
     amount INTEGER NOT NULL,
-    description TEXT NOT NULL,
+    description VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
-    version INTEGER DEFAULT 0,
-    PRIMARY KEY (user_id, transaction_date, sequence_no),
-    FOREIGN KEY (user_id, transaction_date) REFERENCES daily_transaction(user_id, transaction_date) ON DELETE CASCADE
+    version INTEGER DEFAULT 0
 );
 
 -- 日次予算残高テーブル
@@ -196,7 +181,6 @@ CREATE INDEX idx_user_username ON "users"(username);
 CREATE INDEX idx_user_group_id ON "users"(user_group_id);
 CREATE INDEX idx_financial_account_user_id ON financial_account(user_id);
 CREATE INDEX idx_financial_account_main ON financial_account(user_id, is_main_account) WHERE is_main_account = TRUE;
-CREATE INDEX idx_daily_transaction_date ON daily_transaction(transaction_date);
 CREATE INDEX idx_daily_living_expense_date ON daily_living_expense(transaction_date);
 CREATE INDEX idx_daily_personal_expense_date ON daily_personal_expense(transaction_date);
 CREATE INDEX idx_daily_budget_balance_date ON daily_budget_balance(transaction_date);
@@ -220,7 +204,6 @@ CREATE TRIGGER update_group_invitation_updated_at BEFORE UPDATE ON group_invitat
 CREATE TRIGGER update_financial_account_updated_at BEFORE UPDATE ON financial_account FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_monthly_budget_updated_at BEFORE UPDATE ON monthly_budget FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_living_expense_category_updated_at BEFORE UPDATE ON living_expense_category FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_daily_transaction_updated_at BEFORE UPDATE ON daily_transaction FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_daily_living_expense_updated_at BEFORE UPDATE ON daily_living_expense FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_daily_personal_expense_updated_at BEFORE UPDATE ON daily_personal_expense FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_daily_budget_balance_updated_at BEFORE UPDATE ON daily_budget_balance FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
