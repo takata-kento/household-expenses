@@ -107,45 +107,27 @@ classDiagram
     class DailyLivingExpense {
         -DailyLivingExpenseId id
         -UserId userId
-        -LocalDate transactionDate
+        -UserGroupId userGroupId
         -LivingExpenseCategoryId livingExpenseCategoryId
+        -LocalDate transactionDate
         -Money amount
         -Description memo
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
         -Integer version
+        +of(UserId, UserGroupId, LivingExpenseCategoryId, LocalDate, Money, Description) DailyLivingExpense
     }
 
     class DailyPersonalExpense {
+        -DailyLivingExpenseId id
         -UserId userId
         -LocalDate transactionDate
-        -SequenceNumber sequenceNo
         -Money amount
         -Description description
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
         -Integer version
-    }
-
-    class DailyGroupTransaction {
-        -UserGroupId userGroupId
-        -LocalDate transactionDate
-        -List~DailyLivingExpense~ livingExpenses
-        -Money totalLivingExpense
-        -Money budgetBalance
-        -Integer version
-        +addLivingExpense(UserId, LivingExpenseCategoryId, Money, Description) void
-        +calculateTotalLivingExpense() Money
-        +updateBudgetBalance(Money) void
-        +getPersonalShareOfLivingExpense(int) Money
-    }
-
-    class DailyPersonalTransaction {
-        -UserId userId
-        -LocalDate transactionDate
-        -Money income
-        -Money totalExpense
-        -List~DailyPersonalExpense~ personalExpenses
-        -Integer version
-        +addPersonalExpense(Money, Description) void
-        +calculateTotalExpense(Money) void
-        +getTotalPersonalExpense() Money
+        +of(UserId, LocalDate, Money, Description) DailyLivingExpense
     }
 
     class FixedExpenseCategory {
@@ -676,9 +658,6 @@ classDiagram
     User o-- GroupInvitation
 
     FinancialAccount o-- BalanceEditHistory
-
-    DailyGroupTransaction o-- DailyLivingExpense
-    DailyPersonalTransaction o-- DailyPersonalExpense
 
     %% サービス層の依存関係
     UserController ..> UserService
