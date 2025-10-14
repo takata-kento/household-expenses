@@ -119,7 +119,7 @@ classDiagram
     }
 
     class DailyPersonalExpense {
-        -DailyLivingExpenseId id
+        -DailyPersonalExpenseId id
         -UserId userId
         -LocalDate transactionDate
         -Money amount
@@ -127,7 +127,7 @@ classDiagram
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
         -Integer version
-        +of(UserId, LocalDate, Money, Description) DailyLivingExpense
+        +of(UserId, LocalDate, Money, Description) DailyPersonalExpense
     }
 
     class FixedExpenseCategory {
@@ -348,6 +348,12 @@ classDiagram
     }
 
     class DailyLivingExpenseId {
+        <<record>>
+        -long value
+        +value() long
+    }
+
+    class DailyPersonalExpenseId {
         <<record>>
         -long value
         +value() long
@@ -634,8 +640,8 @@ classDiagram
     DailyLivingExpense o-- LivingExpenseCategoryId
     DailyLivingExpense o-- Money
     DailyLivingExpense o-- Description
+    DailyPersonalExpense o-- DailyPersonalExpenseId
     DailyPersonalExpense o-- UserId
-    DailyPersonalExpense o-- SequenceNumber
     DailyPersonalExpense o-- Money
     DailyPersonalExpense o-- Description
     FixedExpenseCategory o-- FixedExpenseCategoryId
