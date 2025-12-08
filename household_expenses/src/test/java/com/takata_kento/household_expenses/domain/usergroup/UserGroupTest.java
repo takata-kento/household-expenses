@@ -1,4 +1,4 @@
-package com.takata_kento.household_expenses.domain;
+package com.takata_kento.household_expenses.domain.usergroup;
 
 import static org.assertj.core.api.Assertions.*;
 

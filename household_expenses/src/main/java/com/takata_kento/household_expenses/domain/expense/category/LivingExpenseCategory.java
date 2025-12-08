@@ -1,4 +1,4 @@
-package com.takata_kento.household_expenses.domain;
+package com.takata_kento.household_expenses.domain.expense.category;
 
 import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
