@@ -1,4 +1,4 @@
-package com.takata_kento.household_expenses.domain;
+package com.takata_kento.household_expenses.domain.usergroup;
 
 import com.takata_kento.household_expenses.domain.valueobject.*;
 import java.time.LocalDateTime;
