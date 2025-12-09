@@ -21,13 +21,11 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
-import org.springframework.lang.NonNull;
 
 @Configuration
 class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
 
     @Override
-    @NonNull
     protected List<?> userConverters() {
         return Arrays.asList(
             new UserIdToLongConverter(),
@@ -65,7 +63,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class UserIdToLongConverter implements Converter<UserId, Long> {
 
         @Override
-        public Long convert(@NonNull UserId source) {
+        public Long convert(UserId source) {
             return source.value();
         }
     }
@@ -74,7 +72,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class LongToUserIdConverter implements Converter<Long, UserId> {
 
         @Override
-        public UserId convert(@NonNull Long source) {
+        public UserId convert(Long source) {
             return new UserId(source);
         }
     }
@@ -83,7 +81,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class UsernameToStringConverter implements Converter<Username, String> {
 
         @Override
-        public String convert(@NonNull Username source) {
+        public String convert(Username source) {
             return source.value();
         }
     }
@@ -92,7 +90,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class StringToUsernameConverter implements Converter<String, Username> {
 
         @Override
-        public Username convert(@NonNull String source) {
+        public Username convert(String source) {
             return new Username(source);
         }
     }
@@ -101,7 +99,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class UserGroupIdToLongConverter implements Converter<UserGroupId, Long> {
 
         @Override
-        public Long convert(@NonNull UserGroupId source) {
+        public Long convert(UserGroupId source) {
             return source.value();
         }
     }
@@ -110,7 +108,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class LongToUserGroupIdConverter implements Converter<Long, UserGroupId> {
 
         @Override
-        public UserGroupId convert(@NonNull Long source) {
+        public UserGroupId convert(Long source) {
             return new UserGroupId(source);
         }
     }
@@ -119,7 +117,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class GroupInvitationIdToLongConverter implements Converter<GroupInvitationId, Long> {
 
         @Override
-        public Long convert(@NonNull GroupInvitationId source) {
+        public Long convert(GroupInvitationId source) {
             return source.value();
         }
     }
@@ -128,7 +126,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class LongToGroupInvitationIdConverter implements Converter<Long, GroupInvitationId> {
 
         @Override
-        public GroupInvitationId convert(@NonNull Long source) {
+        public GroupInvitationId convert(Long source) {
             return new GroupInvitationId(source);
         }
     }
@@ -137,7 +135,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class OptionalUserGroupIdToLongConverter implements Converter<Optional<UserGroupId>, Long> {
 
         @Override
-        public Long convert(@NonNull Optional<UserGroupId> source) {
+        public Long convert(Optional<UserGroupId> source) {
             return source.map(UserGroupId::value).orElse(null);
         }
     }
@@ -146,7 +144,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class LongToOptionalUserGroupIdConverter implements Converter<Long, Optional<UserGroupId>> {
 
         @Override
-        public Optional<UserGroupId> convert(@NonNull Long source) {
+        public Optional<UserGroupId> convert(Long source) {
             return source != null ? Optional.of(new UserGroupId(source)) : Optional.empty();
         }
     }
@@ -155,7 +153,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class GroupNameToStringConverter implements Converter<GroupName, String> {
 
         @Override
-        public String convert(@NonNull GroupName source) {
+        public String convert(GroupName source) {
             return source.value();
         }
     }
@@ -164,7 +162,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class StringToGroupNameConverter implements Converter<String, GroupName> {
 
         @Override
-        public GroupName convert(@NonNull String source) {
+        public GroupName convert(String source) {
             return new GroupName(source);
         }
     }
@@ -173,7 +171,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class DayToIntegerConverter implements Converter<Day, Integer> {
 
         @Override
-        public Integer convert(@NonNull Day source) {
+        public Integer convert(Day source) {
             return source.value();
         }
     }
@@ -182,7 +180,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class IntegerToDayConverter implements Converter<Integer, Day> {
 
         @Override
-        public Day convert(@NonNull Integer source) {
+        public Day convert(Integer source) {
             return new Day(source);
         }
     }
@@ -191,7 +189,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class MonthlyBudgetIdToLongConverter implements Converter<MonthlyBudgetId, Long> {
 
         @Override
-        public Long convert(@NonNull MonthlyBudgetId source) {
+        public Long convert(MonthlyBudgetId source) {
             return source.value();
         }
     }
@@ -200,7 +198,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class LongToMonthlyBudgetIdConverter implements Converter<Long, MonthlyBudgetId> {
 
         @Override
-        public MonthlyBudgetId convert(@NonNull Long source) {
+        public MonthlyBudgetId convert(Long source) {
             return new MonthlyBudgetId(source);
         }
     }
@@ -209,7 +207,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class YearToIntegerConverter implements Converter<Year, Integer> {
 
         @Override
-        public Integer convert(@NonNull Year source) {
+        public Integer convert(Year source) {
             return source.value();
         }
     }
@@ -218,7 +216,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class IntegerToYearConverter implements Converter<Integer, Year> {
 
         @Override
-        public Year convert(@NonNull Integer source) {
+        public Year convert(Integer source) {
             return new Year(source);
         }
     }
@@ -227,7 +225,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class MonthToIntegerConverter implements Converter<Month, Integer> {
 
         @Override
-        public Integer convert(@NonNull Month source) {
+        public Integer convert(Month source) {
             return source.value();
         }
     }
@@ -236,7 +234,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class IntegerToMonthConverter implements Converter<Integer, Month> {
 
         @Override
-        public Month convert(@NonNull Integer source) {
+        public Month convert(Integer source) {
             return new Month(source);
         }
     }
@@ -245,7 +243,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class MoneyToIntegerConverter implements Converter<Money, Integer> {
 
         @Override
-        public Integer convert(@NonNull Money source) {
+        public Integer convert(Money source) {
             return source.amount();
         }
     }
@@ -254,7 +252,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class IntegerToMoneyConverter implements Converter<Integer, Money> {
 
         @Override
-        public Money convert(@NonNull Integer source) {
+        public Money convert(Integer source) {
             return new Money(source);
         }
     }
@@ -263,7 +261,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class LivingExpenseCategoryIdToLongConverter implements Converter<LivingExpenseCategoryId, Long> {
 
         @Override
-        public Long convert(@NonNull LivingExpenseCategoryId source) {
+        public Long convert(LivingExpenseCategoryId source) {
             return source.value();
         }
     }
@@ -272,7 +270,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class LongToLivingExpenseCategoryIdConverter implements Converter<Long, LivingExpenseCategoryId> {
 
         @Override
-        public LivingExpenseCategoryId convert(@NonNull Long source) {
+        public LivingExpenseCategoryId convert(Long source) {
             return new LivingExpenseCategoryId(source);
         }
     }
@@ -281,7 +279,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class CategoryNameToStringConverter implements Converter<CategoryName, String> {
 
         @Override
-        public String convert(@NonNull CategoryName source) {
+        public String convert(CategoryName source) {
             return source.value();
         }
     }
@@ -290,7 +288,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class StringToCategoryNameConverter implements Converter<String, CategoryName> {
 
         @Override
-        public CategoryName convert(@NonNull String source) {
+        public CategoryName convert(String source) {
             return new CategoryName(source);
         }
     }
@@ -299,7 +297,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class DescriptionToStringConverter implements Converter<Description, String> {
 
         @Override
-        public String convert(@NonNull Description source) {
+        public String convert(Description source) {
             return source.value();
         }
     }
@@ -308,7 +306,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     static class StringToDescriptionConverter implements Converter<String, Description> {
 
         @Override
-        public Description convert(@NonNull String source) {
+        public Description convert(String source) {
             return new Description(source);
         }
     }
