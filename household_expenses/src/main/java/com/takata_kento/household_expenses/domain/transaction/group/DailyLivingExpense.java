@@ -124,7 +124,9 @@ class DailyLivingExpense {
 
     void updateMemo(Description memo) {
         if (memo == null) throw new IllegalArgumentException("memo must not be null");
-        if (this.memo.equals(memo)) throw new IllegalArgumentException("same parameter is detected when update memo of DailyLivingExpense");
+        if (this.memo.equals(memo)) throw new IllegalArgumentException(
+            "same parameter is detected when update memo of DailyLivingExpense"
+        );
         this.memo = memo;
     }
 }

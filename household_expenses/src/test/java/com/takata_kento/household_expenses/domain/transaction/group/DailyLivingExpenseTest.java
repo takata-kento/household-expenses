@@ -753,9 +753,7 @@ public class DailyLivingExpenseTest {
         Description sameMemo = new Description("Description");
 
         // When
-        IllegalArgumentException actual = catchIllegalArgumentException(() ->
-            dailyLivingExpense.updateMemo(sameMemo)
-        );
+        IllegalArgumentException actual = catchIllegalArgumentException(() -> dailyLivingExpense.updateMemo(sameMemo));
 
         // Then
         assertThat(actual).hasMessage("same parameter is detected when update memo of DailyLivingExpense");
