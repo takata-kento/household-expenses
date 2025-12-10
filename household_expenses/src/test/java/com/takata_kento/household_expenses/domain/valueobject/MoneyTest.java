@@ -19,6 +19,18 @@ class MoneyTest {
     }
 
     @Test
+    void testThrowErrorWhenCreateWithNegativeValue() {
+        // Given
+        int amount = -1000;
+
+        // When
+        IllegalArgumentException expected = catchIllegalArgumentException(() -> new Money(amount));
+
+        // Then
+        assertThat(expected).hasMessage("Money must not be negative value");
+    }
+
+    @Test
     void testAdd() {
         // Given
         Money money1 = new Money(1000);
