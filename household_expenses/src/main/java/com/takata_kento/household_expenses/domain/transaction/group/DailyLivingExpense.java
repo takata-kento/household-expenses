@@ -35,7 +35,7 @@ class DailyLivingExpense {
     @Version
     private Integer version;
 
-    public DailyLivingExpense(
+    DailyLivingExpense(
         DailyLivingExpenseId id,
         UserId userId,
         LocalDate transactionDate,
@@ -53,7 +53,7 @@ class DailyLivingExpense {
         this.version = version;
     }
 
-    public static DailyLivingExpense create(
+    static DailyLivingExpense create(
         UserId userId,
         LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
@@ -65,31 +65,31 @@ class DailyLivingExpense {
         return new DailyLivingExpense(id, userId, transactionDate, livingExpenseCategoryId, amount, memo, null);
     }
 
-    public DailyLivingExpenseId id() {
+    DailyLivingExpenseId id() {
         return this.id;
     }
 
-    public UserId userId() {
+    UserId userId() {
         return this.userId;
     }
 
-    public LocalDate transactionDate() {
+    LocalDate transactionDate() {
         return this.transactionDate;
     }
 
-    public LivingExpenseCategoryId livingExpenseCategoryId() {
+    LivingExpenseCategoryId livingExpenseCategoryId() {
         return this.livingExpenseCategoryId;
     }
 
-    public Money amount() {
+    Money amount() {
         return this.amount;
     }
 
-    public Description memo() {
+    Description memo() {
         return this.memo;
     }
 
-    public void updateUser(UserId userId) {
+    void updateUser(UserId userId) {
         if (userId == null) throw new IllegalArgumentException("userid must not be null");
         if (this.userId.equals(userId)) throw new IllegalArgumentException(
             "same parameter is detected when update userid of DailyLivingExpense"
@@ -98,7 +98,7 @@ class DailyLivingExpense {
         this.userId = userId;
     }
 
-    public void updateTransactionDate(LocalDate transactionDate) {
+    void updateTransactionDate(LocalDate transactionDate) {
         if (transactionDate == null) throw new IllegalArgumentException("transactionDate must not be null");
         if (this.transactionDate.equals(transactionDate)) throw new IllegalArgumentException(
             "same parameter is detected when update transactionDate of DailyLivingExpense"
@@ -106,7 +106,7 @@ class DailyLivingExpense {
         this.transactionDate = transactionDate;
     }
 
-    public void updateLivingExpenseCategory(LivingExpenseCategoryId id) {
+    void updateLivingExpenseCategory(LivingExpenseCategoryId id) {
         if (id == null) throw new IllegalArgumentException("livingExpenseCategoryId must not be null");
         if (this.livingExpenseCategoryId.equals(id)) throw new IllegalArgumentException(
             "same parameter is detected when update livingExpenseCategoryId of DailyLivingExpense"
@@ -114,7 +114,7 @@ class DailyLivingExpense {
         this.livingExpenseCategoryId = id;
     }
 
-    public void updateAmount(Money amount) {
+    void updateAmount(Money amount) {
         if (amount == null) throw new IllegalArgumentException("amount must not be null");
         if (this.amount.equals(amount)) throw new IllegalArgumentException(
             "same parameter is detected when update amount of DailyLivingExpense"
@@ -122,7 +122,7 @@ class DailyLivingExpense {
         this.amount = amount;
     }
 
-    public void updateMemo(Description memo) {
+    void updateMemo(Description memo) {
         if (memo == null) throw new IllegalArgumentException("memo must not be null");
         if (this.memo.equals(memo)) throw new IllegalArgumentException("same parameter is detected when update memo of DailyLivingExpense");
         this.memo = memo;
