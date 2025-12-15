@@ -93,14 +93,13 @@ erDiagram
         integer version "バージョン"
     }
 
-    %% 日次収支
-    DAILY_TRANSACTION {
-        bigint user_id PK,FK
-        date transaction_date PK "取引日"
-        integer income "収入"
-        integer total_expense "支出合計"
-        integer personal_expense "個人支出"
-        bigint financial_account_id FK
+    %% 日次グループ収支
+    DAILY_GROUP_TRANSACTION {
+        varchar id PK
+        bigint user_group_id FK
+        date transaction_date "取引日"
+        integer total_living_expense "支出合計"
+        integer budget_balance "予算残高"
         timestamp created_at
         timestamp updated_at
         integer version "バージョン"
@@ -108,9 +107,9 @@ erDiagram
 
     %% 日次生活費
     DAILY_LIVING_EXPENSE {
-        bigint id PK
+        varchar id PK
+        varchar daily_group_transaction_id FK
         bigint user_id FK
-        date transaction_date FK
         bigint living_expense_category_id FK
         integer amount "金額"
         varchar memo "メモ"
@@ -119,11 +118,22 @@ erDiagram
         integer version "バージョン"
     }
 
+    %% 日次個人収支
+    DAILY_PERSONAL_TRANSACTION {
+        varchar id PK
+        bigint user_id FK
+        date transaction_date "取引日"
+        integer income "収入"
+        integer total_expense "支出合計"
+        timestamp created_at
+        timestamp updated_at
+        integer version "バージョン"
+    }
+
     %% 日次個人支出
     DAILY_PERSONAL_EXPENSE {
-        bigint user_id PK,FK
-        date transaction_date PK,FK
-        int sequence_no PK "連番"
+        varchar id PK
+        varchar daily_personal_transaction_id FK
         integer amount "金額"
         varchar description "使用目的"
         timestamp created_at
@@ -185,7 +195,7 @@ erDiagram
     USERS }|--|| USER_GROUP : "所属"
     USERS ||--|| AUTHORITIES : "権限"
     USERS ||--o{ FINANCIAL_ACCOUNT : "所有"
-    USERS ||--o{ DAILY_TRANSACTION : "記録"
+    USERS ||--o{ DAILY_PERSONAL_TRANSACTION : "記録"
     USERS ||--o{ MONTHLY_SAVING : "貯金"
     USERS ||--o{ MONTHLY_BUDGET : "設定"
     USERS ||--o{ GROUP_INVITATION : "招待"
@@ -196,13 +206,14 @@ erDiagram
     USER_GROUP ||--o{ MONTHLY_BUDGET : "予算管理"
     USER_GROUP ||--o{ LIVING_EXPENSE_CATEGORY : "分類管理"
     USER_GROUP ||--o{ FIXED_EXPENSE_CATEGORY : "固定費分類管理"
+    USER_GROUP ||--o{ DAILY_LIVING_TRANSACTION : "グループ収支管理"
     
-    FINANCIAL_ACCOUNT ||--o{ DAILY_TRANSACTION : "取引記録"
+    FINANCIAL_ACCOUNT ||--o{ DAILY_PERSONAL_TRANSACTION : "取引記録"
     FINANCIAL_ACCOUNT ||--o{ MONTHLY_SAVING : "貯金先"
     FINANCIAL_ACCOUNT ||--o{ BALANCE_EDIT_HISTORY : "編集履歴"
     
-    DAILY_TRANSACTION ||--o{ DAILY_LIVING_EXPENSE : "生活費詳細"
-    DAILY_TRANSACTION ||--o{ DAILY_PERSONAL_EXPENSE : "個人支出詳細"
+    DAILY_LIVING_TRANSACTION ||--o{ DAILY_LIVING_EXPENSE : "生活費詳細"
+    DAILY_PERSONAL_TRANSACTION ||--o{ DAILY_PERSONAL_EXPENSE : "個人支出詳細"
     
     LIVING_EXPENSE_CATEGORY ||--o{ DAILY_LIVING_EXPENSE : "分類"
     
@@ -251,11 +262,16 @@ erDiagram
 - デフォルト分類と追加分類を識別
 - 共有データ（グループメンバー全員が閲覧可能）
 
-### DAILY_TRANSACTION（日次収支）
+### DAILY_PERSONAL_TRANSACTION（日次個人収支）
 - ユーザーごとの日次収支情報を管理
 - 収入、支出合計を記録
 - 支出合計の計算式: (生活費合計 ÷ グループ人数) + 個人支出合計
 - 非共有データ（記録者本人のみ閲覧可能）
+
+### DAILY_GROUP_TRANSACTION（日次グループ収支）
+- グループごとの日次収支情報を管理
+- 支出合計と予算残高を記録
+- 共有データ（グループメンバー全員が閲覧可能）
 
 ### DAILY_LIVING_EXPENSE（日次生活費）
 - 生活費の詳細を分類別に記録
