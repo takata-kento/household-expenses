@@ -106,47 +106,45 @@ classDiagram
 
     class DailyLivingExpense {
         -DailyLivingExpenseId id
+        -DailyGroupTransactionId dailyGroupTransactionId
         -UserId userId
-        -LocalDate transactionDate
         -LivingExpenseCategoryId livingExpenseCategoryId
         -Money amount
         -Description memo
         -Integer version
-    }
+}
 
     class DailyPersonalExpense {
-        -UserId userId
-        -LocalDate transactionDate
-        -SequenceNumber sequenceNo
+        -DailyPersonalExpenseId id
+        -DailyPersonalTransactionId dailyPersonalTransactionId
         -Money amount
         -Description description
         -Integer version
     }
 
     class DailyGroupTransaction {
+        -DailyGroupTransactionId id
         -UserGroupId userGroupId
         -LocalDate transactionDate
         -List~DailyLivingExpense~ livingExpenses
-        -Money totalLivingExpense
-        -Money budgetBalance
         -Integer version
         +addLivingExpense(UserId, LivingExpenseCategoryId, Money, Description) void
         +calculateTotalLivingExpense() Money
         +updateBudgetBalance(Money) void
         +getPersonalShareOfLivingExpense(int) Money
-    }
+}
 
     class DailyPersonalTransaction {
+        -DailyPersonalTransactionId id
         -UserId userId
         -LocalDate transactionDate
         -Money income
-        -Money totalExpense
         -List~DailyPersonalExpense~ personalExpenses
         -Integer version
         +addPersonalExpense(Money, Description) void
         +calculateTotalExpense(Money) void
         +getTotalPersonalExpense() Money
-    }
+}
 
     class FixedExpenseCategory {
         -FixedExpenseCategoryId id
@@ -367,8 +365,9 @@ classDiagram
 
     class DailyLivingExpenseId {
         <<record>>
-        -long value
-        +value() long
+        -String value
+        +value() String
+        +generate() DailyLivingExpenseId
     }
 
     class FixedExpenseHistoryId {
@@ -381,6 +380,27 @@ classDiagram
         <<record>>
         -long value
         +value() long
+    }
+
+    class DailyGroupTransactionId {
+        <<record>>
+        -String value
+        +value() String
+        +generate() DailyGroupTransactionId
+    }
+
+    class DailyPersonalTransactionId {
+        <<record>>
+        -String value
+        +value() String
+        +generate() DailyPersonalTransactionId
+    }
+
+    class DailyPersonalExpenseId {
+        <<record>>
+        -String value
+        +value() String
+        +generate() DailyPersonalExpenseId
     }
 
     %% Enumクラス
@@ -610,67 +630,6 @@ classDiagram
         +findByUserIdAndYearAndMonth(UserId, Year, Month) Optional~MonthlySaving~
         +findByUserIdAndYear(UserId, Year) List~MonthlySaving~
     }
-
-    %% 値オブジェクトとの関係性
-    User o-- UserId
-    User o-- Username
-    User o-- UserGroupId
-    User o-- FinancialAccountId
-    UserGroup o-- UserGroupId
-    UserGroup o-- GroupName
-    UserGroup o-- Day
-    UserGroup o-- UserId
-    GroupInvitation o-- GroupInvitationId
-    GroupInvitation o-- UserGroupId
-    GroupInvitation o-- UserId
-    GroupInvitation o-- InvitationStatus
-    GroupInvitationInfo o-- GroupInvitationId
-    GroupInvitationInfo o-- UserGroupId
-    GroupInvitationInfo o-- UserId
-    FinancialAccount o-- FinancialAccountId
-    FinancialAccount o-- AccountName
-    FinancialAccount o-- Money
-    BalanceEditHistory o-- BalanceEditHistoryId
-    BalanceEditHistory o-- Money
-    BalanceEditHistory o-- Description
-    MonthlySaving o-- FinancialAccountId
-    DailyGroupTransaction o-- UserGroupId
-    DailyPersonalTransaction o-- UserId
-    MonthlyBudget o-- MonthlyBudgetId
-    MonthlyBudget o-- UserGroupId
-    MonthlyBudget o-- UserId
-    MonthlyBudget o-- Year
-    MonthlyBudget o-- Month
-    MonthlyBudget o-- Money
-    LivingExpenseCategory o-- LivingExpenseCategoryId
-    LivingExpenseCategory o-- CategoryName
-    LivingExpenseCategory o-- Description
-    DailyGroupTransaction o-- Money
-    DailyPersonalTransaction o-- Money
-    DailyLivingExpense o-- DailyLivingExpenseId
-    DailyLivingExpense o-- UserId
-    DailyLivingExpense o-- LivingExpenseCategoryId
-    DailyLivingExpense o-- Money
-    DailyLivingExpense o-- Description
-    DailyPersonalExpense o-- UserId
-    DailyPersonalExpense o-- SequenceNumber
-    DailyPersonalExpense o-- Money
-    DailyPersonalExpense o-- Description
-    FixedExpenseCategory o-- FixedExpenseCategoryId
-    FixedExpenseCategory o-- CategoryName
-    FixedExpenseCategory o-- Description
-    FixedExpenseCategory o-- Money
-    FixedExpenseHistory o-- FixedExpenseHistoryId
-    FixedExpenseHistory o-- FixedExpenseCategoryId
-    FixedExpenseHistory o-- Year
-    FixedExpenseHistory o-- Month
-    FixedExpenseHistory o-- Money
-    FixedExpenseHistory o-- Description
-    MonthlySaving o-- UserId
-    MonthlySaving o-- Year
-    MonthlySaving o-- Month
-    MonthlySaving o-- Money
-    MonthlySaving o-- Description
 
     %% エンティティ間の関係性
     User o-- GroupInvitation

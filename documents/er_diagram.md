@@ -98,8 +98,6 @@ erDiagram
         varchar id PK
         bigint user_group_id FK
         date transaction_date "取引日"
-        integer total_living_expense "支出合計"
-        integer budget_balance "予算残高"
         timestamp created_at
         timestamp updated_at
         integer version "バージョン"
@@ -124,7 +122,6 @@ erDiagram
         bigint user_id FK
         date transaction_date "取引日"
         integer income "収入"
-        integer total_expense "支出合計"
         timestamp created_at
         timestamp updated_at
         integer version "バージョン"
@@ -206,13 +203,13 @@ erDiagram
     USER_GROUP ||--o{ MONTHLY_BUDGET : "予算管理"
     USER_GROUP ||--o{ LIVING_EXPENSE_CATEGORY : "分類管理"
     USER_GROUP ||--o{ FIXED_EXPENSE_CATEGORY : "固定費分類管理"
-    USER_GROUP ||--o{ DAILY_LIVING_TRANSACTION : "グループ収支管理"
-    
+    USER_GROUP ||--o{ DAILY_GROUP_TRANSACTION : "グループ収支管理"
+
     FINANCIAL_ACCOUNT ||--o{ DAILY_PERSONAL_TRANSACTION : "取引記録"
     FINANCIAL_ACCOUNT ||--o{ MONTHLY_SAVING : "貯金先"
     FINANCIAL_ACCOUNT ||--o{ BALANCE_EDIT_HISTORY : "編集履歴"
-    
-    DAILY_LIVING_TRANSACTION ||--o{ DAILY_LIVING_EXPENSE : "生活費詳細"
+
+    DAILY_GROUP_TRANSACTION ||--o{ DAILY_LIVING_EXPENSE : "生活費詳細"
     DAILY_PERSONAL_TRANSACTION ||--o{ DAILY_PERSONAL_EXPENSE : "個人支出詳細"
     
     LIVING_EXPENSE_CATEGORY ||--o{ DAILY_LIVING_EXPENSE : "分類"
