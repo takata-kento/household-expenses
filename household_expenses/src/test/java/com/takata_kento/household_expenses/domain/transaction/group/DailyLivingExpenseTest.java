@@ -275,9 +275,7 @@ public class DailyLivingExpenseTest {
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseInstance")
-    void testThrowSameUserErrorWhenUpdateUser(
-        DailyLivingExpense dailyLivingExpense
-    ) {
+    void testThrowSameUserErrorWhenUpdateUser(DailyLivingExpense dailyLivingExpense) {
         // Given
         UserId sameUserId = new UserId(100L);
 
@@ -292,9 +290,7 @@ public class DailyLivingExpenseTest {
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseInstance")
-    void testNullCheckWhenUpdateUser(
-        DailyLivingExpense dailyLivingExpense
-    ) {
+    void testNullCheckWhenUpdateUser(DailyLivingExpense dailyLivingExpense) {
         // When
         IllegalArgumentException exception = catchIllegalArgumentException(() -> dailyLivingExpense.updateUser(null));
 
@@ -336,9 +332,7 @@ public class DailyLivingExpenseTest {
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseInstance")
-    void testThrowSameCategoryErrorWhenUpdateLivingExpenseCategory(
-        DailyLivingExpense dailyLivingExpense
-    ) {
+    void testThrowSameCategoryErrorWhenUpdateLivingExpenseCategory(DailyLivingExpense dailyLivingExpense) {
         // Given
         LivingExpenseCategoryId sameCategory = new LivingExpenseCategoryId(100);
 
@@ -348,16 +342,12 @@ public class DailyLivingExpenseTest {
         );
 
         // Then
-        then(actual).hasMessage(
-            "same parameter is detected when update livingExpenseCategoryId of DailyLivingExpense"
-        );
+        then(actual).hasMessage("same parameter is detected when update livingExpenseCategoryId of DailyLivingExpense");
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseInstance")
-    void testNullCheckWhenUpdateLivingExpenseCategory(
-        DailyLivingExpense dailyLivingExpense
-    ) {
+    void testNullCheckWhenUpdateLivingExpenseCategory(DailyLivingExpense dailyLivingExpense) {
         // When
         IllegalArgumentException exception = catchIllegalArgumentException(() ->
             dailyLivingExpense.updateLivingExpenseCategory(null)
@@ -401,9 +391,7 @@ public class DailyLivingExpenseTest {
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseInstance")
-    void testThrowSameAmountErrorWhenUpdate(
-        DailyLivingExpense dailyLivingExpense
-    ) {
+    void testThrowSameAmountErrorWhenUpdate(DailyLivingExpense dailyLivingExpense) {
         // Given
         Money sameAmount = new Money(10_000);
 
@@ -418,9 +406,7 @@ public class DailyLivingExpenseTest {
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseInstance")
-    void testNullCheckWhenUpdateAmount(
-        DailyLivingExpense dailyLivingExpense
-    ) {
+    void testNullCheckWhenUpdateAmount(DailyLivingExpense dailyLivingExpense) {
         // When
         IllegalArgumentException exception = catchIllegalArgumentException(() -> dailyLivingExpense.updateAmount(null));
 
@@ -462,9 +448,7 @@ public class DailyLivingExpenseTest {
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseInstance")
-    void testThrowSameDescriptionErrorWhenUpdateMemo(
-        DailyLivingExpense dailyLivingExpense
-    ) {
+    void testThrowSameDescriptionErrorWhenUpdateMemo(DailyLivingExpense dailyLivingExpense) {
         // Given
         Description sameMemo = new Description("Description");
 
@@ -477,9 +461,7 @@ public class DailyLivingExpenseTest {
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseInstance")
-    void testNullCheckWhenUpdateMemo(
-        DailyLivingExpense dailyLivingExpense
-    ) {
+    void testNullCheckWhenUpdateMemo(DailyLivingExpense dailyLivingExpense) {
         // When
         IllegalArgumentException exception = catchIllegalArgumentException(() -> dailyLivingExpense.updateMemo(null));
 
