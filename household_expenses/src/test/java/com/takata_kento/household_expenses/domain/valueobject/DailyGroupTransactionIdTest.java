@@ -1,6 +1,7 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -24,10 +25,11 @@ class DailyGroupTransactionIdTest {
         // Given
         UUID value = null;
 
-        // When & Then
-        assertThatThrownBy(() -> new DailyGroupTransactionId(value))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(DailyGroupTransactionId.class.getSimpleName() + " must not be null");
+        // When
+        IllegalArgumentException actual = catchIllegalArgumentException(() -> new DailyGroupTransactionId(value));
+
+        // Then
+        then(actual).hasMessage(DailyGroupTransactionId.class.getSimpleName() + " must not be null");
     }
 
     @Test
