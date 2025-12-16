@@ -28,7 +28,7 @@ class DailyLivingExpenseIdTest {
         IllegalArgumentException actual = catchIllegalArgumentException(() -> new DailyLivingExpenseId(value));
 
         // Then
-        then(actual).hasMessage(DailyLivingExpenseId.class.getSimpleName() + " must not be null or empty");
+        then(actual).hasMessage(DailyLivingExpenseId.class.getSimpleName() + " must not be null");
     }
 
     @Test
@@ -41,6 +41,6 @@ class DailyLivingExpenseIdTest {
         String actual = expenseId.toString();
 
         // Then
-        then(actual).isEqualTo(value);
+        then(actual).isEqualTo(value.toString());
     }
 }
