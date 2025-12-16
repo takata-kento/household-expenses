@@ -1,6 +1,8 @@
 package com.takata_kento.household_expenses.config;
 
 import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
+import com.takata_kento.household_expenses.domain.valueobject.DailyGroupTransactionId;
+import com.takata_kento.household_expenses.domain.valueobject.DailyLivingExpenseId;
 import com.takata_kento.household_expenses.domain.valueobject.Day;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
@@ -16,6 +18,7 @@ import com.takata_kento.household_expenses.domain.valueobject.Year;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
@@ -55,7 +58,11 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new CategoryNameToStringConverter(),
             new StringToCategoryNameConverter(),
             new DescriptionToStringConverter(),
-            new StringToDescriptionConverter()
+            new StringToDescriptionConverter(),
+            new DailyLivingExpenseIdToStringConverter(),
+            new StringToDailyLivingExpenseIdConverter(),
+            new DailyGroupTransactionIdToStringConverter(),
+            new StringToDailyGroupTransactionIdConverter()
         );
     }
 
@@ -308,6 +315,42 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public Description convert(String source) {
             return new Description(source);
+        }
+    }
+
+    @WritingConverter
+    static class DailyLivingExpenseIdToStringConverter implements Converter<DailyLivingExpenseId, String> {
+
+        @Override
+        public String convert(DailyLivingExpenseId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToDailyLivingExpenseIdConverter implements Converter<String, DailyLivingExpenseId> {
+
+        @Override
+        public DailyLivingExpenseId convert(String source) {
+            return new DailyLivingExpenseId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class DailyGroupTransactionIdToStringConverter implements Converter<DailyGroupTransactionId, String> {
+
+        @Override
+        public String convert(DailyGroupTransactionId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToDailyGroupTransactionIdConverter implements Converter<String, DailyGroupTransactionId> {
+
+        @Override
+        public DailyGroupTransactionId convert(String source) {
+            return new DailyGroupTransactionId(UUID.fromString(source));
         }
     }
 }
