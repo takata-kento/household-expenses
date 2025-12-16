@@ -1,13 +1,14 @@
 package com.takata_kento.household_expenses.domain.transaction.group;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
+import com.takata_kento.household_expenses.domain.valueobject.DailyGroupTransactionId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyLivingExpenseId;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.LivingExpenseCategoryId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
-import java.time.LocalDate;
+import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,11 +17,36 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class DailyLivingExpenseTest {
 
     static Stream<Arguments> provideDailyLivingExpenseData() {
+        UUID dailyLivingExpenseUUID = UUID.randomUUID();
+        UUID dailyGroupTransactionUUID = UUID.randomUUID();
         return Stream.of(
             Arguments.of(
-                new DailyLivingExpenseId(1L),
+                new DailyLivingExpenseId(dailyLivingExpenseUUID),
+                new DailyGroupTransactionId(dailyGroupTransactionUUID),
                 new UserId(100L),
-                LocalDate.of(2024, 6, 1),
+                new LivingExpenseCategoryId(100L),
+                new Money(10_000),
+                new Description("Description"),
+                Integer.valueOf(1),
+                new DailyLivingExpense(
+                    new DailyLivingExpenseId(dailyLivingExpenseUUID),
+                    new DailyGroupTransactionId(dailyGroupTransactionUUID),
+                    new UserId(100L),
+                    new LivingExpenseCategoryId(100L),
+                    new Money(10_000),
+                    new Description("Description"),
+                    Integer.valueOf(1)
+                )
+            )
+        );
+    }
+
+    static Stream<DailyLivingExpense> provideDailyLivingExpenseInstance() {
+        return Stream.of(
+            new DailyLivingExpense(
+                new DailyLivingExpenseId(UUID.randomUUID()),
+                new DailyGroupTransactionId(UUID.randomUUID()),
+                new UserId(100L),
                 new LivingExpenseCategoryId(100L),
                 new Money(10_000),
                 new Description("Description"),
@@ -33,28 +59,19 @@ public class DailyLivingExpenseTest {
     @MethodSource("provideDailyLivingExpenseData")
     void testId(
         DailyLivingExpenseId expectedId,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            expectedId,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         DailyLivingExpense expected = new DailyLivingExpense(
             expectedId,
+            dailyGroupTransactionId,
             userId,
-            transactionDate,
             livingExpenseCategoryId,
             amount,
             memo,
@@ -65,36 +82,27 @@ public class DailyLivingExpenseTest {
         DailyLivingExpenseId actual = dailyLivingExpense.id();
 
         // Then
-        assertThat(actual).isEqualTo(expectedId);
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(actual).isEqualTo(expectedId);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
     void testUserId(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId expectedUserId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            expectedUserId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            dailyGroupTransactionId,
             expectedUserId,
-            transactionDate,
             livingExpenseCategoryId,
             amount,
             memo,
@@ -105,36 +113,27 @@ public class DailyLivingExpenseTest {
         UserId actual = dailyLivingExpense.userId();
 
         // Then
-        assertThat(actual).isEqualTo(expectedUserId);
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(actual).isEqualTo(expectedUserId);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
-    void testTransactionDate(
+    void testDailyGroupTransactionId(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId expectedDailyGroupTransactionId,
         UserId userId,
-        LocalDate expectedTransactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            expectedTransactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            expectedDailyGroupTransactionId,
             userId,
-            expectedTransactionDate,
             livingExpenseCategoryId,
             amount,
             memo,
@@ -142,39 +141,30 @@ public class DailyLivingExpenseTest {
         );
 
         // When
-        LocalDate actual = dailyLivingExpense.transactionDate();
+        DailyGroupTransactionId actual = dailyLivingExpense.dailyGroupTransactionId();
 
         // Then
-        assertThat(actual).isEqualTo(expectedTransactionDate);
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(actual).isEqualTo(expectedDailyGroupTransactionId);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
     void testLivingExpenseCategoryId(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId expectedLivingExpenseCategoryId,
         Money amount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            expectedLivingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            dailyGroupTransactionId,
             userId,
-            transactionDate,
             expectedLivingExpenseCategoryId,
             amount,
             memo,
@@ -185,36 +175,27 @@ public class DailyLivingExpenseTest {
         LivingExpenseCategoryId actual = dailyLivingExpense.livingExpenseCategoryId();
 
         // Then
-        assertThat(actual).isEqualTo(expectedLivingExpenseCategoryId);
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(actual).isEqualTo(expectedLivingExpenseCategoryId);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
     void testAmount(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money expectedAmount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            expectedAmount,
-            memo,
-            version
-        );
-
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            dailyGroupTransactionId,
             userId,
-            transactionDate,
             livingExpenseCategoryId,
             expectedAmount,
             memo,
@@ -225,36 +206,27 @@ public class DailyLivingExpenseTest {
         Money actual = dailyLivingExpense.amount();
 
         // Then
-        assertThat(actual).isEqualTo(expectedAmount);
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(actual).isEqualTo(expectedAmount);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
     void testMemo(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description expectedMemo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            expectedMemo,
-            version
-        );
-
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            dailyGroupTransactionId,
             userId,
-            transactionDate,
             livingExpenseCategoryId,
             amount,
             expectedMemo,
@@ -265,38 +237,29 @@ public class DailyLivingExpenseTest {
         Description actual = dailyLivingExpense.memo();
 
         // Then
-        assertThat(actual).isEqualTo(expectedMemo);
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(actual).isEqualTo(expectedMemo);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
     void testUpdateUser(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId previousUserId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            previousUserId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         UserId expectedUserId = new UserId(200L);
 
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            dailyGroupTransactionId,
             expectedUserId,
-            transactionDate,
             livingExpenseCategoryId,
             amount,
             memo,
@@ -307,31 +270,15 @@ public class DailyLivingExpenseTest {
         dailyLivingExpense.updateUser(expectedUserId);
 
         // Then
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
+    @MethodSource("provideDailyLivingExpenseInstance")
     void testThrowSameUserErrorWhenUpdateUser(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money amount,
-        Description memo,
-        Integer version
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         UserId sameUserId = new UserId(100L);
 
         // When
@@ -340,171 +287,40 @@ public class DailyLivingExpenseTest {
         );
 
         // Then
-        assertThat(actual).hasMessage("same parameter is detected when update userid of DailyLivingExpense");
+        then(actual).hasMessage("same parameter is detected when update userid of DailyLivingExpense");
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
+    @MethodSource("provideDailyLivingExpenseInstance")
     void testNullCheckWhenUpdateUser(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money amount,
-        Description memo,
-        Integer version
+        DailyLivingExpense dailyLivingExpense
     ) {
-        // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         // When
         IllegalArgumentException exception = catchIllegalArgumentException(() -> dailyLivingExpense.updateUser(null));
 
         // Then
-        assertThat(exception).hasMessage("userid must not be null");
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
-    void testUpdateTransactionDate(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money amount,
-        Description memo,
-        Integer version
-    ) {
-        // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
-        LocalDate expectedTransactionDate = LocalDate.of(2025, 6, 1);
-
-        DailyLivingExpense expected = new DailyLivingExpense(
-            id,
-            userId,
-            expectedTransactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
-        // When
-        dailyLivingExpense.updateTransactionDate(expectedTransactionDate);
-
-        // Then
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
-    void testThrowSameDateErrorWhenUpdateTransactionDate(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money money,
-        Description memo,
-        Integer version
-    ) {
-        // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            money,
-            memo,
-            version
-        );
-
-        LocalDate sameTransactionDate = LocalDate.of(2024, 6, 1);
-
-        // When
-        IllegalArgumentException actual = catchIllegalArgumentException(() ->
-            dailyLivingExpense.updateTransactionDate(sameTransactionDate)
-        );
-
-        // Then
-        assertThat(actual).hasMessage("same parameter is detected when update transactionDate of DailyLivingExpense");
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
-    void testNullCheckWhenUpdateTransactionDate(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money money,
-        Description memo,
-        Integer version
-    ) {
-        // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            money,
-            memo,
-            version
-        );
-
-        // When
-        IllegalArgumentException exception = catchIllegalArgumentException(() ->
-            dailyLivingExpense.updateTransactionDate(null)
-        );
-
-        // Then
-        assertThat(exception).hasMessage("transactionDate must not be null");
+        then(exception).hasMessage("userid must not be null");
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
     void testUpdateLivingExpenseCategory(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         LivingExpenseCategoryId expectedCategory = new LivingExpenseCategoryId(200);
 
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            dailyGroupTransactionId,
             userId,
-            transactionDate,
             expectedCategory,
             amount,
             memo,
@@ -515,31 +331,15 @@ public class DailyLivingExpenseTest {
         dailyLivingExpense.updateLivingExpenseCategory(expectedCategory);
 
         // Then
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
+    @MethodSource("provideDailyLivingExpenseInstance")
     void testThrowSameCategoryErrorWhenUpdateLivingExpenseCategory(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money money,
-        Description memo,
-        Integer version
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            money,
-            memo,
-            version
-        );
-
         LivingExpenseCategoryId sameCategory = new LivingExpenseCategoryId(100);
 
         // When
@@ -548,70 +348,44 @@ public class DailyLivingExpenseTest {
         );
 
         // Then
-        assertThat(actual).hasMessage(
+        then(actual).hasMessage(
             "same parameter is detected when update livingExpenseCategoryId of DailyLivingExpense"
         );
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
+    @MethodSource("provideDailyLivingExpenseInstance")
     void testNullCheckWhenUpdateLivingExpenseCategory(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money money,
-        Description memo,
-        Integer version
+        DailyLivingExpense dailyLivingExpense
     ) {
-        // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            money,
-            memo,
-            version
-        );
-
         // When
         IllegalArgumentException exception = catchIllegalArgumentException(() ->
             dailyLivingExpense.updateLivingExpenseCategory(null)
         );
 
         // Then
-        assertThat(exception).hasMessage("livingExpenseCategoryId must not be null");
+        then(exception).hasMessage("livingExpenseCategoryId must not be null");
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
     void testUpdateAmount(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         Money expectedAmount = new Money(20_000);
 
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            dailyGroupTransactionId,
             userId,
-            transactionDate,
             livingExpenseCategoryId,
             expectedAmount,
             memo,
@@ -622,31 +396,15 @@ public class DailyLivingExpenseTest {
         dailyLivingExpense.updateAmount(expectedAmount);
 
         // Then
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
+    @MethodSource("provideDailyLivingExpenseInstance")
     void testThrowSameAmountErrorWhenUpdate(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money money,
-        Description memo,
-        Integer version
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            money,
-            memo,
-            version
-        );
-
         Money sameAmount = new Money(10_000);
 
         // When
@@ -655,66 +413,40 @@ public class DailyLivingExpenseTest {
         );
 
         // Then
-        assertThat(actual).hasMessage("same parameter is detected when update amount of DailyLivingExpense");
+        then(actual).hasMessage("same parameter is detected when update amount of DailyLivingExpense");
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
+    @MethodSource("provideDailyLivingExpenseInstance")
     void testNullCheckWhenUpdateAmount(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money money,
-        Description memo,
-        Integer version
+        DailyLivingExpense dailyLivingExpense
     ) {
-        // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            money,
-            memo,
-            version
-        );
-
         // When
         IllegalArgumentException exception = catchIllegalArgumentException(() -> dailyLivingExpense.updateAmount(null));
 
         // Then
-        assertThat(exception).hasMessage("amount must not be null");
+        then(exception).hasMessage("amount must not be null");
     }
 
     @ParameterizedTest
     @MethodSource("provideDailyLivingExpenseData")
     void testUpdateMemo(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo,
-        Integer version
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            amount,
-            memo,
-            version
-        );
-
         Description expectedMemo = new Description("updated description");
 
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
+            dailyGroupTransactionId,
             userId,
-            transactionDate,
             livingExpenseCategoryId,
             amount,
             expectedMemo,
@@ -725,66 +457,33 @@ public class DailyLivingExpenseTest {
         dailyLivingExpense.updateMemo(expectedMemo);
 
         // Then
-        assertThat(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
+        then(dailyLivingExpense).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
+    @MethodSource("provideDailyLivingExpenseInstance")
     void testThrowSameDescriptionErrorWhenUpdateMemo(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money money,
-        Description memo,
-        Integer version
+        DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            money,
-            memo,
-            version
-        );
-
         Description sameMemo = new Description("Description");
 
         // When
         IllegalArgumentException actual = catchIllegalArgumentException(() -> dailyLivingExpense.updateMemo(sameMemo));
 
         // Then
-        assertThat(actual).hasMessage("same parameter is detected when update memo of DailyLivingExpense");
+        then(actual).hasMessage("same parameter is detected when update memo of DailyLivingExpense");
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseData")
+    @MethodSource("provideDailyLivingExpenseInstance")
     void testNullCheckWhenUpdateMemo(
-        DailyLivingExpenseId id,
-        UserId userId,
-        LocalDate transactionDate,
-        LivingExpenseCategoryId livingExpenseCategoryId,
-        Money money,
-        Description memo,
-        Integer version
+        DailyLivingExpense dailyLivingExpense
     ) {
-        // Given
-        DailyLivingExpense dailyLivingExpense = new DailyLivingExpense(
-            id,
-            userId,
-            transactionDate,
-            livingExpenseCategoryId,
-            money,
-            memo,
-            version
-        );
-
         // When
         IllegalArgumentException exception = catchIllegalArgumentException(() -> dailyLivingExpense.updateMemo(null));
 
         // Then
-        assertThat(exception).hasMessage("memo must not be null");
+        then(exception).hasMessage("memo must not be null");
     }
 }
