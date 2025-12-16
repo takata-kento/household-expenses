@@ -8,4 +8,8 @@ class ValidateUtil {
             throw new IllegalArgumentException(type.getSimpleName() + " must not be null");
         }
     }
+
+    ValidateUtil() {
+        throw new AssertionError("Utility class can not be instance");
+    }
 }
