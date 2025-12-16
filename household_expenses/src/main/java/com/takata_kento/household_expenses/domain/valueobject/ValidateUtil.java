@@ -4,7 +4,7 @@ import java.util.UUID;
 
 class ValidateUtil {
 
-    static void validUUID(UUID value, Class<?> type) {
+    static void validUUID(UUID value, Class<? extends UUIDValueObject> type) {
         if (value == null) {
             throw new IllegalArgumentException(type.getSimpleName() + " must not be null");
         }

@@ -1,9 +1,13 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
-public record DailyLivingExpenseId(long value) {
+import java.util.UUID;
+
+public record DailyLivingExpenseId(UUID value) implements UUIDValueObject {
     public DailyLivingExpenseId {
-        if (value <= 0) {
-            throw new IllegalArgumentException("DailyLivingExpenseId must be positive");
-        }
+        ValidateUtil.validUUID(value, getClass());
+    }
+
+    public String toString() {
+        return value.toString();
     }
 }
