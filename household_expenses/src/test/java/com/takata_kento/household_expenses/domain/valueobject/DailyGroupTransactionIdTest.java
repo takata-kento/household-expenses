@@ -17,7 +17,7 @@ class DailyGroupTransactionIdTest {
         DailyGroupTransactionId actual = new DailyGroupTransactionId(value);
 
         // Then
-        assertThat(actual.value()).isEqualTo(value);
+        then(actual.value()).isEqualTo(value);
     }
 
     @Test
@@ -42,6 +42,6 @@ class DailyGroupTransactionIdTest {
         String actual = id.toString();
 
         // Then
-        assertThat(actual).isEqualTo(value.toString());
+        then(actual).isEqualTo(value.toString());
     }
 }
