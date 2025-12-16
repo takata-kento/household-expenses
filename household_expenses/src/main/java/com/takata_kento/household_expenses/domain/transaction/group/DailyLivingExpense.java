@@ -1,11 +1,12 @@
 package com.takata_kento.household_expenses.domain.transaction.group;
 
+import com.takata_kento.household_expenses.domain.valueobject.DailyGroupTransactionId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyLivingExpenseId;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.LivingExpenseCategoryId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
-import java.time.LocalDate;
+import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
@@ -17,11 +18,11 @@ class DailyLivingExpense {
     @Id
     private DailyLivingExpenseId id;
 
+    @Column("daily_group_transaction_id")
+    private DailyGroupTransactionId dailyGroupTransactionId;
+
     @Column("user_id")
     private UserId userId;
-
-    @Column("transaction_date")
-    private LocalDate transactionDate;
 
     @Column("living_expense_category_id")
     private LivingExpenseCategoryId livingExpenseCategoryId;
@@ -37,16 +38,16 @@ class DailyLivingExpense {
 
     DailyLivingExpense(
         DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo,
         Integer version
     ) {
         this.id = id;
+        this.dailyGroupTransactionId = dailyGroupTransactionId;
         this.userId = userId;
-        this.transactionDate = transactionDate;
         this.livingExpenseCategoryId = livingExpenseCategoryId;
         this.amount = amount;
         this.memo = memo;
@@ -54,27 +55,26 @@ class DailyLivingExpense {
     }
 
     static DailyLivingExpense create(
+        DailyGroupTransactionId dailyGroupTransactionId,
         UserId userId,
-        LocalDate transactionDate,
         LivingExpenseCategoryId livingExpenseCategoryId,
         Money amount,
         Description memo
     ) {
-        Long idValue = Math.abs(java.util.UUID.randomUUID().getLeastSignificantBits());
-        DailyLivingExpenseId id = new DailyLivingExpenseId(idValue);
-        return new DailyLivingExpense(id, userId, transactionDate, livingExpenseCategoryId, amount, memo, null);
+        DailyLivingExpenseId id = new DailyLivingExpenseId(UUID.randomUUID());
+        return new DailyLivingExpense(id, dailyGroupTransactionId, userId, livingExpenseCategoryId, amount, memo, null);
     }
 
     DailyLivingExpenseId id() {
         return this.id;
     }
 
-    UserId userId() {
-        return this.userId;
+    DailyGroupTransactionId dailyGroupTransactionId() {
+        return this.dailyGroupTransactionId;
     }
 
-    LocalDate transactionDate() {
-        return this.transactionDate;
+    UserId userId() {
+        return this.userId;
     }
 
     LivingExpenseCategoryId livingExpenseCategoryId() {
@@ -96,14 +96,6 @@ class DailyLivingExpense {
         );
 
         this.userId = userId;
-    }
-
-    void updateTransactionDate(LocalDate transactionDate) {
-        if (transactionDate == null) throw new IllegalArgumentException("transactionDate must not be null");
-        if (this.transactionDate.equals(transactionDate)) throw new IllegalArgumentException(
-            "same parameter is detected when update transactionDate of DailyLivingExpense"
-        );
-        this.transactionDate = transactionDate;
     }
 
     void updateLivingExpenseCategory(LivingExpenseCategoryId id) {
