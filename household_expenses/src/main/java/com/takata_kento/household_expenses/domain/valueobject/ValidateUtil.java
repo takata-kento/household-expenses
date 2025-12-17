@@ -10,7 +10,7 @@ class ValidateUtil {
         }
     }
 
-    ValidateUtil() {
+    private ValidateUtil() {
         throw new AssertionError("Utility class can not be instance");
     }
 }
