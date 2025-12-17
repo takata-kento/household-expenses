@@ -1,6 +1,6 @@
 package com.takata_kento.household_expenses.domain.expense.category;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
 import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
@@ -15,14 +15,22 @@ import org.junit.jupiter.params.provider.MethodSource;
 class LivingExpenseCategoryTest {
 
     static Stream<Arguments> provideLivingExpenseCategoryData() {
+        LivingExpenseCategoryId id = new LivingExpenseCategoryId(1L);
+        UserGroupId userGroupId = new UserGroupId(100L);
+        CategoryName categoryName = new CategoryName("食費");
+        Description description = new Description("食材・外食費");
+        Boolean isDefault = Boolean.TRUE;
+        Integer version = Integer.valueOf(1);
+
         return Stream.of(
             Arguments.of(
-                new LivingExpenseCategoryId(1L),
-                new UserGroupId(100L),
-                new CategoryName("食費"),
-                new Description("食材・外食費"),
-                true,
-                1
+                id,
+                userGroupId,
+                categoryName,
+                description,
+                isDefault,
+                version,
+                new LivingExpenseCategory(id, userGroupId, categoryName, description, isDefault, version)
             )
         );
     }
@@ -35,7 +43,8 @@ class LivingExpenseCategoryTest {
         CategoryName expectedCategoryName,
         Description expectedDescription,
         Boolean expectedIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // When
         LivingExpenseCategory actual = new LivingExpenseCategory(
@@ -48,12 +57,12 @@ class LivingExpenseCategoryTest {
         );
 
         // Then
-        assertThat(actual.id()).isEqualTo(expectedId);
-        assertThat(actual.userGroupId()).isEqualTo(expectedUserGroupId);
-        assertThat(actual.categoryName()).isEqualTo(expectedCategoryName);
-        assertThat(actual.description()).isEqualTo(expectedDescription);
-        assertThat(actual.isDefault()).isEqualTo(expectedIsDefault);
-        assertThat(actual.version()).isEqualTo(expectedVersion);
+        then(actual.id()).isEqualTo(expectedId);
+        then(actual.userGroupId()).isEqualTo(expectedUserGroupId);
+        then(actual.categoryName()).isEqualTo(expectedCategoryName);
+        then(actual.description()).isEqualTo(expectedDescription);
+        then(actual.isDefault()).isEqualTo(expectedIsDefault);
+        then(actual.version()).isEqualTo(expectedVersion);
     }
 
     @ParameterizedTest
@@ -64,7 +73,8 @@ class LivingExpenseCategoryTest {
         CategoryName expectedCategoryName,
         Description expectedDescription,
         Boolean expectedIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // Given
         LivingExpenseCategory category = new LivingExpenseCategory(
@@ -77,15 +87,11 @@ class LivingExpenseCategoryTest {
         );
 
         // When
-        LivingExpenseCategoryId actual = category.id();
+        LivingExpenseCategoryId actual = livingExpenseCategory.id();
 
         // Then
-        assertThat(actual).isEqualTo(expectedId);
-        assertThat(category.userGroupId()).isEqualTo(expectedUserGroupId);
-        assertThat(category.categoryName()).isEqualTo(expectedCategoryName);
-        assertThat(category.description()).isEqualTo(expectedDescription);
-        assertThat(category.isDefault()).isEqualTo(expectedIsDefault);
-        assertThat(category.version()).isEqualTo(expectedVersion);
+        then(actual).isEqualTo(expectedId);
+        then(livingExpenseCategory).usingRecursiveComparison().isEqualTo(category);
     }
 
     @ParameterizedTest
@@ -96,7 +102,8 @@ class LivingExpenseCategoryTest {
         CategoryName expectedCategoryName,
         Description expectedDescription,
         Boolean expectedIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // Given
         LivingExpenseCategory category = new LivingExpenseCategory(
@@ -112,12 +119,8 @@ class LivingExpenseCategoryTest {
         UserGroupId actual = category.userGroupId();
 
         // Then
-        assertThat(actual).isEqualTo(expectedUserGroupId);
-        assertThat(category.id()).isEqualTo(expectedId);
-        assertThat(category.categoryName()).isEqualTo(expectedCategoryName);
-        assertThat(category.description()).isEqualTo(expectedDescription);
-        assertThat(category.isDefault()).isEqualTo(expectedIsDefault);
-        assertThat(category.version()).isEqualTo(expectedVersion);
+        then(actual).isEqualTo(expectedUserGroupId);
+        then(livingExpenseCategory).usingRecursiveComparison().isEqualTo(category);
     }
 
     @ParameterizedTest
@@ -128,7 +131,8 @@ class LivingExpenseCategoryTest {
         CategoryName expectedCategoryName,
         Description expectedDescription,
         Boolean expectedIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // Given
         LivingExpenseCategory category = new LivingExpenseCategory(
@@ -144,12 +148,8 @@ class LivingExpenseCategoryTest {
         CategoryName actual = category.categoryName();
 
         // Then
-        assertThat(actual).isEqualTo(expectedCategoryName);
-        assertThat(category.id()).isEqualTo(expectedId);
-        assertThat(category.userGroupId()).isEqualTo(expectedUserGroupId);
-        assertThat(category.description()).isEqualTo(expectedDescription);
-        assertThat(category.isDefault()).isEqualTo(expectedIsDefault);
-        assertThat(category.version()).isEqualTo(expectedVersion);
+        then(actual).isEqualTo(expectedCategoryName);
+        then(livingExpenseCategory).usingRecursiveComparison().isEqualTo(category);
     }
 
     @ParameterizedTest
@@ -160,7 +160,8 @@ class LivingExpenseCategoryTest {
         CategoryName expectedCategoryName,
         Description expectedDescription,
         Boolean expectedIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // Given
         LivingExpenseCategory category = new LivingExpenseCategory(
@@ -176,12 +177,8 @@ class LivingExpenseCategoryTest {
         Description actual = category.description();
 
         // Then
-        assertThat(actual).isEqualTo(expectedDescription);
-        assertThat(category.id()).isEqualTo(expectedId);
-        assertThat(category.userGroupId()).isEqualTo(expectedUserGroupId);
-        assertThat(category.categoryName()).isEqualTo(expectedCategoryName);
-        assertThat(category.isDefault()).isEqualTo(expectedIsDefault);
-        assertThat(category.version()).isEqualTo(expectedVersion);
+        then(actual).isEqualTo(expectedDescription);
+        then(livingExpenseCategory).usingRecursiveComparison().isEqualTo(category);
     }
 
     @ParameterizedTest
@@ -192,7 +189,8 @@ class LivingExpenseCategoryTest {
         CategoryName expectedCategoryName,
         Description expectedDescription,
         Boolean expectedIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // Given
         LivingExpenseCategory category = new LivingExpenseCategory(
@@ -208,12 +206,8 @@ class LivingExpenseCategoryTest {
         Boolean actual = category.isDefault();
 
         // Then
-        assertThat(actual).isEqualTo(expectedIsDefault);
-        assertThat(category.id()).isEqualTo(expectedId);
-        assertThat(category.userGroupId()).isEqualTo(expectedUserGroupId);
-        assertThat(category.categoryName()).isEqualTo(expectedCategoryName);
-        assertThat(category.description()).isEqualTo(expectedDescription);
-        assertThat(category.version()).isEqualTo(expectedVersion);
+        then(actual).isEqualTo(expectedIsDefault);
+        then(livingExpenseCategory).usingRecursiveComparison().isEqualTo(category);
     }
 
     @ParameterizedTest
@@ -224,29 +218,25 @@ class LivingExpenseCategoryTest {
         CategoryName currentCategoryName,
         Description expectedDescription,
         Boolean expectedIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // Given
-        LivingExpenseCategory category = new LivingExpenseCategory(
+        CategoryName expectedNewCategoryName = new CategoryName("新しい分類名");
+        LivingExpenseCategory expected = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
-            currentCategoryName,
+            expectedNewCategoryName,
             expectedDescription,
             expectedIsDefault,
             expectedVersion
         );
-        CategoryName expectedNewCategoryName = new CategoryName("新しい分類名");
 
         // When
-        category.updateCategoryName(expectedNewCategoryName);
+        livingExpenseCategory.updateCategoryName(expectedNewCategoryName);
 
         // Then
-        assertThat(category.categoryName()).isEqualTo(expectedNewCategoryName);
-        assertThat(category.id()).isEqualTo(expectedId);
-        assertThat(category.userGroupId()).isEqualTo(expectedUserGroupId);
-        assertThat(category.description()).isEqualTo(expectedDescription);
-        assertThat(category.isDefault()).isEqualTo(expectedIsDefault);
-        assertThat(category.version()).isEqualTo(expectedVersion);
+        then(livingExpenseCategory).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @ParameterizedTest
@@ -257,29 +247,25 @@ class LivingExpenseCategoryTest {
         CategoryName expectedCategoryName,
         Description currentDescription,
         Boolean expectedIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // Given
-        LivingExpenseCategory category = new LivingExpenseCategory(
+        Description expectedNewDescription = new Description("新しい説明");
+        LivingExpenseCategory expected = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
             expectedCategoryName,
-            currentDescription,
+            expectedNewDescription,
             expectedIsDefault,
             expectedVersion
         );
-        Description expectedNewDescription = new Description("新しい説明");
 
         // When
-        category.updateDescription(expectedNewDescription);
+        livingExpenseCategory.updateDescription(expectedNewDescription);
 
         // Then
-        assertThat(category.description()).isEqualTo(expectedNewDescription);
-        assertThat(category.id()).isEqualTo(expectedId);
-        assertThat(category.userGroupId()).isEqualTo(expectedUserGroupId);
-        assertThat(category.categoryName()).isEqualTo(expectedCategoryName);
-        assertThat(category.isDefault()).isEqualTo(expectedIsDefault);
-        assertThat(category.version()).isEqualTo(expectedVersion);
+        then(livingExpenseCategory).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @Test
@@ -319,28 +305,24 @@ class LivingExpenseCategoryTest {
         CategoryName expectedCategoryName,
         Description expectedDescription,
         Boolean currentIsDefault,
-        Integer expectedVersion
+        Integer expectedVersion,
+        LivingExpenseCategory livingExpenseCategory
     ) {
         // Given
-        LivingExpenseCategory category = new LivingExpenseCategory(
+        LivingExpenseCategory expected = new LivingExpenseCategory(
             expectedId,
             expectedUserGroupId,
             expectedCategoryName,
             expectedDescription,
-            currentIsDefault, // 初期状態はデフォルト
+            Boolean.FALSE, // 初期状態はデフォルト
             expectedVersion
         );
 
         // When
-        category.unmarkAsDefault();
+        livingExpenseCategory.unmarkAsDefault();
 
         // Then
-        assertThat(category.isDefault()).isFalse(); // デフォルトが解除される
-        assertThat(category.id()).isEqualTo(expectedId);
-        assertThat(category.userGroupId()).isEqualTo(expectedUserGroupId);
-        assertThat(category.categoryName()).isEqualTo(expectedCategoryName);
-        assertThat(category.description()).isEqualTo(expectedDescription);
-        assertThat(category.version()).isEqualTo(expectedVersion);
+        then(livingExpenseCategory).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @Test
