@@ -130,8 +130,6 @@ classDiagram
         -Integer version
         +addLivingExpense(UserId, LivingExpenseCategoryId, Money, Description) void
         +calculateTotalLivingExpense() Money
-        +updateBudgetBalance(Money) void
-        +getPersonalShareOfLivingExpense(int) Money
 }
 
     class DailyPersonalTransaction {
