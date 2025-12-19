@@ -81,8 +81,6 @@ public class DailyGroupTransaction {
     }
 
     public Money calculateTotalLivingExpense() {
-        return this.livingExpenses.stream()
-            .map(DailyLivingExpense::amount)
-            .reduce(new Money(0), Money::add);
+        return this.livingExpenses.stream().map(DailyLivingExpense::amount).reduce(new Money(0), Money::add);
     }
 }
