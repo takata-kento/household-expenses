@@ -138,7 +138,7 @@ CREATE TABLE daily_personal_expense (
     id VARCHAR(36) PRIMARY KEY,
     daily_personal_transaction_id VARCHAR(36) NOT NULL REFERENCES daily_personal_transaction(id) ON DELETE CASCADE,
     amount INTEGER NOT NULL,
-    description TEXT NOT NULL,
+    memo TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     version INTEGER DEFAULT 0

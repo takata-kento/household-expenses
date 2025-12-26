@@ -118,7 +118,7 @@ classDiagram
         -DailyPersonalExpenseId id
         -DailyPersonalTransactionId dailyPersonalTransactionId
         -Money amount
-        -Description description
+        -Description memo
         -Integer version
     }
 

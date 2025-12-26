@@ -132,7 +132,7 @@ erDiagram
         varchar id PK
         varchar daily_personal_transaction_id FK
         integer amount "金額"
-        varchar description "使用目的"
+        varchar memo "使用目的"
         timestamp created_at
         timestamp updated_at
         integer version "バージョン"
@@ -276,7 +276,7 @@ erDiagram
 
 ### DAILY_PERSONAL_EXPENSE（日次個人支出）
 - 個人支出の詳細を記録
-- 使用目的を記録
+- メモ（使用目的）を記録
 - 非共有データ（記録者本人のみ閲覧可能）
 
 ### DAILY_BUDGET_BALANCE（日次予算残高）
