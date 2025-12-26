@@ -67,8 +67,8 @@ public class DailyPersonalTransaction {
         return this.income;
     }
 
-    public List<DailyPersonalExpense> personalExpenses() {
-        return new ArrayList<>(this.personalExpenses);
+    public List<DailyPersonalExpenseInfo> personalExpenses() {
+        return this.personalExpenses.stream().map(DailyPersonalExpenseInfo::from).toList();
     }
 
     public void addPersonalExpense(Money amount, Description memo) {

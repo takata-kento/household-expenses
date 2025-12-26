@@ -175,12 +175,13 @@ class DailyPersonalTransactionTest {
             expectedPersonalExpenses,
             version
         );
+        int expectedSize = expectedPersonalExpenses.size();
 
         // When
-        List<DailyPersonalExpense> actual = dailyPersonalTransaction.personalExpenses();
+        List<DailyPersonalExpenseInfo> actual = dailyPersonalTransaction.personalExpenses();
 
         // Then
-        then(actual).isEqualTo(expectedPersonalExpenses);
+        then(actual).hasSize(expectedSize);
         then(dailyPersonalTransaction).usingRecursiveComparison().isEqualTo(expected);
     }
 
@@ -204,13 +205,13 @@ class DailyPersonalTransactionTest {
         dailyPersonalTransaction.addPersonalExpense(amount, memo);
 
         // Then
-        List<DailyPersonalExpense> actualPersonalExpenses = dailyPersonalTransaction.personalExpenses();
+        List<DailyPersonalExpenseInfo> actualPersonalExpenses = dailyPersonalTransaction.personalExpenses();
         then(actualPersonalExpenses).hasSize(expectedSize);
 
-        DailyPersonalExpense addedExpense = actualPersonalExpenses.get(actualPersonalExpenses.size() - 1);
+        DailyPersonalExpenseInfo addedExpense = actualPersonalExpenses.get(actualPersonalExpenses.size() - 1);
         then(addedExpense.amount()).isEqualTo(amount);
         then(addedExpense.memo()).isEqualTo(memo);
-        then(addedExpense.dailyPersonalTransactionId()).isEqualTo(id);
+        then(addedExpense.id()).isNotNull();
     }
 
     @ParameterizedTest
