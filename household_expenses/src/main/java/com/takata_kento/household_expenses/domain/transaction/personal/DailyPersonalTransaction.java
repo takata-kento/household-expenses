@@ -29,7 +29,7 @@ public class DailyPersonalTransaction {
     @Column("income")
     private Money income;
 
-    @MappedCollection(idColumn = "daily_personal_transaction_id", keyColumn = "created_at")
+    @MappedCollection(idColumn = "daily_personal_transaction_id")
     private List<DailyPersonalExpense> personalExpenses;
 
     @Version
