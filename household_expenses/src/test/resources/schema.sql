@@ -1,3 +1,6 @@
+-- テスト用スキーマ定義
+-- トリガーとデフォルトデータは除外し、テーブル構造のみ定義
+
 -- 拡張機能の有効化
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -213,43 +216,3 @@ CREATE INDEX idx_daily_budget_balance_date ON daily_budget_balance(transaction_d
 CREATE INDEX idx_monthly_budget_year_month ON monthly_budget(year, month);
 CREATE INDEX idx_fixed_expense_history_year_month ON fixed_expense_history(year, month);
 CREATE INDEX idx_monthly_saving_year_month ON monthly_saving(year, month);
-
--- 更新日時の自動更新のためのトリガー関数
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- 各テーブルに更新日時トリガーを設定
-CREATE TRIGGER update_user_updated_at BEFORE UPDATE ON "users" FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_user_group_updated_at BEFORE UPDATE ON user_group FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_group_invitation_updated_at BEFORE UPDATE ON group_invitation FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_financial_account_updated_at BEFORE UPDATE ON financial_account FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_monthly_budget_updated_at BEFORE UPDATE ON monthly_budget FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_living_expense_category_updated_at BEFORE UPDATE ON living_expense_category FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_daily_group_transaction_updated_at BEFORE UPDATE ON daily_group_transaction FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_daily_living_expense_updated_at BEFORE UPDATE ON daily_living_expense FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_daily_personal_transaction_updated_at BEFORE UPDATE ON daily_personal_transaction FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_daily_personal_expense_updated_at BEFORE UPDATE ON daily_personal_expense FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_daily_budget_balance_updated_at BEFORE UPDATE ON daily_budget_balance FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_fixed_expense_category_updated_at BEFORE UPDATE ON fixed_expense_category FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_fixed_expense_history_updated_at BEFORE UPDATE ON fixed_expense_history FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_monthly_saving_updated_at BEFORE UPDATE ON monthly_saving FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- デフォルト生活費分類データの挿入（グローバル設定として）
-INSERT INTO living_expense_category (user_group_id, category_name, description, is_default) VALUES
-(NULL, '食費', '食材・飲料などの食事関連費用', TRUE),
-(NULL, '食費', '外食関連費用', TRUE),
-(NULL, '交通費', '電車・バス・タクシー・ガソリン代など', TRUE),
-(NULL, '日用品', '洗剤・ティッシュ・シャンプーなどの生活用品', TRUE),
-(NULL, '医療費', '病院代・薬代・健康関連費用', TRUE),
-(NULL, '娯楽費', '映画・本・レジャー・趣味関連費用', TRUE),
-(NULL, '衣服費', '衣類・靴・アクセサリーなど', TRUE),
-(NULL, '教育費', '書籍・講座・資格取得などの学習費用', TRUE),
-(NULL, 'その他', 'その他の生活費', TRUE);
-
--- 初期化完了メッセージ
-SELECT 'Database initialization completed successfully!' as message;
