@@ -3,6 +3,8 @@ package com.takata_kento.household_expenses.config;
 import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.DailyGroupTransactionId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyLivingExpenseId;
+import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalExpenseId;
+import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalTransactionId;
 import com.takata_kento.household_expenses.domain.valueobject.Day;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
@@ -62,7 +64,11 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new DailyLivingExpenseIdToStringConverter(),
             new StringToDailyLivingExpenseIdConverter(),
             new DailyGroupTransactionIdToStringConverter(),
-            new StringToDailyGroupTransactionIdConverter()
+            new StringToDailyGroupTransactionIdConverter(),
+            new DailyPersonalTransactionIdToStringConverter(),
+            new StringToDailyPersonalTransactionIdConverter(),
+            new DailyPersonalExpenseIdToStringConverter(),
+            new StringToDailyPersonalExpenseIdConverter()
         );
     }
 
@@ -351,6 +357,42 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public DailyGroupTransactionId convert(String source) {
             return new DailyGroupTransactionId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class DailyPersonalTransactionIdToStringConverter implements Converter<DailyPersonalTransactionId, String> {
+
+        @Override
+        public String convert(DailyPersonalTransactionId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToDailyPersonalTransactionIdConverter implements Converter<String, DailyPersonalTransactionId> {
+
+        @Override
+        public DailyPersonalTransactionId convert(String source) {
+            return new DailyPersonalTransactionId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class DailyPersonalExpenseIdToStringConverter implements Converter<DailyPersonalExpenseId, String> {
+
+        @Override
+        public String convert(DailyPersonalExpenseId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToDailyPersonalExpenseIdConverter implements Converter<String, DailyPersonalExpenseId> {
+
+        @Override
+        public DailyPersonalExpenseId convert(String source) {
+            return new DailyPersonalExpenseId(UUID.fromString(source));
         }
     }
 }
