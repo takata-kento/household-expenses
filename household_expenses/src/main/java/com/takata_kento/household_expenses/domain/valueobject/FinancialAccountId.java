@@ -1,9 +1,16 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
-public record FinancialAccountId(long value) {
+import java.util.UUID;
+
+public record FinancialAccountId(UUID value) {
     public FinancialAccountId {
-        if (value <= 0) {
-            throw new IllegalArgumentException("FinancialAccountId must be positive");
+        if (value == null) {
+            throw new IllegalArgumentException("FinancialAccountId must not be null");
         }
+    }
+
+    @Override
+    public String toString() {
+        return value.toString();
     }
 }
