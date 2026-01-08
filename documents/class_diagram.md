@@ -321,8 +321,8 @@ classDiagram
 
     class FinancialAccountId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class Day {
@@ -351,14 +351,14 @@ classDiagram
 
     class FixedExpenseCategoryId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class BalanceEditHistoryId {
-        -Long value
-        +getValue() Long
-        +isValid() boolean
+        <<record>>
+        -UUID value
+        +value() UUID
     }
 
     class DailyLivingExpenseId {
@@ -370,8 +370,8 @@ classDiagram
 
     class FixedExpenseHistoryId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class MonthlyBudgetId {
