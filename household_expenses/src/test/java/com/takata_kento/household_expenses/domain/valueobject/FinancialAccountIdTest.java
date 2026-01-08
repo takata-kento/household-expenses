@@ -1,7 +1,9 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class FinancialAccountIdTest {
@@ -9,92 +11,37 @@ class FinancialAccountIdTest {
     @Test
     void testCreate() {
         // Given
-        long value = 123L;
+        UUID value = UUID.randomUUID();
 
         // When
         FinancialAccountId actual = new FinancialAccountId(value);
 
         // Then
-        assertThat(actual.value()).isEqualTo(123L);
+        then(actual.value()).isEqualTo(value);
     }
 
     @Test
-    void testCreateWithZero() {
+    void testCreateWithNull() {
         // Given
-        long value = 0L;
-
-        // When & Then
-        assertThatThrownBy(() -> new FinancialAccountId(value))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("FinancialAccountId must be positive");
-    }
-
-    @Test
-    void testCreateWithNegative() {
-        // Given
-        long value = -1L;
-
-        // When & Then
-        assertThatThrownBy(() -> new FinancialAccountId(value))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("FinancialAccountId must be positive");
-    }
-
-    @Test
-    void testCreateWithMinPositive() {
-        // Given
-        long value = 1L;
+        UUID value = null;
 
         // When
-        FinancialAccountId actual = new FinancialAccountId(value);
+        IllegalArgumentException actual = catchIllegalArgumentException(() -> new FinancialAccountId(value));
 
         // Then
-        assertThat(actual.value()).isEqualTo(1L);
-    }
-
-    @Test
-    void testCreateWithMaxValue() {
-        // Given
-        long value = Long.MAX_VALUE;
-
-        // When
-        FinancialAccountId actual = new FinancialAccountId(value);
-
-        // Then
-        assertThat(actual.value()).isEqualTo(Long.MAX_VALUE);
-    }
-
-    @Test
-    void testEquals() {
-        // Given
-        FinancialAccountId financialAccountId1 = new FinancialAccountId(123L);
-        FinancialAccountId financialAccountId2 = new FinancialAccountId(123L);
-        FinancialAccountId financialAccountId3 = new FinancialAccountId(456L);
-
-        // When & Then
-        assertThat(financialAccountId1).isEqualTo(financialAccountId2);
-        assertThat(financialAccountId1).isNotEqualTo(financialAccountId3);
-    }
-
-    @Test
-    void testHashCode() {
-        // Given
-        FinancialAccountId financialAccountId1 = new FinancialAccountId(123L);
-        FinancialAccountId financialAccountId2 = new FinancialAccountId(123L);
-
-        // When & Then
-        assertThat(financialAccountId1.hashCode()).isEqualTo(financialAccountId2.hashCode());
+        then(actual).hasMessage(FinancialAccountId.class.getSimpleName() + " must not be null");
     }
 
     @Test
     void testToString() {
         // Given
-        FinancialAccountId financialAccountId = new FinancialAccountId(123L);
+        UUID value = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        FinancialAccountId id = new FinancialAccountId(value);
 
         // When
-        String actual = financialAccountId.toString();
+        String actual = id.toString();
 
         // Then
-        assertThat(actual).contains("123");
+        then(actual).isEqualTo(value.toString());
     }
 }
