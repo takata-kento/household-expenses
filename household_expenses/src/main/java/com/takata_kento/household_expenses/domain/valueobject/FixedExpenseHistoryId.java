@@ -1,9 +1,16 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
-public record FixedExpenseHistoryId(long value) {
+import java.util.UUID;
+
+public record FixedExpenseHistoryId(UUID value) {
     public FixedExpenseHistoryId {
-        if (value <= 0) {
-            throw new IllegalArgumentException("FixedExpenseHistoryId must be positive");
+        if (value == null) {
+            throw new IllegalArgumentException("FixedExpenseHistoryId must not be null");
         }
+    }
+
+    @Override
+    public String toString() {
+        return value.toString();
     }
 }
