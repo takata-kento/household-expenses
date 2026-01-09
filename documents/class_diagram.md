@@ -65,11 +65,13 @@ classDiagram
 
     class BalanceEditHistory {
         -BalanceEditHistoryId id
+        -FinancialAccountId financialAccountId
         -Money oldBalance
         -Money newBalance
         -Description editReason
         -LocalDateTime createdAt
         -Integer version
+        +create(FinancialAccountId, Money, Money, Description) BalanceEditHistory
     }
 
     class MonthlyBudget {
