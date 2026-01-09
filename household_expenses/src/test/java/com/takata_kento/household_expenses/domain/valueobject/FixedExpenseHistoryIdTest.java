@@ -29,7 +29,7 @@ class FixedExpenseHistoryIdTest {
         IllegalArgumentException actual = catchIllegalArgumentException(() -> new FixedExpenseHistoryId(value));
 
         // Then
-        then(actual).hasMessage("FixedExpenseHistoryId must not be null");
+        then(actual).hasMessage(FixedExpenseHistoryId.class.getSimpleName() + " must not be null");
     }
 
     @Test

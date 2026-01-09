@@ -29,7 +29,7 @@ class FixedExpenseCategoryIdTest {
         IllegalArgumentException actual = catchIllegalArgumentException(() -> new FixedExpenseCategoryId(value));
 
         // Then
-        then(actual).hasMessage("FixedExpenseCategoryId must not be null");
+        then(actual).hasMessage(FixedExpenseCategoryId.class.getSimpleName() + " must not be null");
     }
 
     @Test

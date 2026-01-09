@@ -6,7 +6,7 @@ import static org.assertj.core.api.BDDAssertions.*;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-class GroupInvitationIdTest {
+class BalanceEditHistoryIdTest {
 
     @Test
     void testCreate() {
@@ -14,7 +14,7 @@ class GroupInvitationIdTest {
         UUID value = UUID.randomUUID();
 
         // When
-        GroupInvitationId actual = new GroupInvitationId(value);
+        BalanceEditHistoryId actual = new BalanceEditHistoryId(value);
 
         // Then
         then(actual.value()).isEqualTo(value);
@@ -26,17 +26,17 @@ class GroupInvitationIdTest {
         UUID value = null;
 
         // When
-        IllegalArgumentException actual = catchIllegalArgumentException(() -> new GroupInvitationId(value));
+        IllegalArgumentException actual = catchIllegalArgumentException(() -> new BalanceEditHistoryId(value));
 
         // Then
-        then(actual).hasMessage(GroupInvitationId.class.getSimpleName() + " must not be null");
+        then(actual).hasMessage("BalanceEditHistoryId must not be null");
     }
 
     @Test
     void testToString() {
         // Given
         UUID value = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
-        GroupInvitationId id = new GroupInvitationId(value);
+        BalanceEditHistoryId id = new BalanceEditHistoryId(value);
 
         // When
         String actual = id.toString();

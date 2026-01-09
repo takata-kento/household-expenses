@@ -2,11 +2,9 @@ package com.takata_kento.household_expenses.domain.valueobject;
 
 import java.util.UUID;
 
-public record FixedExpenseHistoryId(UUID value) {
+public record FixedExpenseHistoryId(UUID value) implements UUIDValueObject {
     public FixedExpenseHistoryId {
-        if (value == null) {
-            throw new IllegalArgumentException("FixedExpenseHistoryId must not be null");
-        }
+        ValidateUtil.validUUID(value, getClass());
     }
 
     @Override
