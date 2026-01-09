@@ -29,7 +29,7 @@ class FinancialAccountIdTest {
         IllegalArgumentException actual = catchIllegalArgumentException(() -> new FinancialAccountId(value));
 
         // Then
-        then(actual).hasMessage("FinancialAccountId must not be null");
+        then(actual).hasMessage(FinancialAccountId.class.getSimpleName() + " must not be null");
     }
 
     @Test

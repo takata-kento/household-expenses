@@ -11,30 +11,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jdbc.test.autoconfigure.DataJdbcTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @DataJdbcTest
 @Testcontainers
+@Sql("/schema.sql")
 class UserGroupRepositoryTest {
 
-    @SuppressWarnings("resource")
     @Container
-    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17-alpine")
-        .withDatabaseName("test")
-        .withUsername("test")
-        .withPassword("test");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
+    @ServiceConnection
+    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17-alpine");
 
     @Autowired
     private UserGroupRepository userGroupRepository;
@@ -44,54 +35,7 @@ class UserGroupRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // 関連テーブルをカスケード削除
-        jdbcClient.sql("DROP TABLE IF EXISTS group_invitation CASCADE").update();
-        jdbcClient.sql("DROP TABLE IF EXISTS users CASCADE").update();
-        jdbcClient.sql("DROP TABLE IF EXISTS user_group CASCADE").update();
-
-        // user_groupテーブル作成
-        jdbcClient
-            .sql(
-                """
-                CREATE TABLE user_group (
-                    id BIGSERIAL PRIMARY KEY,
-                    group_name VARCHAR(255) NOT NULL,
-                    month_start_day INTEGER NOT NULL DEFAULT 1 CHECK (month_start_day >= 1 AND month_start_day <= 31),
-                    created_by_user_id BIGINT,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP WITH TIME ZONE,
-                    version INTEGER DEFAULT 0
-                )
-                """
-            )
-            .update();
-
-        // usersテーブル作成（外部キー制約のため）
-        jdbcClient
-            .sql(
-                """
-                CREATE TABLE "users" (
-                    id BIGSERIAL PRIMARY KEY,
-                    username VARCHAR(255) UNIQUE NOT NULL,
-                    password_hash VARCHAR(255) NOT NULL,
-                    user_group_id BIGINT REFERENCES user_group(id) ON DELETE SET NULL,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP WITH TIME ZONE,
-                    enabled boolean,
-                    version INTEGER DEFAULT 0
-                )
-                """
-            )
-            .update();
-
-        // user_groupのcreated_by_user_idに外部キー制約を追加
-        jdbcClient
-            .sql(
-                "ALTER TABLE user_group ADD FOREIGN KEY (created_by_user_id) REFERENCES \"users\"(id) ON DELETE SET NULL"
-            )
-            .update();
-
-        // 作成者ユーザーを挿入
+        // テストデータを挿入
         jdbcClient
             .sql(
                 """
