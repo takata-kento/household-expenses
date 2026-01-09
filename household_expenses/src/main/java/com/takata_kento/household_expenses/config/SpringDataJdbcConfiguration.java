@@ -7,6 +7,9 @@ import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalExpen
 import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalTransactionId;
 import com.takata_kento.household_expenses.domain.valueobject.Day;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
+import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
+import com.takata_kento.household_expenses.domain.valueobject.FixedExpenseCategoryId;
+import com.takata_kento.household_expenses.domain.valueobject.FixedExpenseHistoryId;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.GroupName;
 import com.takata_kento.household_expenses.domain.valueobject.LivingExpenseCategoryId;
@@ -33,30 +36,36 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
-            new UserIdToLongConverter(),
-            new LongToUserIdConverter(),
+            new UserIdToStringConverter(),
+            new StringToUserIdConverter(),
             new UsernameToStringConverter(),
             new StringToUsernameConverter(),
-            new UserGroupIdToLongConverter(),
-            new LongToUserGroupIdConverter(),
-            new GroupInvitationIdToLongConverter(),
-            new LongToGroupInvitationIdConverter(),
-            new OptionalUserGroupIdToLongConverter(),
-            new LongToOptionalUserGroupIdConverter(),
+            new UserGroupIdToStringConverter(),
+            new StringToUserGroupIdConverter(),
+            new GroupInvitationIdToStringConverter(),
+            new StringToGroupInvitationIdConverter(),
+            new OptionalUserGroupIdToStringConverter(),
+            new StringToOptionalUserGroupIdConverter(),
             new GroupNameToStringConverter(),
             new StringToGroupNameConverter(),
             new DayToIntegerConverter(),
             new IntegerToDayConverter(),
-            new MonthlyBudgetIdToLongConverter(),
-            new LongToMonthlyBudgetIdConverter(),
+            new MonthlyBudgetIdToStringConverter(),
+            new StringToMonthlyBudgetIdConverter(),
             new YearToIntegerConverter(),
             new IntegerToYearConverter(),
             new MonthToIntegerConverter(),
             new IntegerToMonthConverter(),
             new MoneyToIntegerConverter(),
             new IntegerToMoneyConverter(),
-            new LivingExpenseCategoryIdToLongConverter(),
-            new LongToLivingExpenseCategoryIdConverter(),
+            new LivingExpenseCategoryIdToStringConverter(),
+            new StringToLivingExpenseCategoryIdConverter(),
+            new FinancialAccountIdToStringConverter(),
+            new StringToFinancialAccountIdConverter(),
+            new FixedExpenseCategoryIdToStringConverter(),
+            new StringToFixedExpenseCategoryIdConverter(),
+            new FixedExpenseHistoryIdToStringConverter(),
+            new StringToFixedExpenseHistoryIdConverter(),
             new CategoryNameToStringConverter(),
             new StringToCategoryNameConverter(),
             new DescriptionToStringConverter(),
@@ -73,20 +82,20 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class UserIdToLongConverter implements Converter<UserId, Long> {
+    static class UserIdToStringConverter implements Converter<UserId, String> {
 
         @Override
-        public Long convert(UserId source) {
-            return source.value();
+        public String convert(UserId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToUserIdConverter implements Converter<Long, UserId> {
+    static class StringToUserIdConverter implements Converter<String, UserId> {
 
         @Override
-        public UserId convert(Long source) {
-            return new UserId(source);
+        public UserId convert(String source) {
+            return new UserId(UUID.fromString(source));
         }
     }
 
@@ -109,56 +118,56 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class UserGroupIdToLongConverter implements Converter<UserGroupId, Long> {
+    static class UserGroupIdToStringConverter implements Converter<UserGroupId, String> {
 
         @Override
-        public Long convert(UserGroupId source) {
-            return source.value();
+        public String convert(UserGroupId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToUserGroupIdConverter implements Converter<Long, UserGroupId> {
+    static class StringToUserGroupIdConverter implements Converter<String, UserGroupId> {
 
         @Override
-        public UserGroupId convert(Long source) {
-            return new UserGroupId(source);
+        public UserGroupId convert(String source) {
+            return new UserGroupId(UUID.fromString(source));
         }
     }
 
     @WritingConverter
-    static class GroupInvitationIdToLongConverter implements Converter<GroupInvitationId, Long> {
+    static class GroupInvitationIdToStringConverter implements Converter<GroupInvitationId, String> {
 
         @Override
-        public Long convert(GroupInvitationId source) {
-            return source.value();
+        public String convert(GroupInvitationId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToGroupInvitationIdConverter implements Converter<Long, GroupInvitationId> {
+    static class StringToGroupInvitationIdConverter implements Converter<String, GroupInvitationId> {
 
         @Override
-        public GroupInvitationId convert(Long source) {
-            return new GroupInvitationId(source);
+        public GroupInvitationId convert(String source) {
+            return new GroupInvitationId(UUID.fromString(source));
         }
     }
 
     @WritingConverter
-    static class OptionalUserGroupIdToLongConverter implements Converter<Optional<UserGroupId>, Long> {
+    static class OptionalUserGroupIdToStringConverter implements Converter<Optional<UserGroupId>, String> {
 
         @Override
-        public Long convert(Optional<UserGroupId> source) {
-            return source.map(UserGroupId::value).orElse(null);
+        public String convert(Optional<UserGroupId> source) {
+            return source.map(UserGroupId::toString).orElse(null);
         }
     }
 
     @ReadingConverter
-    static class LongToOptionalUserGroupIdConverter implements Converter<Long, Optional<UserGroupId>> {
+    static class StringToOptionalUserGroupIdConverter implements Converter<String, Optional<UserGroupId>> {
 
         @Override
-        public Optional<UserGroupId> convert(Long source) {
-            return source != null ? Optional.of(new UserGroupId(source)) : Optional.empty();
+        public Optional<UserGroupId> convert(String source) {
+            return source != null ? Optional.of(new UserGroupId(UUID.fromString(source))) : Optional.empty();
         }
     }
 
@@ -199,20 +208,20 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class MonthlyBudgetIdToLongConverter implements Converter<MonthlyBudgetId, Long> {
+    static class MonthlyBudgetIdToStringConverter implements Converter<MonthlyBudgetId, String> {
 
         @Override
-        public Long convert(MonthlyBudgetId source) {
-            return source.value();
+        public String convert(MonthlyBudgetId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToMonthlyBudgetIdConverter implements Converter<Long, MonthlyBudgetId> {
+    static class StringToMonthlyBudgetIdConverter implements Converter<String, MonthlyBudgetId> {
 
         @Override
-        public MonthlyBudgetId convert(Long source) {
-            return new MonthlyBudgetId(source);
+        public MonthlyBudgetId convert(String source) {
+            return new MonthlyBudgetId(UUID.fromString(source));
         }
     }
 
@@ -271,20 +280,74 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class LivingExpenseCategoryIdToLongConverter implements Converter<LivingExpenseCategoryId, Long> {
+    static class LivingExpenseCategoryIdToStringConverter implements Converter<LivingExpenseCategoryId, String> {
 
         @Override
-        public Long convert(LivingExpenseCategoryId source) {
-            return source.value();
+        public String convert(LivingExpenseCategoryId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToLivingExpenseCategoryIdConverter implements Converter<Long, LivingExpenseCategoryId> {
+    static class StringToLivingExpenseCategoryIdConverter implements Converter<String, LivingExpenseCategoryId> {
 
         @Override
-        public LivingExpenseCategoryId convert(Long source) {
-            return new LivingExpenseCategoryId(source);
+        public LivingExpenseCategoryId convert(String source) {
+            return new LivingExpenseCategoryId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class FinancialAccountIdToStringConverter implements Converter<FinancialAccountId, String> {
+
+        @Override
+        public String convert(FinancialAccountId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToFinancialAccountIdConverter implements Converter<String, FinancialAccountId> {
+
+        @Override
+        public FinancialAccountId convert(String source) {
+            return new FinancialAccountId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class FixedExpenseCategoryIdToStringConverter implements Converter<FixedExpenseCategoryId, String> {
+
+        @Override
+        public String convert(FixedExpenseCategoryId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToFixedExpenseCategoryIdConverter implements Converter<String, FixedExpenseCategoryId> {
+
+        @Override
+        public FixedExpenseCategoryId convert(String source) {
+            return new FixedExpenseCategoryId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class FixedExpenseHistoryIdToStringConverter implements Converter<FixedExpenseHistoryId, String> {
+
+        @Override
+        public String convert(FixedExpenseHistoryId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToFixedExpenseHistoryIdConverter implements Converter<String, FixedExpenseHistoryId> {
+
+        @Override
+        public FixedExpenseHistoryId convert(String source) {
+            return new FixedExpenseHistoryId(UUID.fromString(source));
         }
     }
 

@@ -1,7 +1,9 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class UserIdTest {
@@ -9,92 +11,37 @@ class UserIdTest {
     @Test
     void testCreate() {
         // Given
-        long value = 123L;
+        UUID value = UUID.randomUUID();
 
         // When
         UserId actual = new UserId(value);
 
         // Then
-        assertThat(actual.value()).isEqualTo(123L);
+        then(actual.value()).isEqualTo(value);
     }
 
     @Test
-    void testCreateWithZero() {
+    void testCreateWithNull() {
         // Given
-        long value = 0L;
-
-        // When & Then
-        assertThatThrownBy(() -> new UserId(value))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("UserId must be positive");
-    }
-
-    @Test
-    void testCreateWithNegative() {
-        // Given
-        long value = -1L;
-
-        // When & Then
-        assertThatThrownBy(() -> new UserId(value))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("UserId must be positive");
-    }
-
-    @Test
-    void testCreateWithMinPositive() {
-        // Given
-        long value = 1L;
+        UUID value = null;
 
         // When
-        UserId actual = new UserId(value);
+        IllegalArgumentException actual = catchIllegalArgumentException(() -> new UserId(value));
 
         // Then
-        assertThat(actual.value()).isEqualTo(1L);
-    }
-
-    @Test
-    void testCreateWithMaxValue() {
-        // Given
-        long value = Long.MAX_VALUE;
-
-        // When
-        UserId actual = new UserId(value);
-
-        // Then
-        assertThat(actual.value()).isEqualTo(Long.MAX_VALUE);
-    }
-
-    @Test
-    void testEquals() {
-        // Given
-        UserId userId1 = new UserId(123L);
-        UserId userId2 = new UserId(123L);
-        UserId userId3 = new UserId(456L);
-
-        // When & Then
-        assertThat(userId1).isEqualTo(userId2);
-        assertThat(userId1).isNotEqualTo(userId3);
-    }
-
-    @Test
-    void testHashCode() {
-        // Given
-        UserId userId1 = new UserId(123L);
-        UserId userId2 = new UserId(123L);
-
-        // When & Then
-        assertThat(userId1.hashCode()).isEqualTo(userId2.hashCode());
+        then(actual).hasMessage(UserId.class.getSimpleName() + " must not be null");
     }
 
     @Test
     void testToString() {
         // Given
-        UserId userId = new UserId(123L);
+        UUID value = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        UserId id = new UserId(value);
 
         // When
-        String actual = userId.toString();
+        String actual = id.toString();
 
         // Then
-        assertThat(actual).contains("123");
+        then(actual).isEqualTo(value.toString());
     }
 }

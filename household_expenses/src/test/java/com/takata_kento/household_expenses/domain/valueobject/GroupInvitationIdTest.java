@@ -1,67 +1,47 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.BDDAssertions.*;
 
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class GroupInvitationIdTest {
 
     @Test
-    void testConstructor() {
+    void testCreate() {
         // Given
-        long expectedValue = 1L;
+        UUID value = UUID.randomUUID();
 
         // When
-        GroupInvitationId actual = new GroupInvitationId(expectedValue);
+        GroupInvitationId actual = new GroupInvitationId(value);
 
         // Then
-        assertThat(actual.value()).isEqualTo(expectedValue);
+        then(actual.value()).isEqualTo(value);
     }
 
     @Test
-    void testConstructor_withValidValue() {
+    void testCreateWithNull() {
         // Given
-        long validValue = 100L;
+        UUID value = null;
 
         // When
-        GroupInvitationId actual = new GroupInvitationId(validValue);
+        IllegalArgumentException actual = catchIllegalArgumentException(() -> new GroupInvitationId(value));
 
         // Then
-        assertThat(actual.value()).isEqualTo(validValue);
+        then(actual).hasMessage(GroupInvitationId.class.getSimpleName() + " must not be null");
     }
 
     @Test
-    void testConstructor_withZero_shouldThrowException() {
+    void testToString() {
         // Given
-        long invalidValue = 0L;
+        UUID value = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        GroupInvitationId id = new GroupInvitationId(value);
 
-        // When / Then
-        assertThatThrownBy(() -> new GroupInvitationId(invalidValue))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("GroupInvitationId must be positive");
-    }
+        // When
+        String actual = id.toString();
 
-    @Test
-    void testConstructor_withNegativeValue_shouldThrowException() {
-        // Given
-        long invalidValue = -1L;
-
-        // When / Then
-        assertThatThrownBy(() -> new GroupInvitationId(invalidValue))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("GroupInvitationId must be positive");
-    }
-
-    @Test
-    void testEquals() {
-        // Given
-        GroupInvitationId id1 = new GroupInvitationId(1L);
-        GroupInvitationId id2 = new GroupInvitationId(1L);
-        GroupInvitationId id3 = new GroupInvitationId(2L);
-
-        // When / Then
-        assertThat(id1).isEqualTo(id2);
-        assertThat(id1).isNotEqualTo(id3);
-        assertThat(id1.hashCode()).isEqualTo(id2.hashCode());
+        // Then
+        then(actual).isEqualTo(value.toString());
     }
 }
