@@ -7,6 +7,7 @@ public record FixedExpenseCategoryId(UUID value) implements UUIDValueObject {
         ValidateUtil.validUUID(value, getClass());
     }
 
+    @Override
     public String toString() {
         return value.toString();
     }
