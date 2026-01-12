@@ -47,7 +47,7 @@ erDiagram
 
     %% 金融口座
     FINANCIAL_ACCOUNT {
-        bigint id PK
+        varchar id PK "UUID"
         bigint user_id FK
         varchar account_name "口座名"
         integer balance "残高"
@@ -59,8 +59,8 @@ erDiagram
 
     %% 預金残高編集履歴
     BALANCE_EDIT_HISTORY {
-        bigint id PK
-        bigint financial_account_id FK
+        varchar id PK "UUID"
+        varchar financial_account_id FK "UUID"
         integer old_balance "変更前残高"
         integer new_balance "変更後残高"
         varchar edit_reason "編集理由"
@@ -151,7 +151,7 @@ erDiagram
 
     %% 固定費分類
     FIXED_EXPENSE_CATEGORY {
-        bigint id PK
+        varchar id PK "UUID"
         bigint user_group_id FK
         varchar category_name "分類名"
         varchar description "説明"
@@ -163,8 +163,8 @@ erDiagram
 
     %% 固定費履歴
     FIXED_EXPENSE_HISTORY {
-        bigint id PK
-        bigint fixed_expense_category_id FK
+        varchar id PK "UUID"
+        varchar fixed_expense_category_id FK "UUID"
         int year "年"
         int month "月"
         integer amount "金額"
@@ -181,7 +181,7 @@ erDiagram
         int year PK "年"
         int month PK "月"
         integer saving_amount "貯金額"
-        bigint financial_account_id FK
+        varchar financial_account_id FK "UUID"
         varchar memo "メモ"
         timestamp created_at
         timestamp updated_at
