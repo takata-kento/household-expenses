@@ -10,9 +10,4 @@ public record FinancialAccountId(UUID value) implements UUIDValueObject {
     public String toString() {
         return value.toString();
     }
-
-    @Override
-    public String toString() {
-        return value.toString();
-    }
 }
