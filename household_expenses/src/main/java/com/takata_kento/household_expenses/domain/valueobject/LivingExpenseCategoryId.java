@@ -1,13 +1,9 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
-import java.util.UUID;
-
-public record LivingExpenseCategoryId(UUID value) implements UUIDValueObject {
+public record LivingExpenseCategoryId(long value) {
     public LivingExpenseCategoryId {
-        ValidateUtil.validUUID(value, getClass());
-    }
-
-    public String toString() {
-        return value.toString();
+        if (value <= 0) {
+            throw new IllegalArgumentException("LivingExpenseCategoryId must be positive");
+        }
     }
 }

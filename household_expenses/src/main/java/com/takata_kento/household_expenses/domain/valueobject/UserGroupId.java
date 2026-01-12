@@ -1,13 +1,9 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
-import java.util.UUID;
-
-public record UserGroupId(UUID value) implements UUIDValueObject {
+public record UserGroupId(long value) {
     public UserGroupId {
-        ValidateUtil.validUUID(value, getClass());
-    }
-
-    public String toString() {
-        return value.toString();
+        if (value <= 0) {
+            throw new IllegalArgumentException("UserGroupId must be positive");
+        }
     }
 }

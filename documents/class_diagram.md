@@ -226,10 +226,10 @@ classDiagram
     }
 
     class DailyLivingExpenseRequest {
-        -LivingExpenseCategoryId categoryId
+        -Long categoryId
         -Money amount
         -Description memo
-        +getCategoryId() LivingExpenseCategoryId
+        +getCategoryId() Long
         +getAmount() Money
         +getMemo() Description
     }
@@ -303,30 +303,26 @@ classDiagram
 
     class UserId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -long value
+        +value() long
     }
 
     class UserGroupId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -long value
+        +value() long
     }
 
     class GroupInvitationId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -long value
+        +value() long
     }
 
     class FinancialAccountId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -long value
+        +value() long
     }
 
     class Day {
@@ -349,65 +345,60 @@ classDiagram
 
     class LivingExpenseCategoryId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -long value
+        +value() long
     }
 
     class FixedExpenseCategoryId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -long value
+        +value() long
     }
 
     class BalanceEditHistoryId {
-        <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -Long value
+        +getValue() Long
+        +isValid() boolean
     }
 
     class DailyLivingExpenseId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -String value
+        +value() String
+        +generate() DailyLivingExpenseId
     }
 
     class FixedExpenseHistoryId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -long value
+        +value() long
     }
 
     class MonthlyBudgetId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -long value
+        +value() long
     }
 
     class DailyGroupTransactionId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -String value
+        +value() String
+        +generate() DailyGroupTransactionId
     }
 
     class DailyPersonalTransactionId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -String value
+        +value() String
+        +generate() DailyPersonalTransactionId
     }
 
     class DailyPersonalExpenseId {
         <<record>>
-        -UUID value
-        +value() UUID
-        +toString() String
+        -String value
+        +value() String
+        +generate() DailyPersonalExpenseId
     }
 
     %% Enumクラス
@@ -456,28 +447,28 @@ classDiagram
         -BudgetService budgetService
         +recordDailyTransaction(DailyTransactionRequest) DailyTransaction
         +calculateTotalExpense(List~DailyLivingExpenseRequest~, List~DailyPersonalExpenseRequest~, Integer) BigDecimal
-        +getDailyTransaction(UserId, LocalDate) DailyTransaction
-        +updateDailyTransaction(UserId, LocalDate, DailyTransactionRequest) DailyTransaction
-        +deleteDailyTransaction(UserId, LocalDate) void
+        +getDailyTransaction(Long, LocalDate) DailyTransaction
+        +updateDailyTransaction(Long, LocalDate, DailyTransactionRequest) DailyTransaction
+        +deleteDailyTransaction(Long, LocalDate) void
     }
 
     class BudgetService {
         -MonthlyBudgetRepository monthlyBudgetRepository
         +setMonthlyBudget(MonthlyBudgetRequest) MonthlyBudget
-        +getMonthlyBudget(UserGroupId, Integer, Integer) MonthlyBudget
-        +calculateBudgetBalance(UserGroupId, LocalDate, BigDecimal) BigDecimal
+        +getMonthlyBudget(Long, Integer, Integer) MonthlyBudget
+        +calculateBudgetBalance(Long, LocalDate, BigDecimal) BigDecimal
     }
 
     class ExpenseService {
         -LivingExpenseCategoryRepository livingExpenseCategoryRepository
         -FixedExpenseCategoryRepository fixedExpenseCategoryRepository
         -FixedExpenseHistoryRepository fixedExpenseHistoryRepository
-        +createLivingExpenseCategory(UserGroupId, String, String) LivingExpenseCategory
-        +updateLivingExpenseCategory(LivingExpenseCategoryId, String, String) LivingExpenseCategory
-        +deleteLivingExpenseCategory(LivingExpenseCategoryId) void
-        +createFixedExpenseCategory(UserGroupId, String, String, BigDecimal) FixedExpenseCategory
-        +setFixedExpenseAmount(FixedExpenseCategoryId, Integer, Integer, BigDecimal) FixedExpenseHistory
-        +getFixedExpenses(UserGroupId, Integer, Integer) List~FixedExpenseHistory~
+        +createLivingExpenseCategory(Long, String, String) LivingExpenseCategory
+        +updateLivingExpenseCategory(Long, String, String) LivingExpenseCategory
+        +deleteLivingExpenseCategory(Long) void
+        +createFixedExpenseCategory(Long, String, String, BigDecimal) FixedExpenseCategory
+        +setFixedExpenseAmount(Long, Integer, Integer, BigDecimal) FixedExpenseHistory
+        +getFixedExpenses(Long, Integer, Integer) List~FixedExpenseHistory~
     }
 
     class AccountService {
@@ -537,10 +528,10 @@ classDiagram
     class ExpenseController {
         -ExpenseService expenseService
         +createLivingExpenseCategory(String, String) ResponseEntity~LivingExpenseCategory~
-        +updateLivingExpenseCategory(LivingExpenseCategoryId, String, String) ResponseEntity~LivingExpenseCategory~
-        +deleteLivingExpenseCategory(LivingExpenseCategoryId) ResponseEntity~Void~
+        +updateLivingExpenseCategory(Long, String, String) ResponseEntity~LivingExpenseCategory~
+        +deleteLivingExpenseCategory(Long) ResponseEntity~Void~
         +createFixedExpenseCategory(String, String, BigDecimal) ResponseEntity~FixedExpenseCategory~
-        +setFixedExpenseAmount(FixedExpenseCategoryId, Integer, Integer, BigDecimal) ResponseEntity~FixedExpenseHistory~
+        +setFixedExpenseAmount(Long, Integer, Integer, BigDecimal) ResponseEntity~FixedExpenseHistory~
         +getFixedExpenses(Integer, Integer) ResponseEntity~List~FixedExpenseHistory~~
     }
 
@@ -589,18 +580,18 @@ classDiagram
 
     class BalanceEditHistoryRepository {
         <<interface>>
-        +findByFinancialAccountIdOrderByIdDesc(FinancialAccountId) List~BalanceEditHistory~
+        +findByFinancialAccountIdOrderByIdDesc(Long) List~BalanceEditHistory~
     }
 
     class MonthlyBudgetRepository {
         <<interface>>
-        +findByUserGroupIdAndYearAndMonth(UserGroupId, Integer, Integer) Optional~MonthlyBudget~
+        +findByUserGroupIdAndYearAndMonth(Long, Integer, Integer) Optional~MonthlyBudget~
     }
 
     class LivingExpenseCategoryRepository {
         <<interface>>
-        +findByUserGroupId(UserGroupId) List~LivingExpenseCategory~
-        +findByUserGroupIdAndIsDefault(UserGroupId, Boolean) List~LivingExpenseCategory~
+        +findByUserGroupId(Long) List~LivingExpenseCategory~
+        +findByUserGroupIdAndIsDefault(Long, Boolean) List~LivingExpenseCategory~
     }
 
     class DailyTransactionRepository {
@@ -623,13 +614,13 @@ classDiagram
 
     class FixedExpenseCategoryRepository {
         <<interface>>
-        +findByUserGroupId(UserGroupId) List~FixedExpenseCategory~
+        +findByUserGroupId(Long) List~FixedExpenseCategory~
     }
 
     class FixedExpenseHistoryRepository {
         <<interface>>
-        +findByFixedExpenseCategoryIdAndYearAndMonth(FixedExpenseCategoryId, Integer, Integer) Optional~FixedExpenseHistory~
-        +findByFixedExpenseCategoryIdInAndYear(List~FixedExpenseCategoryId~, Integer) List~FixedExpenseHistory~
+        +findByFixedExpenseCategoryIdAndYearAndMonth(Long, Integer, Integer) Optional~FixedExpenseHistory~
+        +findByFixedExpenseCategoryIdInAndYear(List~Long~, Integer) List~FixedExpenseHistory~
     }
 
     class MonthlySavingRepository {

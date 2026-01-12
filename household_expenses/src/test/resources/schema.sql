@@ -6,10 +6,10 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ユーザーグループテーブル
 CREATE TABLE user_group (
-    id VARCHAR(36) PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     group_name VARCHAR(255) NOT NULL,
     month_start_day INTEGER NOT NULL DEFAULT 1 CHECK (month_start_day >= 1 AND month_start_day <= 31),
-    created_by_user_id VARCHAR(36),
+    created_by_user_id BIGINT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     version INTEGER DEFAULT 0
@@ -17,10 +17,10 @@ CREATE TABLE user_group (
 
 -- ユーザーテーブル
 CREATE TABLE "users" (
-    id VARCHAR(36) PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    user_group_id VARCHAR(36) REFERENCES user_group(id) ON DELETE SET NULL,
+    user_group_id BIGINT REFERENCES user_group(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     enabled boolean,
@@ -39,10 +39,10 @@ CREATE UNIQUE INDEX ix_auth_username ON authorities (username,authority);
 
 -- グループ招待テーブル
 CREATE TABLE group_invitation (
-    id VARCHAR(36) PRIMARY KEY,
-    user_group_id VARCHAR(36) NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
-    invited_user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    invited_by_user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
+    invited_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    invited_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED')),
     invited_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     responded_at TIMESTAMP WITH TIME ZONE,
@@ -53,8 +53,8 @@ CREATE TABLE group_invitation (
 
 -- 金融口座テーブル
 CREATE TABLE financial_account (
-    id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     account_name VARCHAR(255) NOT NULL,
     balance INTEGER NOT NULL DEFAULT 0,
     is_main_account BOOLEAN NOT NULL DEFAULT FALSE,
@@ -65,8 +65,8 @@ CREATE TABLE financial_account (
 
 -- 預金残高編集履歴テーブル
 CREATE TABLE balance_edit_history (
-    id VARCHAR(36) PRIMARY KEY,
-    financial_account_id VARCHAR(36) NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    financial_account_id BIGINT NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
     old_balance INTEGER NOT NULL,
     new_balance INTEGER NOT NULL,
     edit_reason TEXT,
@@ -76,12 +76,12 @@ CREATE TABLE balance_edit_history (
 
 -- 月次予算テーブル
 CREATE TABLE monthly_budget (
-    id VARCHAR(36) PRIMARY KEY,
-    user_group_id VARCHAR(36) NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     budget_amount INTEGER NOT NULL,
-    set_by_user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    set_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     version INTEGER DEFAULT 0,
@@ -90,8 +90,8 @@ CREATE TABLE monthly_budget (
 
 -- 生活費分類テーブル
 CREATE TABLE living_expense_category (
-    id VARCHAR(36) PRIMARY KEY,
-    user_group_id VARCHAR(36) REFERENCES user_group(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_group_id BIGINT REFERENCES user_group(id) ON DELETE CASCADE,
     category_name VARCHAR(255) NOT NULL,
     description TEXT,
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
@@ -103,7 +103,7 @@ CREATE TABLE living_expense_category (
 -- 日次グループ収支テーブル
 CREATE TABLE daily_group_transaction (
     id VARCHAR(36) PRIMARY KEY,
-    user_group_id VARCHAR(36) NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
+    user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     transaction_date DATE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
@@ -115,8 +115,8 @@ CREATE TABLE daily_group_transaction (
 CREATE TABLE daily_living_expense (
     id VARCHAR(36) PRIMARY KEY,
     daily_group_transaction_id VARCHAR(36) NOT NULL REFERENCES daily_group_transaction(id) ON DELETE CASCADE,
-    user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    living_expense_category_id VARCHAR(36) NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    living_expense_category_id BIGINT NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
     amount INTEGER NOT NULL,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -127,7 +127,7 @@ CREATE TABLE daily_living_expense (
 -- 日次個人収支テーブル
 CREATE TABLE daily_personal_transaction (
     id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     transaction_date DATE NOT NULL,
     income INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -150,7 +150,7 @@ CREATE TABLE daily_personal_expense (
 
 -- 日次予算残高テーブル
 CREATE TABLE daily_budget_balance (
-    user_group_id VARCHAR(36) NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
+    user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     transaction_date DATE NOT NULL,
     total_living_expense INTEGER NOT NULL DEFAULT 0,
     budget_balance INTEGER NOT NULL,
@@ -162,8 +162,8 @@ CREATE TABLE daily_budget_balance (
 
 -- 固定費分類テーブル
 CREATE TABLE fixed_expense_category (
-    id VARCHAR(36) PRIMARY KEY,
-    user_group_id VARCHAR(36) NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     category_name VARCHAR(255) NOT NULL,
     description TEXT,
     default_amount INTEGER DEFAULT 0,
@@ -174,8 +174,8 @@ CREATE TABLE fixed_expense_category (
 
 -- 固定費履歴テーブル
 CREATE TABLE fixed_expense_history (
-    id VARCHAR(36) PRIMARY KEY,
-    fixed_expense_category_id VARCHAR(36) NOT NULL REFERENCES fixed_expense_category(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    fixed_expense_category_id BIGINT NOT NULL REFERENCES fixed_expense_category(id) ON DELETE CASCADE,
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     amount INTEGER NOT NULL,
@@ -188,11 +188,11 @@ CREATE TABLE fixed_expense_history (
 
 -- 月次貯金テーブル
 CREATE TABLE monthly_saving (
-    user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     saving_amount INTEGER NOT NULL,
-    financial_account_id VARCHAR(36) NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
+    financial_account_id BIGINT NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
