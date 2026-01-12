@@ -1,11 +1,12 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.BDDAssertions.*;
 
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-class FinancialAccountIdTest {
+class BalanceEditHistoryIdTest {
 
     @Test
     void testCreate() {
@@ -13,7 +14,7 @@ class FinancialAccountIdTest {
         UUID value = UUID.randomUUID();
 
         // When
-        FinancialAccountId actual = new FinancialAccountId(value);
+        BalanceEditHistoryId actual = new BalanceEditHistoryId(value);
 
         // Then
         then(actual.value()).isEqualTo(value);
@@ -25,22 +26,22 @@ class FinancialAccountIdTest {
         UUID value = null;
 
         // When
-        IllegalArgumentException actual = catchIllegalArgumentException(() -> new FinancialAccountId(value));
+        IllegalArgumentException actual = catchIllegalArgumentException(() -> new BalanceEditHistoryId(value));
 
         // Then
-        then(actual).hasMessage(FinancialAccountId.class.getSimpleName() + " must not be null");
+        then(actual).hasMessage("BalanceEditHistoryId must not be null");
     }
 
     @Test
     void testToString() {
         // Given
         UUID value = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
-        FinancialAccountId financialAccountId = new FinancialAccountId(value);
+        BalanceEditHistoryId id = new BalanceEditHistoryId(value);
 
         // When
-        String actual = financialAccountId.toString();
+        String actual = id.toString();
 
         // Then
-        then(actual).contains(value.toString());
+        then(actual).isEqualTo(value.toString());
     }
 }

@@ -53,7 +53,7 @@ CREATE TABLE group_invitation (
 
 -- 金融口座テーブル
 CREATE TABLE financial_account (
-    id BIGSERIAL PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     account_name VARCHAR(255) NOT NULL,
     balance INTEGER NOT NULL DEFAULT 0,
@@ -65,8 +65,8 @@ CREATE TABLE financial_account (
 
 -- 預金残高編集履歴テーブル
 CREATE TABLE balance_edit_history (
-    id BIGSERIAL PRIMARY KEY,
-    financial_account_id BIGINT NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
+    id VARCHAR(36) PRIMARY KEY,
+    financial_account_id VARCHAR(36) NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
     old_balance INTEGER NOT NULL,
     new_balance INTEGER NOT NULL,
     edit_reason TEXT,
@@ -162,7 +162,7 @@ CREATE TABLE daily_budget_balance (
 
 -- 固定費分類テーブル
 CREATE TABLE fixed_expense_category (
-    id BIGSERIAL PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY,
     user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     category_name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -174,8 +174,8 @@ CREATE TABLE fixed_expense_category (
 
 -- 固定費履歴テーブル
 CREATE TABLE fixed_expense_history (
-    id BIGSERIAL PRIMARY KEY,
-    fixed_expense_category_id BIGINT NOT NULL REFERENCES fixed_expense_category(id) ON DELETE CASCADE,
+    id VARCHAR(36) PRIMARY KEY,
+    fixed_expense_category_id VARCHAR(36) NOT NULL REFERENCES fixed_expense_category(id) ON DELETE CASCADE,
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     amount INTEGER NOT NULL,
@@ -192,7 +192,7 @@ CREATE TABLE monthly_saving (
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     saving_amount INTEGER NOT NULL,
-    financial_account_id BIGINT NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
+    financial_account_id VARCHAR(36) NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
