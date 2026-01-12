@@ -1,9 +1,7 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.BDDAssertions.*;
 
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class UserGroupIdTest {
@@ -11,37 +9,92 @@ class UserGroupIdTest {
     @Test
     void testCreate() {
         // Given
-        UUID value = UUID.randomUUID();
+        long value = 123L;
 
         // When
         UserGroupId actual = new UserGroupId(value);
 
         // Then
-        then(actual.value()).isEqualTo(value);
+        assertThat(actual.value()).isEqualTo(123L);
     }
 
     @Test
-    void testCreateWithNull() {
+    void testCreateWithZero() {
         // Given
-        UUID value = null;
+        long value = 0L;
+
+        // When & Then
+        assertThatThrownBy(() -> new UserGroupId(value))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("UserGroupId must be positive");
+    }
+
+    @Test
+    void testCreateWithNegative() {
+        // Given
+        long value = -1L;
+
+        // When & Then
+        assertThatThrownBy(() -> new UserGroupId(value))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("UserGroupId must be positive");
+    }
+
+    @Test
+    void testCreateWithMinPositive() {
+        // Given
+        long value = 1L;
 
         // When
-        IllegalArgumentException actual = catchIllegalArgumentException(() -> new UserGroupId(value));
+        UserGroupId actual = new UserGroupId(value);
 
         // Then
-        then(actual).hasMessage(UserGroupId.class.getSimpleName() + " must not be null");
+        assertThat(actual.value()).isEqualTo(1L);
+    }
+
+    @Test
+    void testCreateWithMaxValue() {
+        // Given
+        long value = Long.MAX_VALUE;
+
+        // When
+        UserGroupId actual = new UserGroupId(value);
+
+        // Then
+        assertThat(actual.value()).isEqualTo(Long.MAX_VALUE);
+    }
+
+    @Test
+    void testEquals() {
+        // Given
+        UserGroupId userGroupId1 = new UserGroupId(123L);
+        UserGroupId userGroupId2 = new UserGroupId(123L);
+        UserGroupId userGroupId3 = new UserGroupId(456L);
+
+        // When & Then
+        assertThat(userGroupId1).isEqualTo(userGroupId2);
+        assertThat(userGroupId1).isNotEqualTo(userGroupId3);
+    }
+
+    @Test
+    void testHashCode() {
+        // Given
+        UserGroupId userGroupId1 = new UserGroupId(123L);
+        UserGroupId userGroupId2 = new UserGroupId(123L);
+
+        // When & Then
+        assertThat(userGroupId1.hashCode()).isEqualTo(userGroupId2.hashCode());
     }
 
     @Test
     void testToString() {
         // Given
-        UUID value = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
-        UserGroupId id = new UserGroupId(value);
+        UserGroupId userGroupId = new UserGroupId(123L);
 
         // When
-        String actual = id.toString();
+        String actual = userGroupId.toString();
 
         // Then
-        then(actual).isEqualTo(value.toString());
+        assertThat(actual).contains("123");
     }
 }

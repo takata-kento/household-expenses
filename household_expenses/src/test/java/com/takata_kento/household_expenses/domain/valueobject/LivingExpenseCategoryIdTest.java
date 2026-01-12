@@ -1,9 +1,7 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.BDDAssertions.*;
 
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class LivingExpenseCategoryIdTest {
@@ -11,37 +9,92 @@ class LivingExpenseCategoryIdTest {
     @Test
     void testCreate() {
         // Given
-        UUID value = UUID.randomUUID();
+        long value = 123L;
 
         // When
         LivingExpenseCategoryId actual = new LivingExpenseCategoryId(value);
 
         // Then
-        then(actual.value()).isEqualTo(value);
+        assertThat(actual.value()).isEqualTo(123L);
     }
 
     @Test
-    void testCreateWithNull() {
+    void testCreateWithZero() {
         // Given
-        UUID value = null;
+        long value = 0L;
+
+        // When & Then
+        assertThatThrownBy(() -> new LivingExpenseCategoryId(value))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("LivingExpenseCategoryId must be positive");
+    }
+
+    @Test
+    void testCreateWithNegative() {
+        // Given
+        long value = -1L;
+
+        // When & Then
+        assertThatThrownBy(() -> new LivingExpenseCategoryId(value))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("LivingExpenseCategoryId must be positive");
+    }
+
+    @Test
+    void testCreateWithMinPositive() {
+        // Given
+        long value = 1L;
 
         // When
-        IllegalArgumentException actual = catchIllegalArgumentException(() -> new LivingExpenseCategoryId(value));
+        LivingExpenseCategoryId actual = new LivingExpenseCategoryId(value);
 
         // Then
-        then(actual).hasMessage(LivingExpenseCategoryId.class.getSimpleName() + " must not be null");
+        assertThat(actual.value()).isEqualTo(1L);
+    }
+
+    @Test
+    void testCreateWithMaxValue() {
+        // Given
+        long value = Long.MAX_VALUE;
+
+        // When
+        LivingExpenseCategoryId actual = new LivingExpenseCategoryId(value);
+
+        // Then
+        assertThat(actual.value()).isEqualTo(Long.MAX_VALUE);
+    }
+
+    @Test
+    void testEquals() {
+        // Given
+        LivingExpenseCategoryId categoryId1 = new LivingExpenseCategoryId(123L);
+        LivingExpenseCategoryId categoryId2 = new LivingExpenseCategoryId(123L);
+        LivingExpenseCategoryId categoryId3 = new LivingExpenseCategoryId(456L);
+
+        // When & Then
+        assertThat(categoryId1).isEqualTo(categoryId2);
+        assertThat(categoryId1).isNotEqualTo(categoryId3);
+    }
+
+    @Test
+    void testHashCode() {
+        // Given
+        LivingExpenseCategoryId categoryId1 = new LivingExpenseCategoryId(123L);
+        LivingExpenseCategoryId categoryId2 = new LivingExpenseCategoryId(123L);
+
+        // When & Then
+        assertThat(categoryId1.hashCode()).isEqualTo(categoryId2.hashCode());
     }
 
     @Test
     void testToString() {
         // Given
-        UUID value = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
-        LivingExpenseCategoryId id = new LivingExpenseCategoryId(value);
+        LivingExpenseCategoryId categoryId = new LivingExpenseCategoryId(123L);
 
         // When
-        String actual = id.toString();
+        String actual = categoryId.toString();
 
         // Then
-        then(actual).isEqualTo(value.toString());
+        assertThat(actual).contains("123");
     }
 }

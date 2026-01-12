@@ -4,10 +4,10 @@
 erDiagram
     %% ユーザー
     USERS {
-        varchar id PK "ユーザーID (UUID)"
+        bigint id PK "ユーザーID"
         varchar username "ユーザー名 (UNIQUE)"
         varchar password_hash "パスワードハッシュ"
-        varchar user_group_id FK "所属グループID（NULL可）"
+        bigint user_group_id FK "所属グループID（NULL可）"
         timestamp created_at
         timestamp updated_at
         boolean enabled
@@ -22,10 +22,10 @@ erDiagram
 
     %% ユーザーグループ
     USER_GROUP {
-        varchar id PK "グループID (UUID)"
+        bigint id PK
         varchar group_name "グループ名"
         int month_start_day "月の始まり日"
-        varchar created_by_user_id FK
+        bigint created_by_user_id FK
         timestamp created_at
         timestamp updated_at
         integer version "バージョン"
@@ -34,10 +34,10 @@ erDiagram
 
     %% グループ招待
     GROUP_INVITATION {
-        varchar id PK "招待ID (UUID)"
-        varchar user_group_id FK
-        varchar invited_user_id FK
-        varchar invited_by_user_id FK
+        bigint id PK "招待ID"
+        bigint user_group_id FK
+        bigint invited_user_id FK
+        bigint invited_by_user_id FK
         varchar status "PENDING/ACCEPTED/REJECTED"
         timestamp invited_at
         timestamp responded_at
@@ -47,8 +47,8 @@ erDiagram
 
     %% 金融口座
     FINANCIAL_ACCOUNT {
-        varchar id PK "口座ID (UUID)"
-        varchar user_id FK
+        bigint id PK
+        bigint user_id FK
         varchar account_name "口座名"
         integer balance "残高"
         boolean is_main_account "メイン口座フラグ"
@@ -59,8 +59,8 @@ erDiagram
 
     %% 預金残高編集履歴
     BALANCE_EDIT_HISTORY {
-        varchar id PK "履歴ID (UUID)"
-        varchar financial_account_id FK
+        bigint id PK
+        bigint financial_account_id FK
         integer old_balance "変更前残高"
         integer new_balance "変更後残高"
         varchar edit_reason "編集理由"
@@ -70,12 +70,12 @@ erDiagram
 
     %% 月次予算
     MONTHLY_BUDGET {
-        varchar id PK "予算ID (UUID)"
-        varchar user_group_id FK
+        bigint id PK "予算ID"
+        bigint user_group_id FK
         int year "年"
         int month "月"
         integer budget_amount "予算額"
-        varchar set_by_user_id FK
+        bigint set_by_user_id FK
         timestamp created_at
         timestamp updated_at
         integer version "バージョン"
@@ -83,8 +83,8 @@ erDiagram
 
     %% 生活費分類
     LIVING_EXPENSE_CATEGORY {
-        varchar id PK "分類ID (UUID)"
-        varchar user_group_id FK
+        bigint id PK
+        bigint user_group_id FK
         varchar category_name "分類名"
         varchar description "説明"
         boolean is_default "デフォルト分類フラグ"
@@ -95,8 +95,8 @@ erDiagram
 
     %% 日次グループ収支
     DAILY_GROUP_TRANSACTION {
-        varchar id PK "取引ID (UUID)"
-        varchar user_group_id FK
+        varchar id PK
+        bigint user_group_id FK
         date transaction_date "取引日"
         timestamp created_at
         timestamp updated_at
@@ -105,10 +105,10 @@ erDiagram
 
     %% 日次生活費
     DAILY_LIVING_EXPENSE {
-        varchar id PK "支出ID (UUID)"
+        varchar id PK
         varchar daily_group_transaction_id FK
-        varchar user_id FK
-        varchar living_expense_category_id FK
+        bigint user_id FK
+        bigint living_expense_category_id FK
         integer amount "金額"
         varchar memo "メモ"
         timestamp created_at
@@ -118,8 +118,8 @@ erDiagram
 
     %% 日次個人収支
     DAILY_PERSONAL_TRANSACTION {
-        varchar id PK "取引ID (UUID)"
-        varchar user_id FK
+        varchar id PK
+        bigint user_id FK
         date transaction_date "取引日"
         integer income "収入"
         timestamp created_at
@@ -129,7 +129,7 @@ erDiagram
 
     %% 日次個人支出
     DAILY_PERSONAL_EXPENSE {
-        varchar id PK "支出ID (UUID)"
+        varchar id PK
         varchar daily_personal_transaction_id FK
         integer amount "金額"
         varchar memo "使用目的"
@@ -140,7 +140,7 @@ erDiagram
 
     %% 日次予算残高
     DAILY_BUDGET_BALANCE {
-        varchar user_group_id PK,FK
+        bigint user_group_id PK,FK
         date transaction_date PK "取引日"
         integer total_living_expense "生活費合計"
         integer budget_balance "予算残金"
@@ -151,8 +151,8 @@ erDiagram
 
     %% 固定費分類
     FIXED_EXPENSE_CATEGORY {
-        varchar id PK "分類ID (UUID)"
-        varchar user_group_id FK
+        bigint id PK
+        bigint user_group_id FK
         varchar category_name "分類名"
         varchar description "説明"
         integer default_amount "デフォルト金額"
@@ -163,8 +163,8 @@ erDiagram
 
     %% 固定費履歴
     FIXED_EXPENSE_HISTORY {
-        varchar id PK "履歴ID (UUID)"
-        varchar fixed_expense_category_id FK
+        bigint id PK
+        bigint fixed_expense_category_id FK
         int year "年"
         int month "月"
         integer amount "金額"
@@ -177,11 +177,11 @@ erDiagram
 
     %% 月次貯金
     MONTHLY_SAVING {
-        varchar user_id PK,FK
+        bigint user_id PK,FK
         int year PK "年"
         int month PK "月"
         integer saving_amount "貯金額"
-        varchar financial_account_id FK
+        bigint financial_account_id FK
         varchar memo "メモ"
         timestamp created_at
         timestamp updated_at
@@ -198,7 +198,7 @@ erDiagram
     USERS ||--o{ GROUP_INVITATION : "招待"
     USERS ||--o{ GROUP_INVITATION : "被招待"
     USERS ||--o{ DAILY_LIVING_EXPENSE : "生活費記録"
-
+    
     USER_GROUP ||--o{ GROUP_INVITATION : "招待管理"
     USER_GROUP ||--o{ MONTHLY_BUDGET : "予算管理"
     USER_GROUP ||--o{ LIVING_EXPENSE_CATEGORY : "分類管理"
@@ -211,13 +211,13 @@ erDiagram
 
     DAILY_GROUP_TRANSACTION ||--o{ DAILY_LIVING_EXPENSE : "生活費詳細"
     DAILY_PERSONAL_TRANSACTION ||--o{ DAILY_PERSONAL_EXPENSE : "個人支出詳細"
-
+    
     LIVING_EXPENSE_CATEGORY ||--o{ DAILY_LIVING_EXPENSE : "分類"
-
+    
     FIXED_EXPENSE_CATEGORY ||--o{ FIXED_EXPENSE_HISTORY : "履歴"
-
+    
     USER_GROUP ||--o{ DAILY_BUDGET_BALANCE : "予算残高管理"
-
+    
     MONTHLY_BUDGET ||--o{ DAILY_BUDGET_BALANCE : "予算基準"
     DAILY_LIVING_EXPENSE }o--|| DAILY_BUDGET_BALANCE : "生活費集計"
 ```
@@ -227,68 +227,57 @@ erDiagram
 ### USERS（ユーザー）
 - アプリケーションのユーザー情報を管理
 - 認証に必要なユーザー名とパスワードハッシュを保持
-- **ID型**: UUID (VARCHAR(36))
 
 ### USER_GROUP（ユーザーグループ）
 - 家計を共有するユーザーグループを管理
 - 月の始まり日をグループごとに設定可能
 - グループ作成者を記録
-- **ID型**: UUID (VARCHAR(36))
 
 
 ### GROUP_INVITATION（グループ招待）
 - グループへの招待状を管理
 - pending（未回答）、accepted（承認）、rejected（拒否）のステータス
 - 有効期限なし
-- **ID型**: UUID (VARCHAR(36))
 
 ### FINANCIAL_ACCOUNT（金融口座）
 - ユーザーごとの金融口座情報を管理
 - メイン口座（変動費記録用）の識別
 - 非共有データ（所有者のみ閲覧可能）
-- **ID型**: UUID (VARCHAR(36))
 
 ### BALANCE_EDIT_HISTORY（預金残高編集履歴）
 - 預金残高の手動編集履歴を記録
 - 編集理由を記録（編集者は口座所有者のみ）
-- **ID型**: UUID (VARCHAR(36))
 
 ### MONTHLY_BUDGET（月次予算）
 - グループごとの月次予算を管理
 - 生活費の予算額を設定
 - 全メンバーが設定・更新可能
 - 最後に設定したユーザーを記録
-- **ID型**: UUID (VARCHAR(36))
 
 ### LIVING_EXPENSE_CATEGORY（生活費分類）
 - 生活費の分類をグループごとに管理
 - デフォルト分類と追加分類を識別
 - 共有データ（グループメンバー全員が閲覧可能）
-- **ID型**: UUID (VARCHAR(36))
 
 ### DAILY_PERSONAL_TRANSACTION（日次個人収支）
 - ユーザーごとの日次収支情報を管理
 - 収入、支出合計を記録
 - 支出合計の計算式: (生活費合計 ÷ グループ人数) + 個人支出合計
 - 非共有データ（記録者本人のみ閲覧可能）
-- **ID型**: UUID (VARCHAR(36))
 
 ### DAILY_GROUP_TRANSACTION（日次グループ収支）
 - グループごとの日次収支情報を管理
 - 支出合計と予算残高を記録
 - 共有データ（グループメンバー全員が閲覧可能）
-- **ID型**: UUID (VARCHAR(36))
 
 ### DAILY_LIVING_EXPENSE（日次生活費）
 - 生活費の詳細を分類別に記録
 - 共有データ（グループメンバー全員が閲覧可能）
-- **ID型**: UUID (VARCHAR(36))
 
 ### DAILY_PERSONAL_EXPENSE（日次個人支出）
 - 個人支出の詳細を記録
 - メモ（使用目的）を記録
 - 非共有データ（記録者本人のみ閲覧可能）
-- **ID型**: UUID (VARCHAR(36))
 
 ### DAILY_BUDGET_BALANCE（日次予算残高）
 - グループごとの日次予算残高を管理
@@ -299,12 +288,10 @@ erDiagram
 ### FIXED_EXPENSE_CATEGORY（固定費分類）
 - 固定費の分類をグループごとに管理
 - 共有データ（グループメンバー全員が閲覧可能）
-- **ID型**: UUID (VARCHAR(36))
 
 ### FIXED_EXPENSE_HISTORY（固定費履歴）
 - 月次の固定費実績を記録
 - 共有データ（グループメンバー全員が閲覧可能）
-- **ID型**: UUID (VARCHAR(36))
 
 ### MONTHLY_SAVING（月次貯金）
 - ユーザーごとの月次貯金実績を記録
@@ -327,4 +314,4 @@ erDiagram
 - 収入情報
 - 貯金額（MONTHLY_SAVING）
 - 預金残高（FINANCIAL_ACCOUNT）
-- 残高編集履歴（BALANCE_EDIT_HISTORY)
+- 残高編集履歴（BALANCE_EDIT_HISTORY）
