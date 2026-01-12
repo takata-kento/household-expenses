@@ -10,30 +10,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jdbc.test.autoconfigure.DataJdbcTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @DataJdbcTest
 @Testcontainers
+@Sql("/schema.sql")
 class LivingExpenseCategoryRepositoryTest {
 
-    @SuppressWarnings("resource")
     @Container
-    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17-alpine")
-        .withDatabaseName("test")
-        .withUsername("test")
-        .withPassword("test");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
+    @ServiceConnection
+    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17-alpine");
 
     @Autowired
     private LivingExpenseCategoryRepository livingExpenseCategoryRepository;
@@ -43,29 +34,39 @@ class LivingExpenseCategoryRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // 関連テーブルをカスケード削除
-        jdbcClient.sql("DROP TABLE IF EXISTS living_expense_category CASCADE").update();
+        // テストデータ挿入
+        LocalDateTime now = LocalDateTime.now();
 
-        // living_expense_categoryテーブル作成
+        // ユーザーグループを挿入
         jdbcClient
             .sql(
                 """
-                CREATE TABLE living_expense_category (
-                    id BIGINT PRIMARY KEY,
-                    user_group_id BIGINT NOT NULL,
-                    category_name VARCHAR(255) NOT NULL,
-                    description VARCHAR(1000),
-                    is_default BOOLEAN NOT NULL DEFAULT FALSE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    version INTEGER
-                )
+                INSERT INTO
+                    user_group (id, group_name, month_start_day, version)
+                VALUES
+                    (:id, :group_name, :month_start_day, :version)
                 """
             )
+            .param("id", 100L)
+            .param("group_name", "Test Group 1")
+            .param("month_start_day", 1)
+            .param("version", 0)
             .update();
 
-        // テストデータ挿入
-        LocalDateTime now = LocalDateTime.now();
+        jdbcClient
+            .sql(
+                """
+                INSERT INTO
+                    user_group (id, group_name, month_start_day, version)
+                VALUES
+                    (:id, :group_name, :month_start_day, :version)
+                """
+            )
+            .param("id", 200L)
+            .param("group_name", "Test Group 2")
+            .param("month_start_day", 1)
+            .param("version", 0)
+            .update();
 
         jdbcClient
             .sql(
