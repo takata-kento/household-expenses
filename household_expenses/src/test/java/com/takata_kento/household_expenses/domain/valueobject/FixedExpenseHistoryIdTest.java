@@ -2,6 +2,8 @@ package com.takata_kento.household_expenses.domain.valueobject;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 
 class FixedExpenseHistoryIdTest {
@@ -9,92 +11,37 @@ class FixedExpenseHistoryIdTest {
     @Test
     void testCreate() {
         // Given
-        long value = 123L;
+        UUID value = UUID.randomUUID();
 
         // When
         FixedExpenseHistoryId actual = new FixedExpenseHistoryId(value);
 
         // Then
-        assertThat(actual.value()).isEqualTo(123L);
+        assertThat(actual.value()).isEqualTo(value);
     }
 
     @Test
-    void testCreateWithZero() {
+    void testCreateWithNull() {
         // Given
-        long value = 0L;
-
-        // When & Then
-        assertThatThrownBy(() -> new FixedExpenseHistoryId(value))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("FixedExpenseHistoryId must be positive");
-    }
-
-    @Test
-    void testCreateWithNegative() {
-        // Given
-        long value = -1L;
-
-        // When & Then
-        assertThatThrownBy(() -> new FixedExpenseHistoryId(value))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("FixedExpenseHistoryId must be positive");
-    }
-
-    @Test
-    void testCreateWithMinPositive() {
-        // Given
-        long value = 1L;
+        UUID value = null;
 
         // When
-        FixedExpenseHistoryId actual = new FixedExpenseHistoryId(value);
+        IllegalArgumentException actual = catchIllegalArgumentException(() -> new FixedExpenseHistoryId(value));
 
         // Then
-        assertThat(actual.value()).isEqualTo(1L);
-    }
-
-    @Test
-    void testCreateWithMaxValue() {
-        // Given
-        long value = Long.MAX_VALUE;
-
-        // When
-        FixedExpenseHistoryId actual = new FixedExpenseHistoryId(value);
-
-        // Then
-        assertThat(actual.value()).isEqualTo(Long.MAX_VALUE);
-    }
-
-    @Test
-    void testEquals() {
-        // Given
-        FixedExpenseHistoryId historyId1 = new FixedExpenseHistoryId(123L);
-        FixedExpenseHistoryId historyId2 = new FixedExpenseHistoryId(123L);
-        FixedExpenseHistoryId historyId3 = new FixedExpenseHistoryId(456L);
-
-        // When & Then
-        assertThat(historyId1).isEqualTo(historyId2);
-        assertThat(historyId1).isNotEqualTo(historyId3);
-    }
-
-    @Test
-    void testHashCode() {
-        // Given
-        FixedExpenseHistoryId historyId1 = new FixedExpenseHistoryId(123L);
-        FixedExpenseHistoryId historyId2 = new FixedExpenseHistoryId(123L);
-
-        // When & Then
-        assertThat(historyId1.hashCode()).isEqualTo(historyId2.hashCode());
+        assertThat(actual).hasMessage(FixedExpenseHistoryId.class.getSimpleName() + " must not be null");
     }
 
     @Test
     void testToString() {
         // Given
-        FixedExpenseHistoryId historyId = new FixedExpenseHistoryId(123L);
+        UUID value = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        FixedExpenseHistoryId historyId = new FixedExpenseHistoryId(value);
 
         // When
         String actual = historyId.toString();
 
         // Then
-        assertThat(actual).contains("123");
+        assertThat(actual).contains(value.toString());
     }
 }
