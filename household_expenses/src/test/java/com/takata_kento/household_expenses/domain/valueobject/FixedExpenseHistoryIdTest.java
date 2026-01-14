@@ -3,7 +3,6 @@ package com.takata_kento.household_expenses.domain.valueobject;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 
 class FixedExpenseHistoryIdTest {
