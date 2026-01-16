@@ -9,7 +9,7 @@ CREATE TABLE user_group (
     id BIGSERIAL PRIMARY KEY,
     group_name VARCHAR(255) NOT NULL,
     month_start_day INTEGER NOT NULL DEFAULT 1 CHECK (month_start_day >= 1 AND month_start_day <= 31),
-    created_by_user_id BIGINT,
+    created_by_user_id VARCHAR(36),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     version INTEGER DEFAULT 0
@@ -17,7 +17,7 @@ CREATE TABLE user_group (
 
 -- ユーザーテーブル
 CREATE TABLE "users" (
-    id BIGSERIAL PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     user_group_id BIGINT REFERENCES user_group(id) ON DELETE SET NULL,
@@ -41,8 +41,8 @@ CREATE UNIQUE INDEX ix_auth_username ON authorities (username,authority);
 CREATE TABLE group_invitation (
     id BIGSERIAL PRIMARY KEY,
     user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
-    invited_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    invited_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    invited_user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    invited_by_user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'REJECTED')),
     invited_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     responded_at TIMESTAMP WITH TIME ZONE,
@@ -54,7 +54,7 @@ CREATE TABLE group_invitation (
 -- 金融口座テーブル
 CREATE TABLE financial_account (
     id VARCHAR(36) PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     account_name VARCHAR(255) NOT NULL,
     balance INTEGER NOT NULL DEFAULT 0,
     is_main_account BOOLEAN NOT NULL DEFAULT FALSE,
@@ -81,7 +81,7 @@ CREATE TABLE monthly_budget (
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     budget_amount INTEGER NOT NULL,
-    set_by_user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    set_by_user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     version INTEGER DEFAULT 0,
@@ -115,7 +115,7 @@ CREATE TABLE daily_group_transaction (
 CREATE TABLE daily_living_expense (
     id VARCHAR(36) PRIMARY KEY,
     daily_group_transaction_id VARCHAR(36) NOT NULL REFERENCES daily_group_transaction(id) ON DELETE CASCADE,
-    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     living_expense_category_id BIGINT NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
     amount INTEGER NOT NULL,
     memo TEXT,
@@ -127,7 +127,7 @@ CREATE TABLE daily_living_expense (
 -- 日次個人収支テーブル
 CREATE TABLE daily_personal_transaction (
     id VARCHAR(36) PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     transaction_date DATE NOT NULL,
     income INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -188,7 +188,7 @@ CREATE TABLE fixed_expense_history (
 
 -- 月次貯金テーブル
 CREATE TABLE monthly_saving (
-    user_id BIGINT NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
+    user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     saving_amount INTEGER NOT NULL,
