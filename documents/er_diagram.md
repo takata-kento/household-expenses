@@ -4,7 +4,7 @@
 erDiagram
     %% ユーザー
     USERS {
-        bigint id PK "ユーザーID"
+        varchar id PK "ユーザーID"
         varchar username "ユーザー名 (UNIQUE)"
         varchar password_hash "パスワードハッシュ"
         bigint user_group_id FK "所属グループID（NULL可）"
@@ -25,7 +25,7 @@ erDiagram
         bigint id PK
         varchar group_name "グループ名"
         int month_start_day "月の始まり日"
-        bigint created_by_user_id FK
+        varchar created_by_user_id FK
         timestamp created_at
         timestamp updated_at
         integer version "バージョン"
@@ -36,8 +36,8 @@ erDiagram
     GROUP_INVITATION {
         bigint id PK "招待ID"
         bigint user_group_id FK
-        bigint invited_user_id FK
-        bigint invited_by_user_id FK
+        varchar invited_user_id FK
+        varchar invited_by_user_id FK
         varchar status "PENDING/ACCEPTED/REJECTED"
         timestamp invited_at
         timestamp responded_at
@@ -48,7 +48,7 @@ erDiagram
     %% 金融口座
     FINANCIAL_ACCOUNT {
         varchar id PK "UUID"
-        bigint user_id FK
+        varchar user_id FK
         varchar account_name "口座名"
         integer balance "残高"
         boolean is_main_account "メイン口座フラグ"
@@ -75,7 +75,7 @@ erDiagram
         int year "年"
         int month "月"
         integer budget_amount "予算額"
-        bigint set_by_user_id FK
+        varchar set_by_user_id FK
         timestamp created_at
         timestamp updated_at
         integer version "バージョン"
@@ -107,7 +107,7 @@ erDiagram
     DAILY_LIVING_EXPENSE {
         varchar id PK
         varchar daily_group_transaction_id FK
-        bigint user_id FK
+        varchar user_id FK
         bigint living_expense_category_id FK
         integer amount "金額"
         varchar memo "メモ"
@@ -119,7 +119,7 @@ erDiagram
     %% 日次個人収支
     DAILY_PERSONAL_TRANSACTION {
         varchar id PK
-        bigint user_id FK
+        varchar user_id FK
         date transaction_date "取引日"
         integer income "収入"
         timestamp created_at
@@ -177,7 +177,7 @@ erDiagram
 
     %% 月次貯金
     MONTHLY_SAVING {
-        bigint user_id PK,FK
+        varchar user_id PK,FK
         int year PK "年"
         int month PK "月"
         integer saving_amount "貯金額"
