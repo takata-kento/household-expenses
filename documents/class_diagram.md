@@ -353,8 +353,8 @@ classDiagram
 
     class FixedExpenseCategoryId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class BalanceEditHistoryId {
