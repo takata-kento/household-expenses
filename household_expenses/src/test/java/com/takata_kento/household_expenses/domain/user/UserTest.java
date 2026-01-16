@@ -11,14 +11,19 @@ import com.takata_kento.household_expenses.domain.valueobject.Username;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class UserTest {
 
+    private static final UserId USER_ID_1 = new UserId(UUID.randomUUID());
+    private static final UserId USER_ID_2 = new UserId(UUID.randomUUID());
+    private static final UserId USER_ID_3 = new UserId(UUID.randomUUID());
+
     @Test
     void testUserCreation() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         Integer expectedVersion = null;
@@ -44,7 +49,7 @@ class UserTest {
     @Test
     void testUserCreationWithNullUserGroup() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         Optional<UserGroupId> expectedUserGroup = Optional.empty();
         Integer expectedVersion = null;
@@ -64,7 +69,7 @@ class UserTest {
     @Test
     void testId() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         Integer expectedVersion = null;
@@ -85,7 +90,7 @@ class UserTest {
     @Test
     void testUsername() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         Integer expectedVersion = null;
@@ -106,7 +111,7 @@ class UserTest {
     @Test
     void testGetPendingInvitations() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         Integer expectedVersion = null;
 
@@ -115,7 +120,7 @@ class UserTest {
             new GroupInvitationId(1L),
             new UserGroupId(100L),
             expectedUserId,
-            new UserId(2L),
+            USER_ID_2,
             InvitationStatus.PENDING,
             now,
             null,
@@ -127,7 +132,7 @@ class UserTest {
             new GroupInvitationId(2L),
             new UserGroupId(200L),
             expectedUserId,
-            new UserId(3L),
+            USER_ID_3,
             InvitationStatus.ACCEPTED,
             now,
             now,
@@ -146,7 +151,7 @@ class UserTest {
         actual.forEach(info -> {
             assertThat(info.groupInvitationId()).isEqualTo(new GroupInvitationId(1L));
             assertThat(info.userGroupId()).isEqualTo(new UserGroupId(100L));
-            assertThat(info.invitedByUserId()).isEqualTo(new UserId(2L));
+            assertThat(info.invitedByUserId()).isEqualTo(USER_ID_2);
         });
         assertThat(user.id()).isEqualTo(expectedUserId);
         assertThat(user.name()).isEqualTo(expectedUsername);
@@ -158,7 +163,7 @@ class UserTest {
     @Test
     void testReceivedInvitations() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         Integer expectedVersion = null;
 
@@ -167,7 +172,7 @@ class UserTest {
             new GroupInvitationId(1L),
             new UserGroupId(100L),
             expectedUserId,
-            new UserId(2L),
+            USER_ID_2,
             InvitationStatus.PENDING,
             now,
             null,
@@ -179,7 +184,7 @@ class UserTest {
             new GroupInvitationId(2L),
             new UserGroupId(200L),
             expectedUserId,
-            new UserId(3L),
+            USER_ID_3,
             InvitationStatus.ACCEPTED,
             now,
             now,
@@ -202,7 +207,7 @@ class UserTest {
                     info ->
                         info.groupInvitationId().equals(new GroupInvitationId(1L)) &&
                         info.userGroupId().equals(new UserGroupId(100L)) &&
-                        info.invitedByUserId().equals(new UserId(2L))
+                        info.invitedByUserId().equals(USER_ID_2)
                 )
         ).isTrue();
         assertThat(
@@ -212,7 +217,7 @@ class UserTest {
                     info ->
                         info.groupInvitationId().equals(new GroupInvitationId(2L)) &&
                         info.userGroupId().equals(new UserGroupId(200L)) &&
-                        info.invitedByUserId().equals(new UserId(3L))
+                        info.invitedByUserId().equals(USER_ID_3)
                 )
         ).isTrue();
         assertThat(user.id()).isEqualTo(expectedUserId);
@@ -225,7 +230,7 @@ class UserTest {
     @Test
     void testLeaveGroup() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         UserGroupId userGroupId = new UserGroupId(100L);
         Integer expectedVersion = null;
@@ -246,7 +251,7 @@ class UserTest {
     @Test
     void testCanCreateGroup() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         Integer expectedVersion = null;
         User user = new User(expectedUserId, expectedUsername, Optional.empty(), null, expectedVersion);
@@ -267,7 +272,7 @@ class UserTest {
     @Test
     void testCanCreateGroupWhenAlreadyInGroup() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         UserGroupId userGroupId = new UserGroupId(100L);
         Integer expectedVersion = null;
@@ -289,7 +294,7 @@ class UserTest {
     @Test
     void testCanLeaveGroup() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         UserGroupId userGroupId = new UserGroupId(100L);
         Integer expectedVersion = null;
@@ -311,7 +316,7 @@ class UserTest {
     @Test
     void testCanLeaveGroupWhenNotInGroup() {
         // Given
-        UserId expectedUserId = new UserId(1L);
+        UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         Integer expectedVersion = null;
         User user = new User(expectedUserId, expectedUsername, Optional.empty(), null, expectedVersion);
@@ -332,10 +337,10 @@ class UserTest {
     @Test
     void testCanInvite() {
         // Given
-        UserId inviterUserId = new UserId(1L);
+        UserId inviterUserId = USER_ID_1;
         Username inviterUsername = new Username("inviter");
         UserGroupId userGroupId = new UserGroupId(100L);
-        UserId inviteeUserId = new UserId(2L);
+        UserId inviteeUserId = USER_ID_2;
         Integer expectedVersion = null;
         User inviter = new User(inviterUserId, inviterUsername, Optional.of(userGroupId), null, expectedVersion);
 
@@ -355,9 +360,9 @@ class UserTest {
     @Test
     void testCanInviteWhenNotInGroup() {
         // Given
-        UserId inviterUserId = new UserId(1L);
+        UserId inviterUserId = USER_ID_1;
         Username inviterUsername = new Username("inviter");
-        UserId inviteeUserId = new UserId(2L);
+        UserId inviteeUserId = USER_ID_2;
         Integer expectedVersion = null;
         User inviter = new User(inviterUserId, inviterUsername, Optional.empty(), null, expectedVersion);
 
@@ -377,10 +382,10 @@ class UserTest {
     @Test
     void testInvite() {
         // Given
-        UserId inviterUserId = new UserId(1L);
+        UserId inviterUserId = USER_ID_1;
         Username inviterUsername = new Username("inviter");
         UserGroupId userGroupId = new UserGroupId(100L);
-        UserId inviteeUserId = new UserId(2L);
+        UserId inviteeUserId = USER_ID_2;
         Username inviteeUsername = new Username("invitee");
         User invitee = new User(inviteeUserId, inviteeUsername, Optional.empty(), null, null);
         Integer expectedVersion = null;
@@ -416,7 +421,7 @@ class UserTest {
     @Test
     void testAccept() {
         // Given
-        UserId invitedUserId = new UserId(1L);
+        UserId invitedUserId = USER_ID_1;
         Username invitedUsername = new Username("invited");
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         GroupInvitationId invitationId = new GroupInvitationId(10L);
@@ -425,7 +430,7 @@ class UserTest {
             invitationId,
             expectedUserGroupId,
             invitedUserId,
-            new UserId(2L),
+            USER_ID_2,
             InvitationStatus.PENDING,
             now,
             null,
@@ -451,7 +456,7 @@ class UserTest {
     @Test
     void testReject() {
         // Given
-        UserId invitedUserId = new UserId(1L);
+        UserId invitedUserId = USER_ID_1;
         Username invitedUsername = new Username("invited");
         GroupInvitationId invitationId = new GroupInvitationId(10L);
         LocalDateTime now = LocalDateTime.now();
@@ -459,7 +464,7 @@ class UserTest {
             invitationId,
             new UserGroupId(100L),
             invitedUserId,
-            new UserId(2L),
+            USER_ID_2,
             InvitationStatus.PENDING,
             now,
             null,

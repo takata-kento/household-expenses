@@ -7,6 +7,7 @@ import com.takata_kento.household_expenses.domain.valueobject.GroupName;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @Testcontainers
 @Sql("/schema.sql")
 class UserGroupRepositoryTest {
+
+    private static final UserId TEST_USER_ID = new UserId(UUID.randomUUID());
 
     @Container
     @ServiceConnection
@@ -45,7 +48,7 @@ class UserGroupRepositoryTest {
                     (:id, :username, :password_hash, :enabled, :version)
                 """
             )
-            .param("id", 1L)
+            .param("id", TEST_USER_ID.toString())
             .param("username", "creator")
             .param("password_hash", "dummy_hash")
             .param("enabled", true)
@@ -64,7 +67,7 @@ class UserGroupRepositoryTest {
             .param("id", 1L)
             .param("group_name", "Test Group")
             .param("month_start_day", 10)
-            .param("created_by_user_id", 1L)
+            .param("created_by_user_id", TEST_USER_ID.toString())
             .param("version", 1)
             .update();
     }
@@ -72,15 +75,11 @@ class UserGroupRepositoryTest {
     @Test
     void testSave() {
         // Given
-        long createdByUserId = 1L;
+        String createdByUserId = TEST_USER_ID.toString();
         String groupName = "Test Group";
         int monthStartDay = 15;
 
-        UserGroup userGroup = UserGroup.create(
-            new GroupName(groupName),
-            new Day(monthStartDay),
-            new UserId(createdByUserId)
-        );
+        UserGroup userGroup = UserGroup.create(new GroupName(groupName), new Day(monthStartDay), TEST_USER_ID);
 
         // When
         UserGroup savedUserGroup = userGroupRepository.save(userGroup);
@@ -101,10 +100,10 @@ class UserGroupRepositoryTest {
             .single();
         assertThat(monthStartDayFromDb).isEqualTo(monthStartDay);
 
-        Long createdByUserIdFromDb = jdbcClient
+        String createdByUserIdFromDb = jdbcClient
             .sql("SELECT created_by_user_id FROM user_group WHERE id = ?")
             .param(savedUserGroup.id().value())
-            .query(Long.class)
+            .query(String.class)
             .single();
         assertThat(createdByUserIdFromDb).isEqualTo(createdByUserId);
     }
@@ -115,7 +114,6 @@ class UserGroupRepositoryTest {
         long expectedId = 1L;
         String expectedGroupName = "Test Group";
         int expectedMonthStartDay = 10;
-        long expectedCreatedByUserId = 1L;
         UserGroupId userGroupId = new UserGroupId(expectedId);
 
         // When
@@ -126,7 +124,7 @@ class UserGroupRepositoryTest {
         assertThat(actual.get().id()).isEqualTo(new UserGroupId(expectedId));
         assertThat(actual.get().name()).isEqualTo(new GroupName(expectedGroupName));
         assertThat(actual.get().monthStartDay()).isEqualTo(new Day(expectedMonthStartDay));
-        assertThat(actual.get().createdByUserId()).isEqualTo(new UserId(expectedCreatedByUserId));
+        assertThat(actual.get().createdByUserId()).isEqualTo(TEST_USER_ID);
     }
 
     @Test

@@ -19,8 +19,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 class DailyPersonalTransactionTest {
 
     static Stream<Arguments> provideDailyPersonalTransactionData() {
-        UUID uuid = UUID.randomUUID();
-        DailyPersonalTransactionId transactionId = new DailyPersonalTransactionId(uuid);
+        UUID userUUID1 = UUID.randomUUID();
+        UUID userUUID2 = UUID.randomUUID();
+        UUID dailyPersonalTransactionUUID = UUID.randomUUID();
+        UserId userId1 = new UserId(userUUID1);
+        UserId userId2 = new UserId(userUUID2);
+        DailyPersonalTransactionId transactionId = new DailyPersonalTransactionId(dailyPersonalTransactionUUID);
 
         List<DailyPersonalExpense> emptyExpenses = new ArrayList<>();
 
@@ -44,14 +48,14 @@ class DailyPersonalTransactionTest {
         return Stream.of(
             Arguments.of(
                 transactionId,
-                new UserId(1L),
+                userId1,
                 LocalDate.of(2025, 12, 26),
                 new Money(10_000),
                 emptyExpenses,
                 Integer.valueOf(1),
                 new DailyPersonalTransaction(
                     transactionId,
-                    new UserId(1L),
+                    userId1,
                     LocalDate.of(2025, 12, 26),
                     new Money(10_000),
                     emptyExpenses,
@@ -60,14 +64,14 @@ class DailyPersonalTransactionTest {
             ),
             Arguments.of(
                 transactionId,
-                new UserId(2L),
+                userId2,
                 LocalDate.of(2025, 12, 27),
                 new Money(20_000),
                 expenses,
                 Integer.valueOf(1),
                 new DailyPersonalTransaction(
                     transactionId,
-                    new UserId(2L),
+                    userId2,
                     LocalDate.of(2025, 12, 27),
                     new Money(20_000),
                     expenses,

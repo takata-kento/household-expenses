@@ -10,6 +10,7 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Year;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class MonthlyBudgetTest {
@@ -20,7 +21,8 @@ class MonthlyBudgetTest {
     final Year EXPECTED_YEAR = new Year(2024);
     final Month EXPECTED_MONTH = new Month(6);
     final Money EXPECTED_BUDGET_AMOUNT = new Money(100000);
-    final UserId EXPECTED_SET_BY_USER_ID = new UserId(10L);
+    final UUID USER_UUID = UUID.randomUUID();
+    final UserId EXPECTED_SET_BY_USER_ID = new UserId(USER_UUID);
     final LocalDateTime EXPECTED_CREATED_AT = LocalDateTime.of(2024, 6, 1, 10, 0, 0);
     final LocalDateTime EXPECTED_UPDATED_AT = LocalDateTime.of(2024, 6, 10, 10, 0, 0);
     final Integer EXPECTED_VERSION = 0;
@@ -64,7 +66,7 @@ class MonthlyBudgetTest {
         );
 
         Money expectedBudgetAmount = new Money(120000);
-        UserId expectedSetByUserId = new UserId(20L);
+        UserId expectedSetByUserId = new UserId(UUID.randomUUID());
 
         // When
         budget.updateBudgetAmount(expectedBudgetAmount, expectedSetByUserId);
@@ -104,7 +106,7 @@ class MonthlyBudgetTest {
         // Given
         MonthlyBudget budget = setUpBudget();
 
-        UserId differentUserId = new UserId(20L);
+        UserId differentUserId = new UserId(UUID.randomUUID());
 
         // When
         boolean actualIsSetByUser = budget.isSetBy(EXPECTED_SET_BY_USER_ID);

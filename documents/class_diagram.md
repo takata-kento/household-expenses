@@ -305,8 +305,8 @@ classDiagram
 
     class UserId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class UserGroupId {

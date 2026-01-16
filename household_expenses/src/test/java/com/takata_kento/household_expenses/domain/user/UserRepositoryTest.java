@@ -9,6 +9,7 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @Testcontainers
 @Sql("/schema.sql")
 class UserRepositoryTest {
+
+    private static final UserId TEST_USER_ID_1 = new UserId(UUID.randomUUID());
+    private static final UserId TEST_USER_ID_2 = new UserId(UUID.randomUUID());
 
     @Container
     @ServiceConnection
@@ -62,7 +66,7 @@ class UserRepositoryTest {
                     (:id, :username, :password_hash, :user_group_id, :enabled, :version)
                 """
             )
-            .param("id", 1L)
+            .param("id", TEST_USER_ID_1.toString())
             .param("username", "testuser")
             .param("password_hash", "dummy_hash")
             .param("user_group_id", 100L)
@@ -79,7 +83,7 @@ class UserRepositoryTest {
                     (:id, :username, :password_hash, :enabled, :version)
                 """
             )
-            .param("id", 2L)
+            .param("id", TEST_USER_ID_2.toString())
             .param("username", "testuser2")
             .param("password_hash", "dummy_hash")
             .param("enabled", true)
@@ -90,16 +94,14 @@ class UserRepositoryTest {
     @Test
     void testFindById() {
         // Given
-        long expectedId = 1L;
         String expectedUsername = "testuser";
-        UserId userId = new UserId(expectedId);
 
         // When
-        Optional<User> actual = userRepository.findById(userId);
+        Optional<User> actual = userRepository.findById(TEST_USER_ID_1);
 
         // Then
         assertThat(actual).isPresent();
-        assertThat(actual.get().id()).isEqualTo(new UserId(expectedId));
+        assertThat(actual.get().id()).isEqualTo(TEST_USER_ID_1);
         assertThat(actual.get().name()).isEqualTo(new Username(expectedUsername));
         assertThat(actual.get().isBelongsToGroup()).isTrue();
     }
@@ -107,7 +109,7 @@ class UserRepositoryTest {
     @Test
     void testFindByIdNotFound() {
         // Given
-        long nonExistentId = 999L;
+        UUID nonExistentId = UUID.randomUUID();
         UserId userId = new UserId(nonExistentId);
 
         // When
@@ -120,7 +122,6 @@ class UserRepositoryTest {
     @Test
     void testFindByUsername() {
         // Given
-        long expectedId = 1L;
         String expectedUsername = "testuser";
         Username username = new Username(expectedUsername);
 
@@ -129,7 +130,7 @@ class UserRepositoryTest {
 
         // Then
         assertThat(actual).isPresent();
-        assertThat(actual.get().id()).isEqualTo(new UserId(expectedId));
+        assertThat(actual.get().id()).isEqualTo(TEST_USER_ID_1);
         assertThat(actual.get().name()).isEqualTo(new Username(expectedUsername));
         assertThat(actual.get().isBelongsToGroup()).isTrue();
     }
@@ -176,16 +177,14 @@ class UserRepositoryTest {
     @Test
     void testFindByIdWithNullUserGroupId() {
         // Given
-        long expectedId = 2L;
         String expectedUsername = "testuser2";
-        UserId userId = new UserId(expectedId);
 
         // When
-        Optional<User> actual = userRepository.findById(userId);
+        Optional<User> actual = userRepository.findById(TEST_USER_ID_2);
 
         // Then
         assertThat(actual).isPresent();
-        assertThat(actual.get().id()).isEqualTo(new UserId(expectedId));
+        assertThat(actual.get().id()).isEqualTo(TEST_USER_ID_2);
         assertThat(actual.get().name()).isEqualTo(new Username(expectedUsername));
         assertThat(actual.get().isBelongsToGroup()).isFalse();
     }
@@ -193,12 +192,9 @@ class UserRepositoryTest {
     @Test
     void testFindByIdWithReceivedInvitations() {
         // Given
-        long expectedId = 2L;
         String expectedUsername = "testuser2";
-        UserId userId = new UserId(expectedId);
 
         // 招待者とグループの設定
-        long inviterUserId = 1L;
         long userGroupId = 100L;
         long invitationId = 1L;
 
@@ -207,15 +203,15 @@ class UserRepositoryTest {
             .sql(
                 "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)"
             )
-            .params(invitationId, userGroupId, expectedId, inviterUserId, "PENDING")
+            .params(invitationId, userGroupId, TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), "PENDING")
             .update();
 
         // When
-        Optional<User> actual = userRepository.findById(userId);
+        Optional<User> actual = userRepository.findById(TEST_USER_ID_2);
 
         // Then
         assertThat(actual).isPresent();
-        assertThat(actual.get().id()).isEqualTo(new UserId(expectedId));
+        assertThat(actual.get().id()).isEqualTo(TEST_USER_ID_2);
         assertThat(actual.get().name()).isEqualTo(new Username(expectedUsername));
         assertThat(actual.get().isBelongsToGroup()).isFalse();
 
@@ -225,17 +221,13 @@ class UserRepositoryTest {
         GroupInvitationInfo invitation = receivedInvitations.iterator().next();
         assertThat(invitation.groupInvitationId()).isEqualTo(new GroupInvitationId(invitationId));
         assertThat(invitation.userGroupId()).isEqualTo(new UserGroupId(userGroupId));
-        assertThat(invitation.invitedByUserId()).isEqualTo(new UserId(inviterUserId));
+        assertThat(invitation.invitedByUserId()).isEqualTo(TEST_USER_ID_1);
     }
 
     @Test
     void testFindByIdWithNoInvitations() {
-        // Given
-        long expectedId = 2L;
-        UserId userId = new UserId(expectedId);
-
         // When
-        Optional<User> actual = userRepository.findById(userId);
+        Optional<User> actual = userRepository.findById(TEST_USER_ID_2);
 
         // Then
         assertThat(actual).isPresent();
@@ -245,12 +237,8 @@ class UserRepositoryTest {
 
     @Test
     void testLeaveGroupAndSave() {
-        // Given
-        long expectedId = 1L;
-        UserId userId = new UserId(expectedId);
-
         // When
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(TEST_USER_ID_1).orElseThrow();
         assertThat(user.isBelongsToGroup()).isTrue();
 
         user.leaveGroup();
@@ -260,7 +248,7 @@ class UserRepositoryTest {
         // DBから直接確認
         Integer userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM users WHERE id = ?")
-            .param(expectedId)
+            .param(TEST_USER_ID_1.toString())
             .query(Integer.class)
             .optional()
             .orElse(null);
@@ -270,13 +258,11 @@ class UserRepositoryTest {
     @Test
     void testInviteUserAndSave() {
         // Given
-        long inviterUserId = 1L;
-        long inviteeUserId = 2L;
         long userGroupId = 100L;
 
         // When
-        User inviter = userRepository.findById(new UserId(inviterUserId)).orElseThrow();
-        User invitee = userRepository.findById(new UserId(inviteeUserId)).orElseThrow();
+        User inviter = userRepository.findById(TEST_USER_ID_1).orElseThrow();
+        User invitee = userRepository.findById(TEST_USER_ID_2).orElseThrow();
 
         // 招待前の状態確認
         assertThat(inviter.isBelongsToGroup()).isTrue();
@@ -293,7 +279,7 @@ class UserRepositoryTest {
         // DBから直接確認
         Integer userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM users WHERE id = ?")
-            .param(inviteeUserId)
+            .param(TEST_USER_ID_2.toString())
             .query(Integer.class)
             .optional()
             .orElse(null);
@@ -303,7 +289,7 @@ class UserRepositoryTest {
             .sql(
                 "SELECT COUNT(*) FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
             )
-            .params(invitationId.value(), inviteeUserId, inviterUserId, userGroupId)
+            .params(invitationId.value(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), userGroupId)
             .query(Integer.class)
             .single();
         assertThat(invitationCount).isEqualTo(1);
@@ -312,7 +298,7 @@ class UserRepositoryTest {
             .sql(
                 "SELECT status FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
             )
-            .params(invitationId.value(), inviteeUserId, inviterUserId, userGroupId)
+            .params(invitationId.value(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), userGroupId)
             .query(String.class)
             .single();
         assertThat(status).isEqualTo("PENDING");
@@ -321,8 +307,6 @@ class UserRepositoryTest {
     @Test
     void testAcceptInvitationAndSave() {
         // Given
-        long invitedUserId = 2L;
-        long inviterUserId = 1L;
         long userGroupId = 100L;
         long invitationId = 1L;
 
@@ -331,11 +315,11 @@ class UserRepositoryTest {
             .sql(
                 "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)"
             )
-            .params(invitationId, userGroupId, invitedUserId, inviterUserId, "PENDING")
+            .params(invitationId, userGroupId, TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), "PENDING")
             .update();
 
         // When
-        User invitedUser = userRepository.findById(new UserId(invitedUserId)).orElseThrow();
+        User invitedUser = userRepository.findById(TEST_USER_ID_2).orElseThrow();
 
         // 招待承認前の状態確認
         assertThat(invitedUser.isBelongsToGroup()).isFalse();
@@ -350,7 +334,7 @@ class UserRepositoryTest {
         // DBから直接確認
         Long userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM users WHERE id = ?")
-            .param(invitedUserId)
+            .param(TEST_USER_ID_2.toString())
             .query(Long.class)
             .single();
         assertThat(userGroupIdFromDb).isEqualTo(userGroupId);
@@ -373,8 +357,6 @@ class UserRepositoryTest {
     @Test
     void testRejectInvitationAndSave() {
         // Given
-        long invitedUserId = 2L;
-        long inviterUserId = 1L;
         long userGroupId = 100L;
         long invitationId = 1L;
 
@@ -383,11 +365,11 @@ class UserRepositoryTest {
             .sql(
                 "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)"
             )
-            .params(invitationId, userGroupId, invitedUserId, inviterUserId, "PENDING")
+            .params(invitationId, userGroupId, TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), "PENDING")
             .update();
 
         // When
-        User invitedUser = userRepository.findById(new UserId(invitedUserId)).orElseThrow();
+        User invitedUser = userRepository.findById(TEST_USER_ID_2).orElseThrow();
 
         // 招待拒否前の状態確認
         assertThat(invitedUser.isBelongsToGroup()).isFalse();
@@ -402,7 +384,7 @@ class UserRepositoryTest {
         // DBから直接確認
         Long userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM users WHERE id = ?")
-            .param(invitedUserId)
+            .param(TEST_USER_ID_2.toString())
             .query(Long.class)
             .optional()
             .orElse(null);
