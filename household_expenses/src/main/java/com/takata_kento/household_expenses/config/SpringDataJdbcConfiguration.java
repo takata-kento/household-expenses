@@ -6,6 +6,7 @@ import com.takata_kento.household_expenses.domain.valueobject.DailyLivingExpense
 import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalExpenseId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalTransactionId;
 import com.takata_kento.household_expenses.domain.valueobject.Day;
+import com.takata_kento.household_expenses.domain.valueobject.FixedExpenseCategoryId;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.GroupName;
@@ -68,7 +69,9 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new DailyPersonalTransactionIdToStringConverter(),
             new StringToDailyPersonalTransactionIdConverter(),
             new DailyPersonalExpenseIdToStringConverter(),
-            new StringToDailyPersonalExpenseIdConverter()
+            new StringToDailyPersonalExpenseIdConverter(),
+            new FixedExpenseCategoryIdToStringConverter(),
+            new StringToFixedExpenseCategoryIdConverter()
         );
     }
 
@@ -393,6 +396,24 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public DailyPersonalExpenseId convert(String source) {
             return new DailyPersonalExpenseId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class FixedExpenseCategoryIdToStringConverter implements Converter<FixedExpenseCategoryId, String> {
+
+        @Override
+        public String convert(FixedExpenseCategoryId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToFixedExpenseCategoryIdConverter implements Converter<String, FixedExpenseCategoryId> {
+
+        @Override
+        public FixedExpenseCategoryId convert(String source) {
+            return new FixedExpenseCategoryId(UUID.fromString(source));
         }
     }
 }
