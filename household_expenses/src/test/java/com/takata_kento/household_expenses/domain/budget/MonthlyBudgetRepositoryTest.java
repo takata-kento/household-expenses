@@ -11,6 +11,7 @@ import com.takata_kento.household_expenses.domain.valueobject.Year;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ class MonthlyBudgetRepositoryTest {
     @Autowired
     private JdbcClient jdbcClient;
 
+    final UUID USER_UUID = UUID.randomUUID();
+
     @BeforeEach
     void setUp() {
         // テストユーザーを挿入
@@ -49,7 +52,7 @@ class MonthlyBudgetRepositoryTest {
                     (:id, :username, :password_hash, :enabled, :version)
                 """
             )
-            .param("id", 1L)
+            .param("id", USER_UUID.toString())
             .param("username", "testuser")
             .param("password_hash", "dummy_hash")
             .param("enabled", true)
@@ -69,7 +72,7 @@ class MonthlyBudgetRepositoryTest {
             .param("id", 1L)
             .param("group_name", "Test Group")
             .param("month_start_day", 1)
-            .param("created_by_user_id", 1L)
+            .param("created_by_user_id", USER_UUID.toString())
             .param("version", 1)
             .update();
 
@@ -88,7 +91,7 @@ class MonthlyBudgetRepositoryTest {
             .param("year", 2024)
             .param("month", 7)
             .param("budget_amount", 100000)
-            .param("set_by_user_id", 1L)
+            .param("set_by_user_id", USER_UUID.toString())
             .param("created_at", LocalDateTime.of(2024, 7, 1, 10, 0, 0))
             .param("version", 1)
             .update();
@@ -107,7 +110,7 @@ class MonthlyBudgetRepositoryTest {
             .param("year", 2024)
             .param("month", 11)
             .param("budget_amount", 95000)
-            .param("set_by_user_id", 1L)
+            .param("set_by_user_id", USER_UUID.toString())
             .param("created_at", LocalDateTime.of(2024, 7, 1, 10, 0, 0))
             .param("version", 1)
             .update();
@@ -117,7 +120,6 @@ class MonthlyBudgetRepositoryTest {
     void testSave() {
         // Given
         long userGroupId = 1L;
-        long setByUserId = 1L;
         int year = 2024;
         int month = 6;
         int budgetAmount = 100000;
@@ -127,7 +129,7 @@ class MonthlyBudgetRepositoryTest {
             new Year(year),
             new Month(month),
             new Money(budgetAmount),
-            new UserId(setByUserId)
+            new UserId(USER_UUID)
         );
 
         // When
@@ -163,12 +165,12 @@ class MonthlyBudgetRepositoryTest {
             .single();
         assertThat(monthFromDb).isEqualTo(month);
 
-        Long setByUserIdFromDb = jdbcClient
+        String setByUserIdFromDb = jdbcClient
             .sql("SELECT set_by_user_id FROM monthly_budget WHERE id = ?")
             .param(savedMonthlyBudget.id().value())
-            .query(Long.class)
+            .query(String.class)
             .single();
-        assertThat(setByUserIdFromDb).isEqualTo(setByUserId);
+        assertThat(setByUserIdFromDb).isEqualTo(USER_UUID.toString());
     }
 
     @Test
@@ -200,7 +202,7 @@ class MonthlyBudgetRepositoryTest {
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);
         Money expectedBudgetAmount = new Money(100000);
-        UserId expectedSetByUserId = new UserId(1L);
+        UserId expectedSetByUserId = new UserId(USER_UUID);
         LocalDateTime expectedCreatedAt = LocalDateTime.of(2024, 7, 1, 10, 0, 0);
         LocalDateTime expectedUpdatedAt = null;
         Integer expectedVersion = 1;
@@ -230,7 +232,7 @@ class MonthlyBudgetRepositoryTest {
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);
         Money expectedBudgetAmount = new Money(100000);
-        UserId expectedSetByUserId = new UserId(1L);
+        UserId expectedSetByUserId = new UserId(USER_UUID);
         LocalDateTime expectedCreatedAt = LocalDateTime.of(2024, 7, 1, 10, 0, 0);
         LocalDateTime expectedUpdatedAt = null;
         Integer expectedVersion = 1;

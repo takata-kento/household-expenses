@@ -12,18 +12,18 @@ import org.springframework.data.repository.query.Param;
 public interface DailyPersonalTransactionRepository
     extends CrudRepository<DailyPersonalTransaction, DailyPersonalTransactionId> {
     @Query(
-        "SELECT * FROM daily_personal_transaction WHERE user_id = :#{#userId.value} AND transaction_date = :transactionDate"
+        "SELECT * FROM daily_personal_transaction WHERE user_id = :#{#userId.value.toString()} AND transaction_date = :transactionDate"
     )
     Optional<DailyPersonalTransaction> findByUserIdAndTransactionDate(
         @Param("userId") UserId userId,
         @Param("transactionDate") LocalDate transactionDate
     );
 
-    @Query("SELECT * FROM daily_personal_transaction WHERE user_id = :#{#userId.value}")
+    @Query("SELECT * FROM daily_personal_transaction WHERE user_id = :#{#userId.value.toString()}")
     List<DailyPersonalTransaction> findByUserId(@Param("userId") UserId userId);
 
     @Query(
-        "SELECT EXISTS(SELECT 1 FROM daily_personal_transaction WHERE user_id = :#{#userId.value} AND transaction_date = :transactionDate)"
+        "SELECT EXISTS(SELECT 1 FROM daily_personal_transaction WHERE user_id = :#{#userId.value.toString()} AND transaction_date = :transactionDate)"
     )
     boolean existsByUserIdAndTransactionDate(
         @Param("userId") UserId userId,

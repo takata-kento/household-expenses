@@ -19,11 +19,12 @@ public class DailyLivingExpenseTest {
     static Stream<Arguments> provideDailyLivingExpenseData() {
         UUID dailyLivingExpenseUUID = UUID.randomUUID();
         UUID dailyGroupTransactionUUID = UUID.randomUUID();
+        UUID userUUID = UUID.randomUUID();
         return Stream.of(
             Arguments.of(
                 new DailyLivingExpenseId(dailyLivingExpenseUUID),
                 new DailyGroupTransactionId(dailyGroupTransactionUUID),
-                new UserId(100L),
+                new UserId(userUUID),
                 new LivingExpenseCategoryId(100L),
                 new Money(10_000),
                 new Description("Description"),
@@ -31,7 +32,7 @@ public class DailyLivingExpenseTest {
                 new DailyLivingExpense(
                     new DailyLivingExpenseId(dailyLivingExpenseUUID),
                     new DailyGroupTransactionId(dailyGroupTransactionUUID),
-                    new UserId(100L),
+                    new UserId(userUUID),
                     new LivingExpenseCategoryId(100L),
                     new Money(10_000),
                     new Description("Description"),
@@ -46,7 +47,7 @@ public class DailyLivingExpenseTest {
             new DailyLivingExpense(
                 new DailyLivingExpenseId(UUID.randomUUID()),
                 new DailyGroupTransactionId(UUID.randomUUID()),
-                new UserId(100L),
+                new UserId(UUID.randomUUID()),
                 new LivingExpenseCategoryId(100L),
                 new Money(10_000),
                 new Description("Description"),
@@ -254,7 +255,7 @@ public class DailyLivingExpenseTest {
         DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        UserId expectedUserId = new UserId(200L);
+        UserId expectedUserId = new UserId(UUID.randomUUID());
 
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
@@ -274,11 +275,17 @@ public class DailyLivingExpenseTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideDailyLivingExpenseInstance")
-    void testThrowSameUserErrorWhenUpdateUser(DailyLivingExpense dailyLivingExpense) {
-        // Given
-        UserId sameUserId = new UserId(100L);
-
+    @MethodSource("provideDailyLivingExpenseData")
+    void testThrowSameUserErrorWhenUpdateUser(
+        DailyLivingExpenseId id,
+        DailyGroupTransactionId dailyGroupTransactionId,
+        UserId sameUserId,
+        LivingExpenseCategoryId livingExpenseCategoryId,
+        Money amount,
+        Description memo,
+        Integer version,
+        DailyLivingExpense dailyLivingExpense
+    ) {
         // When
         IllegalArgumentException actual = catchIllegalArgumentException(() ->
             dailyLivingExpense.updateUser(sameUserId)

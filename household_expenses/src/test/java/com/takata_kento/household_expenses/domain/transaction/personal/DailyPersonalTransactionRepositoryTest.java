@@ -27,6 +27,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @Sql("/schema.sql")
 class DailyPersonalTransactionRepositoryTest {
 
+    private static final UUID TEST_USER_UUID = UUID.randomUUID();
+
     @Container
     @ServiceConnection
     static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17-alpine");
@@ -44,7 +46,7 @@ class DailyPersonalTransactionRepositoryTest {
             .sql(
                 "INSERT INTO users (id, username, password_hash, enabled) VALUES (:id, :username, :password, :enabled)"
             )
-            .param("id", 1L)
+            .param("id", TEST_USER_UUID.toString())
             .param("username", "testuser")
             .param("password", "hashedpassword")
             .param("enabled", true)
@@ -54,7 +56,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testSave() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(TEST_USER_UUID);
         DailyPersonalTransactionId transactionId = new DailyPersonalTransactionId(UUID.randomUUID());
         LocalDate transactionDate = LocalDate.of(2025, 12, 26);
         Money income = new Money(10_000);
@@ -80,12 +82,12 @@ class DailyPersonalTransactionRepositoryTest {
             .single();
         then(idFromDb).isEqualTo(transactionId.toString());
 
-        Long userIdFromDb = jdbcClient
+        String userIdFromDb = jdbcClient
             .sql("SELECT user_id FROM daily_personal_transaction WHERE id = ?")
             .param(savedTransaction.id().toString())
-            .query(Long.class)
+            .query(String.class)
             .single();
-        then(userIdFromDb).isEqualTo(userId.value());
+        then(userIdFromDb).isEqualTo(userId.toString());
 
         LocalDate transactionDateFromDb = jdbcClient
             .sql("SELECT transaction_date FROM daily_personal_transaction WHERE id = ?")
@@ -105,7 +107,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testSaveWithPersonalExpenses() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(TEST_USER_UUID);
         DailyPersonalTransactionId transactionId = new DailyPersonalTransactionId(UUID.randomUUID());
         LocalDate transactionDate = LocalDate.of(2025, 12, 26);
         Money income = new Money(10_000);
@@ -145,7 +147,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testFindById() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(TEST_USER_UUID);
         DailyPersonalTransactionId transactionId = new DailyPersonalTransactionId(UUID.randomUUID());
         LocalDate transactionDate = LocalDate.of(2025, 12, 26);
         Money income = new Money(10_000);
@@ -178,7 +180,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testFindByUserIdAndTransactionDate() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(TEST_USER_UUID);
         DailyPersonalTransactionId transactionId = new DailyPersonalTransactionId(UUID.randomUUID());
         LocalDate transactionDate = LocalDate.of(2025, 12, 26);
         Money income = new Money(10_000);
@@ -199,7 +201,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testFindByUserIdAndTransactionDateNotFound() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(UUID.randomUUID());
         LocalDate transactionDate = LocalDate.of(2025, 12, 26);
 
         // When
@@ -212,7 +214,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testFindByUserId() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(TEST_USER_UUID);
         DailyPersonalTransactionId transactionId1 = new DailyPersonalTransactionId(UUID.randomUUID());
         DailyPersonalTransactionId transactionId2 = new DailyPersonalTransactionId(UUID.randomUUID());
 
@@ -230,7 +232,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testFindByUserIdEmpty() {
         // Given
-        UserId userId = new UserId(999L);
+        UserId userId = new UserId(UUID.randomUUID());
 
         // When
         List<DailyPersonalTransaction> actual = repository.findByUserId(userId);
@@ -242,7 +244,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testExistsByUserIdAndTransactionDate() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(TEST_USER_UUID);
         DailyPersonalTransactionId transactionId = new DailyPersonalTransactionId(UUID.randomUUID());
         LocalDate transactionDate = LocalDate.of(2025, 12, 26);
 
@@ -258,7 +260,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testExistsByUserIdAndTransactionDateNotFound() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(UUID.randomUUID());
         LocalDate transactionDate = LocalDate.of(2025, 12, 26);
 
         // When
@@ -271,7 +273,7 @@ class DailyPersonalTransactionRepositoryTest {
     @Test
     void testDelete() {
         // Given
-        UserId userId = new UserId(1L);
+        UserId userId = new UserId(TEST_USER_UUID);
         DailyPersonalTransactionId transactionId = new DailyPersonalTransactionId(UUID.randomUUID());
         LocalDate transactionDate = LocalDate.of(2025, 12, 26);
 
@@ -297,7 +299,7 @@ class DailyPersonalTransactionRepositoryTest {
                 "INSERT INTO daily_personal_transaction (id, user_id, transaction_date, income) VALUES (:id, :userId, :transactionDate, :income)"
             )
             .param("id", transactionId.toString())
-            .param("userId", userId.value())
+            .param("userId", userId.toString())
             .param("transactionDate", transactionDate)
             .param("income", income.amount())
             .update();

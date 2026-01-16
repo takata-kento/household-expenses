@@ -33,8 +33,8 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
-            new UserIdToLongConverter(),
-            new LongToUserIdConverter(),
+            new UserIdToStringConverter(),
+            new StringToUserIdConverter(),
             new UsernameToStringConverter(),
             new StringToUsernameConverter(),
             new UserGroupIdToLongConverter(),
@@ -73,20 +73,20 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class UserIdToLongConverter implements Converter<UserId, Long> {
+    static class UserIdToStringConverter implements Converter<UserId, String> {
 
         @Override
-        public Long convert(UserId source) {
-            return source.value();
+        public String convert(UserId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToUserIdConverter implements Converter<Long, UserId> {
+    static class StringToUserIdConverter implements Converter<String, UserId> {
 
         @Override
-        public UserId convert(Long source) {
-            return new UserId(source);
+        public UserId convert(String source) {
+            return new UserId(UUID.fromString(source));
         }
     }
 
