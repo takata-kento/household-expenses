@@ -317,8 +317,8 @@ classDiagram
 
     class GroupInvitationId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class FinancialAccountId {

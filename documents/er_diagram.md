@@ -34,7 +34,7 @@ erDiagram
 
     %% グループ招待
     GROUP_INVITATION {
-        bigint id PK "招待ID"
+        varchar id PK "招待ID (UUID)"
         bigint user_group_id FK
         varchar invited_user_id FK
         varchar invited_by_user_id FK
