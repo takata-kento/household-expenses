@@ -196,7 +196,7 @@ class UserRepositoryTest {
 
         // 招待者とグループの設定
         long userGroupId = 100L;
-        long invitationId = 1L;
+        String invitationId = UUID.randomUUID().toString();
 
         // 招待データを挿入
         jdbcClient
@@ -219,7 +219,7 @@ class UserRepositoryTest {
         assertThat(receivedInvitations).hasSize(1);
 
         GroupInvitationInfo invitation = receivedInvitations.iterator().next();
-        assertThat(invitation.groupInvitationId()).isEqualTo(new GroupInvitationId(invitationId));
+        assertThat(invitation.groupInvitationId()).isEqualTo(new GroupInvitationId(UUID.fromString(invitationId)));
         assertThat(invitation.userGroupId()).isEqualTo(new UserGroupId(userGroupId));
         assertThat(invitation.invitedByUserId()).isEqualTo(TEST_USER_ID_1);
     }
@@ -289,7 +289,7 @@ class UserRepositoryTest {
             .sql(
                 "SELECT COUNT(*) FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
             )
-            .params(invitationId.value(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), userGroupId)
+            .params(invitationId.toString(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), userGroupId)
             .query(Integer.class)
             .single();
         assertThat(invitationCount).isEqualTo(1);
@@ -298,7 +298,7 @@ class UserRepositoryTest {
             .sql(
                 "SELECT status FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
             )
-            .params(invitationId.value(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), userGroupId)
+            .params(invitationId.toString(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), userGroupId)
             .query(String.class)
             .single();
         assertThat(status).isEqualTo("PENDING");
@@ -308,7 +308,7 @@ class UserRepositoryTest {
     void testAcceptInvitationAndSave() {
         // Given
         long userGroupId = 100L;
-        long invitationId = 1L;
+        String invitationId = UUID.randomUUID().toString();
 
         // 招待データを挿入
         jdbcClient
@@ -325,7 +325,7 @@ class UserRepositoryTest {
         assertThat(invitedUser.isBelongsToGroup()).isFalse();
 
         // 招待を承認
-        invitedUser.accept(new GroupInvitationId(invitationId));
+        invitedUser.accept(new GroupInvitationId(UUID.fromString(invitationId)));
 
         // 承認したユーザーの状態を永続化
         userRepository.save(invitedUser);
@@ -358,7 +358,7 @@ class UserRepositoryTest {
     void testRejectInvitationAndSave() {
         // Given
         long userGroupId = 100L;
-        long invitationId = 1L;
+        String invitationId = UUID.randomUUID().toString();
 
         // 招待データを挿入
         jdbcClient
@@ -375,7 +375,7 @@ class UserRepositoryTest {
         assertThat(invitedUser.isBelongsToGroup()).isFalse();
 
         // 招待を拒否
-        invitedUser.reject(new GroupInvitationId(invitationId));
+        invitedUser.reject(new GroupInvitationId(UUID.fromString(invitationId)));
 
         // 拒否したユーザーの状態を永続化
         userRepository.save(invitedUser);

@@ -114,10 +114,12 @@ class UserTest {
         UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         Integer expectedVersion = null;
+        GroupInvitationId pendingInvitationId = new GroupInvitationId(UUID.randomUUID());
+        GroupInvitationId acceptedInvitationId = new GroupInvitationId(UUID.randomUUID());
 
         LocalDateTime now = LocalDateTime.now();
         GroupInvitation pendingInvitation = new GroupInvitation(
-            new GroupInvitationId(1L),
+            pendingInvitationId,
             new UserGroupId(100L),
             expectedUserId,
             USER_ID_2,
@@ -129,7 +131,7 @@ class UserTest {
         );
 
         GroupInvitation acceptedInvitation = new GroupInvitation(
-            new GroupInvitationId(2L),
+            acceptedInvitationId,
             new UserGroupId(200L),
             expectedUserId,
             USER_ID_3,
@@ -149,7 +151,7 @@ class UserTest {
         // Then
         assertThat(actual).hasSize(1);
         actual.forEach(info -> {
-            assertThat(info.groupInvitationId()).isEqualTo(new GroupInvitationId(1L));
+            assertThat(info.groupInvitationId()).isEqualTo(pendingInvitationId);
             assertThat(info.userGroupId()).isEqualTo(new UserGroupId(100L));
             assertThat(info.invitedByUserId()).isEqualTo(USER_ID_2);
         });
@@ -166,10 +168,12 @@ class UserTest {
         UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
         Integer expectedVersion = null;
+        GroupInvitationId invitationId1 = new GroupInvitationId(UUID.randomUUID());
+        GroupInvitationId invitationId2 = new GroupInvitationId(UUID.randomUUID());
 
         LocalDateTime now = LocalDateTime.now();
         GroupInvitation invitation1 = new GroupInvitation(
-            new GroupInvitationId(1L),
+            invitationId1,
             new UserGroupId(100L),
             expectedUserId,
             USER_ID_2,
@@ -181,7 +185,7 @@ class UserTest {
         );
 
         GroupInvitation invitation2 = new GroupInvitation(
-            new GroupInvitationId(2L),
+            invitationId2,
             new UserGroupId(200L),
             expectedUserId,
             USER_ID_3,
@@ -205,7 +209,7 @@ class UserTest {
                 .stream()
                 .anyMatch(
                     info ->
-                        info.groupInvitationId().equals(new GroupInvitationId(1L)) &&
+                        info.groupInvitationId().equals(invitationId1) &&
                         info.userGroupId().equals(new UserGroupId(100L)) &&
                         info.invitedByUserId().equals(USER_ID_2)
                 )
@@ -215,7 +219,7 @@ class UserTest {
                 .stream()
                 .anyMatch(
                     info ->
-                        info.groupInvitationId().equals(new GroupInvitationId(2L)) &&
+                        info.groupInvitationId().equals(invitationId2) &&
                         info.userGroupId().equals(new UserGroupId(200L)) &&
                         info.invitedByUserId().equals(USER_ID_3)
                 )
@@ -424,7 +428,7 @@ class UserTest {
         UserId invitedUserId = USER_ID_1;
         Username invitedUsername = new Username("invited");
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        GroupInvitationId invitationId = new GroupInvitationId(10L);
+        GroupInvitationId invitationId = new GroupInvitationId(UUID.randomUUID());
         LocalDateTime now = LocalDateTime.now();
         GroupInvitation pendingInvitation = new GroupInvitation(
             invitationId,
@@ -458,7 +462,7 @@ class UserTest {
         // Given
         UserId invitedUserId = USER_ID_1;
         Username invitedUsername = new Username("invited");
-        GroupInvitationId invitationId = new GroupInvitationId(10L);
+        GroupInvitationId invitationId = new GroupInvitationId(UUID.randomUUID());
         LocalDateTime now = LocalDateTime.now();
         GroupInvitation pendingInvitation = new GroupInvitation(
             invitationId,

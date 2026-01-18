@@ -16,7 +16,7 @@ class GroupInvitationInfoTest {
     @Test
     void testFromGroupInvitation() {
         // Given
-        GroupInvitationId expectedGroupInvitationId = new GroupInvitationId(1L);
+        GroupInvitationId expectedGroupInvitationId = new GroupInvitationId(UUID.randomUUID());
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserId invitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
