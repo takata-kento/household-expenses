@@ -39,7 +39,7 @@ CREATE UNIQUE INDEX ix_auth_username ON authorities (username,authority);
 
 -- グループ招待テーブル
 CREATE TABLE group_invitation (
-    id BIGSERIAL PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY,
     user_group_id BIGINT NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
     invited_user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     invited_by_user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
