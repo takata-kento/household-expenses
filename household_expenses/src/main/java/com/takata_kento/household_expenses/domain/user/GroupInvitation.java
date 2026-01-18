@@ -60,8 +60,7 @@ public class GroupInvitation {
 
     public static GroupInvitation create(UserGroupId userGroupId, UserId invitedUserId, UserId invitedByUserId) {
         LocalDateTime now = LocalDateTime.now();
-        Long invitationId = Math.abs(UUID.randomUUID().getLeastSignificantBits());
-        GroupInvitationId id = new GroupInvitationId(invitationId);
+        GroupInvitationId id = new GroupInvitationId(UUID.randomUUID());
         return new GroupInvitation(
             id,
             userGroupId,

@@ -40,8 +40,8 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToUsernameConverter(),
             new UserGroupIdToLongConverter(),
             new LongToUserGroupIdConverter(),
-            new GroupInvitationIdToLongConverter(),
-            new LongToGroupInvitationIdConverter(),
+            new GroupInvitationIdToStringConverter(),
+            new StringToGroupInvitationIdConverter(),
             new OptionalUserGroupIdToLongConverter(),
             new LongToOptionalUserGroupIdConverter(),
             new GroupNameToStringConverter(),
@@ -130,20 +130,20 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class GroupInvitationIdToLongConverter implements Converter<GroupInvitationId, Long> {
+    static class GroupInvitationIdToStringConverter implements Converter<GroupInvitationId, String> {
 
         @Override
-        public Long convert(GroupInvitationId source) {
-            return source.value();
+        public String convert(GroupInvitationId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToGroupInvitationIdConverter implements Converter<Long, GroupInvitationId> {
+    static class StringToGroupInvitationIdConverter implements Converter<String, GroupInvitationId> {
 
         @Override
-        public GroupInvitationId convert(Long source) {
-            return new GroupInvitationId(source);
+        public GroupInvitationId convert(String source) {
+            return new GroupInvitationId(UUID.fromString(source));
         }
     }
 

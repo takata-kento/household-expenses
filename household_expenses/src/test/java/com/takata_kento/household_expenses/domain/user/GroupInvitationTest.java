@@ -12,7 +12,7 @@ class GroupInvitationTest {
     @Test
     void testConstructor() {
         // Given
-        GroupInvitationId expectedId = new GroupInvitationId(1L);
+        GroupInvitationId expectedId = new GroupInvitationId(UUID.randomUUID());
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
@@ -76,7 +76,7 @@ class GroupInvitationTest {
     @Test
     void testAccept() {
         // Given
-        GroupInvitationId expectedId = new GroupInvitationId(1L);
+        GroupInvitationId expectedId = new GroupInvitationId(UUID.randomUUID());
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
@@ -114,7 +114,7 @@ class GroupInvitationTest {
     @Test
     void testReject() {
         // Given
-        GroupInvitationId expectedId = new GroupInvitationId(1L);
+        GroupInvitationId expectedId = new GroupInvitationId(UUID.randomUUID());
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
@@ -152,8 +152,8 @@ class GroupInvitationTest {
     @Test
     void testIsPending() {
         // Given
-        GroupInvitationId expectedId1 = new GroupInvitationId(1L);
-        GroupInvitationId expectedId2 = new GroupInvitationId(2L);
+        GroupInvitationId expectedId1 = new GroupInvitationId(UUID.randomUUID());
+        GroupInvitationId expectedId2 = new GroupInvitationId(UUID.randomUUID());
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
@@ -210,8 +210,8 @@ class GroupInvitationTest {
     @Test
     void testCanRespond() {
         // Given
-        GroupInvitationId expectedId1 = new GroupInvitationId(1L);
-        GroupInvitationId expectedId2 = new GroupInvitationId(2L);
+        GroupInvitationId expectedId1 = new GroupInvitationId(UUID.randomUUID());
+        GroupInvitationId expectedId2 = new GroupInvitationId(UUID.randomUUID());
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
@@ -268,7 +268,7 @@ class GroupInvitationTest {
     @Test
     void testIsFrom() {
         // Given
-        GroupInvitationId expectedId = new GroupInvitationId(1L);
+        GroupInvitationId expectedId = new GroupInvitationId(UUID.randomUUID());
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         UserGroupId differentUserGroupId = new UserGroupId(200L);
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
