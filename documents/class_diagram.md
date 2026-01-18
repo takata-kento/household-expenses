@@ -347,8 +347,8 @@ classDiagram
 
     class LivingExpenseCategoryId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class FixedExpenseCategoryId {
