@@ -90,7 +90,7 @@ CREATE TABLE monthly_budget (
 
 -- 生活費分類テーブル
 CREATE TABLE living_expense_category (
-    id BIGSERIAL PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY,
     user_group_id BIGINT REFERENCES user_group(id) ON DELETE CASCADE,
     category_name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -116,7 +116,7 @@ CREATE TABLE daily_living_expense (
     id VARCHAR(36) PRIMARY KEY,
     daily_group_transaction_id VARCHAR(36) NOT NULL REFERENCES daily_group_transaction(id) ON DELETE CASCADE,
     user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    living_expense_category_id BIGINT NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
+    living_expense_category_id VARCHAR(36) NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
     amount INTEGER NOT NULL,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

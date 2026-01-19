@@ -6,6 +6,7 @@ import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,33 +73,36 @@ class LivingExpenseCategoryRepositoryTest {
             .sql(
                 """
                 INSERT INTO living_expense_category (id, user_group_id, category_name, description, is_default, created_at, updated_at, version)
-                VALUES (1, 100, '食費', '食材・外食費', true, ?, ?, 0)
+                VALUES (:id, 100, '食費', '食材・外食費', true, :created_at, :updated_at, 0)
                 """
             )
-            .param(now)
-            .param(now)
+            .param("id", UUID.randomUUID().toString())
+            .param("created_at", now)
+            .param("updated_at", now)
             .update();
 
         jdbcClient
             .sql(
                 """
                 INSERT INTO living_expense_category (id, user_group_id, category_name, description, is_default, created_at, updated_at, version)
-                VALUES (2, 100, '交通費', '電車・バス代', false, ?, ?, 0)
+                VALUES (:id, 100, '交通費', '電車・バス代', false, :created_at, :updated_at, 0)
                 """
             )
-            .param(now)
-            .param(now)
+            .param("id", UUID.randomUUID().toString())
+            .param("created_at", now)
+            .param("updated_at", now)
             .update();
 
         jdbcClient
             .sql(
                 """
                 INSERT INTO living_expense_category (id, user_group_id, category_name, description, is_default, created_at, updated_at, version)
-                VALUES (3, 200, '日用品', '生活雑貨', false, ?, ?, 0)
+                VALUES (:id, 200, '日用品', '生活雑貨', false, :created_at, :updated_at, 0)
                 """
             )
-            .param(now)
-            .param(now)
+            .param("id", UUID.randomUUID().toString())
+            .param("created_at", now)
+            .param("updated_at", now)
             .update();
     }
 

@@ -87,7 +87,7 @@ CREATE TABLE monthly_budget (
 
 -- 生活費分類テーブル
 CREATE TABLE living_expense_category (
-    id BIGSERIAL PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY,
     user_group_id BIGINT REFERENCES user_group(id) ON DELETE CASCADE,
     category_name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -113,7 +113,7 @@ CREATE TABLE daily_living_expense (
     id VARCHAR(36) PRIMARY KEY,
     daily_group_transaction_id VARCHAR(36) NOT NULL REFERENCES daily_group_transaction(id) ON DELETE CASCADE,
     user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    living_expense_category_id BIGINT NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
+    living_expense_category_id VARCHAR(36) NOT NULL REFERENCES living_expense_category(id) ON DELETE CASCADE,
     amount INTEGER NOT NULL,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -240,16 +240,16 @@ CREATE TRIGGER update_fixed_expense_history_updated_at BEFORE UPDATE ON fixed_ex
 CREATE TRIGGER update_monthly_saving_updated_at BEFORE UPDATE ON monthly_saving FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- デフォルト生活費分類データの挿入（グローバル設定として）
-INSERT INTO living_expense_category (user_group_id, category_name, description, is_default) VALUES
-(NULL, '食費', '食材・飲料などの食事関連費用', TRUE),
-(NULL, '食費', '外食関連費用', TRUE),
-(NULL, '交通費', '電車・バス・タクシー・ガソリン代など', TRUE),
-(NULL, '日用品', '洗剤・ティッシュ・シャンプーなどの生活用品', TRUE),
-(NULL, '医療費', '病院代・薬代・健康関連費用', TRUE),
-(NULL, '娯楽費', '映画・本・レジャー・趣味関連費用', TRUE),
-(NULL, '衣服費', '衣類・靴・アクセサリーなど', TRUE),
-(NULL, '教育費', '書籍・講座・資格取得などの学習費用', TRUE),
-(NULL, 'その他', 'その他の生活費', TRUE);
+INSERT INTO living_expense_category (id, user_group_id, category_name, description, is_default) VALUES
+(uuid_generate_v4(), NULL, '食費', '食材・飲料などの食事関連費用', TRUE),
+(uuid_generate_v4(), NULL, '食費', '外食関連費用', TRUE),
+(uuid_generate_v4(), NULL, '交通費', '電車・バス・タクシー・ガソリン代など', TRUE),
+(uuid_generate_v4(), NULL, '日用品', '洗剤・ティッシュ・シャンプーなどの生活用品', TRUE),
+(uuid_generate_v4(), NULL, '医療費', '病院代・薬代・健康関連費用', TRUE),
+(uuid_generate_v4(), NULL, '娯楽費', '映画・本・レジャー・趣味関連費用', TRUE),
+(uuid_generate_v4(), NULL, '衣服費', '衣類・靴・アクセサリーなど', TRUE),
+(uuid_generate_v4(), NULL, '教育費', '書籍・講座・資格取得などの学習費用', TRUE),
+(uuid_generate_v4(), NULL, 'その他', 'その他の生活費', TRUE);
 
 -- 初期化完了メッセージ
 SELECT 'Database initialization completed successfully!' as message;

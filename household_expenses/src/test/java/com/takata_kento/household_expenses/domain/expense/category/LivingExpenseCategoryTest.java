@@ -6,6 +6,7 @@ import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.LivingExpenseCategoryId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
+import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,7 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class LivingExpenseCategoryTest {
 
     static Stream<Arguments> provideLivingExpenseCategoryData() {
-        LivingExpenseCategoryId id = new LivingExpenseCategoryId(1L);
+        LivingExpenseCategoryId id = new LivingExpenseCategoryId(UUID.randomUUID());
         UserGroupId userGroupId = new UserGroupId(100L);
         CategoryName categoryName = new CategoryName("食費");
         Description description = new Description("食材・外食費");
@@ -271,7 +272,7 @@ class LivingExpenseCategoryTest {
     @Test
     void testMarkAsDefault() {
         // Given
-        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(1L);
+        LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(UUID.randomUUID());
         UserGroupId expectedUserGroupId = new UserGroupId(100L);
         CategoryName expectedCategoryName = new CategoryName("食費");
         Description expectedDescription = new Description("食材・外食費");

@@ -83,7 +83,7 @@ erDiagram
 
     %% 生活費分類
     LIVING_EXPENSE_CATEGORY {
-        bigint id PK
+        varchar id PK
         bigint user_group_id FK
         varchar category_name "分類名"
         varchar description "説明"
@@ -108,7 +108,7 @@ erDiagram
         varchar id PK
         varchar daily_group_transaction_id FK
         varchar user_id FK
-        bigint living_expense_category_id FK
+        varchar living_expense_category_id FK
         integer amount "金額"
         varchar memo "メモ"
         timestamp created_at

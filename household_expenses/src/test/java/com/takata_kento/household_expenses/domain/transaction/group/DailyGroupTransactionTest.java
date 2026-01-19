@@ -159,7 +159,7 @@ class DailyGroupTransactionTest {
     ) {
         // Given
         UserId userId = new UserId(UUID.randomUUID());
-        LivingExpenseCategoryId categoryId = new LivingExpenseCategoryId(1L);
+        LivingExpenseCategoryId categoryId = new LivingExpenseCategoryId(UUID.randomUUID());
         Money amount = new Money(1000);
         Description memo = new Description("test memo");
         int expectedSize = livingExpenses.size() + 1;
@@ -191,12 +191,12 @@ class DailyGroupTransactionTest {
     ) {
         // Given
         UserId userId1 = new UserId(UUID.randomUUID());
-        LivingExpenseCategoryId categoryId1 = new LivingExpenseCategoryId(1L);
+        LivingExpenseCategoryId categoryId1 = new LivingExpenseCategoryId(UUID.randomUUID());
         Money amount1 = new Money(1000);
         Description memo1 = new Description("test memo 1");
 
         UserId userId2 = new UserId(UUID.randomUUID());
-        LivingExpenseCategoryId categoryId2 = new LivingExpenseCategoryId(2L);
+        LivingExpenseCategoryId categoryId2 = new LivingExpenseCategoryId(UUID.randomUUID());
         Money amount2 = new Money(2000);
         Description memo2 = new Description("test memo 2");
 
