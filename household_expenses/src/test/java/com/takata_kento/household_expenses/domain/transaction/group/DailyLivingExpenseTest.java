@@ -16,6 +16,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class DailyLivingExpenseTest {
 
+    private static final UUID LIVING_EXPENSE_CATEGORY_UUID = UUID.randomUUID();
+
     static Stream<Arguments> provideDailyLivingExpenseData() {
         UUID dailyLivingExpenseUUID = UUID.randomUUID();
         UUID dailyGroupTransactionUUID = UUID.randomUUID();
@@ -25,7 +27,7 @@ public class DailyLivingExpenseTest {
                 new DailyLivingExpenseId(dailyLivingExpenseUUID),
                 new DailyGroupTransactionId(dailyGroupTransactionUUID),
                 new UserId(userUUID),
-                new LivingExpenseCategoryId(100L),
+                new LivingExpenseCategoryId(LIVING_EXPENSE_CATEGORY_UUID),
                 new Money(10_000),
                 new Description("Description"),
                 Integer.valueOf(1),
@@ -33,7 +35,7 @@ public class DailyLivingExpenseTest {
                     new DailyLivingExpenseId(dailyLivingExpenseUUID),
                     new DailyGroupTransactionId(dailyGroupTransactionUUID),
                     new UserId(userUUID),
-                    new LivingExpenseCategoryId(100L),
+                    new LivingExpenseCategoryId(LIVING_EXPENSE_CATEGORY_UUID),
                     new Money(10_000),
                     new Description("Description"),
                     Integer.valueOf(1)
@@ -48,7 +50,7 @@ public class DailyLivingExpenseTest {
                 new DailyLivingExpenseId(UUID.randomUUID()),
                 new DailyGroupTransactionId(UUID.randomUUID()),
                 new UserId(UUID.randomUUID()),
-                new LivingExpenseCategoryId(100L),
+                new LivingExpenseCategoryId(LIVING_EXPENSE_CATEGORY_UUID),
                 new Money(10_000),
                 new Description("Description"),
                 Integer.valueOf(1)
@@ -318,7 +320,7 @@ public class DailyLivingExpenseTest {
         DailyLivingExpense dailyLivingExpense
     ) {
         // Given
-        LivingExpenseCategoryId expectedCategory = new LivingExpenseCategoryId(200);
+        LivingExpenseCategoryId expectedCategory = new LivingExpenseCategoryId(UUID.randomUUID());
 
         DailyLivingExpense expected = new DailyLivingExpense(
             id,
@@ -341,7 +343,7 @@ public class DailyLivingExpenseTest {
     @MethodSource("provideDailyLivingExpenseInstance")
     void testThrowSameCategoryErrorWhenUpdateLivingExpenseCategory(DailyLivingExpense dailyLivingExpense) {
         // Given
-        LivingExpenseCategoryId sameCategory = new LivingExpenseCategoryId(100);
+        LivingExpenseCategoryId sameCategory = new LivingExpenseCategoryId(LIVING_EXPENSE_CATEGORY_UUID);
 
         // When
         IllegalArgumentException actual = catchIllegalArgumentException(() ->

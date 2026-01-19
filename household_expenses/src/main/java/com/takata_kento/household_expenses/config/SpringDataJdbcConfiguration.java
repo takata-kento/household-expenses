@@ -56,8 +56,8 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new IntegerToMonthConverter(),
             new MoneyToIntegerConverter(),
             new IntegerToMoneyConverter(),
-            new LivingExpenseCategoryIdToLongConverter(),
-            new LongToLivingExpenseCategoryIdConverter(),
+            new LivingExpenseCategoryIdToStringConverter(),
+            new StringToLivingExpenseCategoryIdConverter(),
             new CategoryNameToStringConverter(),
             new StringToCategoryNameConverter(),
             new DescriptionToStringConverter(),
@@ -274,20 +274,20 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class LivingExpenseCategoryIdToLongConverter implements Converter<LivingExpenseCategoryId, Long> {
+    static class LivingExpenseCategoryIdToStringConverter implements Converter<LivingExpenseCategoryId, String> {
 
         @Override
-        public Long convert(LivingExpenseCategoryId source) {
-            return source.value();
+        public String convert(LivingExpenseCategoryId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToLivingExpenseCategoryIdConverter implements Converter<Long, LivingExpenseCategoryId> {
+    static class StringToLivingExpenseCategoryIdConverter implements Converter<String, LivingExpenseCategoryId> {
 
         @Override
-        public LivingExpenseCategoryId convert(Long source) {
-            return new LivingExpenseCategoryId(source);
+        public LivingExpenseCategoryId convert(String source) {
+            return new LivingExpenseCategoryId(UUID.fromString(source));
         }
     }
 

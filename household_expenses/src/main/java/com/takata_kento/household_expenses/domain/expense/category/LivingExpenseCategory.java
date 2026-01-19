@@ -52,7 +52,7 @@ public class LivingExpenseCategory {
         Description description,
         UserGroupId userGroupId
     ) {
-        Long idValue = Math.abs(UUID.randomUUID().getLeastSignificantBits());
+        UUID idValue = UUID.randomUUID();
         LivingExpenseCategoryId id = new LivingExpenseCategoryId(idValue);
         return new LivingExpenseCategory(id, userGroupId, categoryName, description, false, null);
     }
