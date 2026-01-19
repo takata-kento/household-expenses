@@ -6,8 +6,8 @@ import com.takata_kento.household_expenses.domain.valueobject.DailyLivingExpense
 import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalExpenseId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalTransactionId;
 import com.takata_kento.household_expenses.domain.valueobject.Day;
-import com.takata_kento.household_expenses.domain.valueobject.FixedExpenseCategoryId;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
+import com.takata_kento.household_expenses.domain.valueobject.FixedExpenseCategoryId;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.GroupName;
 import com.takata_kento.household_expenses.domain.valueobject.LivingExpenseCategoryId;
