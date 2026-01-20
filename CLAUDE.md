@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### アーキテクチャ構成
 - **バックエンド**: Spring Boot 3.5.3 + Java 21 + PostgreSQL
 - **データアクセス**: Spring Data JDBC（JPAではない）
-- **フロントエンド**: Next.js 15.3.5 + React 19 + Tailwind CSS 4
+- **フロントエンド**: Vue.js 3.5.26
 - **データベース**: PostgreSQL 15
 
 ## 開発コマンド
@@ -23,10 +23,10 @@ cd household_expenses
 ./mvnw package           # アプリケーションビルド
 ```
 
-### フロントエンド（household-expenses-front/）
+### フロントエンド（front/household-expenses）
 ```bash
-cd household-expenses-front
-npm run dev              # 開発サーバー起動（Turbopack使用）
+cd front/household-expenses
+npm run dev             # 開発サーバー起動
 npm run build           # プロダクションビルド
 npm run start           # プロダクションサーバー起動
 npm run lint            # ESLint実行
