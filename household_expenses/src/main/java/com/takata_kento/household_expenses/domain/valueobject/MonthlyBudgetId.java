@@ -1,9 +1,13 @@
 package com.takata_kento.household_expenses.domain.valueobject;
 
-public record MonthlyBudgetId(long value) {
+import java.util.UUID;
+
+public record MonthlyBudgetId(UUID value) implements UUIDValueObject {
     public MonthlyBudgetId {
-        if (value <= 0) {
-            throw new IllegalArgumentException("MonthlyBudgetId must be positive");
-        }
+        ValidateUtil.validUUID(value, getClass());
+    }
+
+    public String toString() {
+        return value.toString();
     }
 }

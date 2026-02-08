@@ -16,7 +16,8 @@ import org.junit.jupiter.api.Test;
 class MonthlyBudgetTest {
 
     // Basic Given
-    final MonthlyBudgetId EXPECTED_ID = new MonthlyBudgetId(1L);
+    final UUID BUDGET_UUID = UUID.randomUUID();
+    final MonthlyBudgetId EXPECTED_ID = new MonthlyBudgetId(BUDGET_UUID);
     final UserGroupId EXPECTED_USER_GROUP_ID = new UserGroupId(1L);
     final Year EXPECTED_YEAR = new Year(2024);
     final Month EXPECTED_MONTH = new Month(6);
