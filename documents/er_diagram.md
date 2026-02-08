@@ -70,7 +70,7 @@ erDiagram
 
     %% 月次予算
     MONTHLY_BUDGET {
-        bigint id PK "予算ID"
+        varchar id PK "予算ID (UUID)"
         bigint user_group_id FK
         int year "年"
         int month "月"

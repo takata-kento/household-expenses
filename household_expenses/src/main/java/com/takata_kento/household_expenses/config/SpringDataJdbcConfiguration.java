@@ -48,8 +48,8 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToGroupNameConverter(),
             new DayToIntegerConverter(),
             new IntegerToDayConverter(),
-            new MonthlyBudgetIdToLongConverter(),
-            new LongToMonthlyBudgetIdConverter(),
+            new MonthlyBudgetIdToStringConverter(),
+            new StringToMonthlyBudgetIdConverter(),
             new YearToIntegerConverter(),
             new IntegerToYearConverter(),
             new MonthToIntegerConverter(),
@@ -202,20 +202,20 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class MonthlyBudgetIdToLongConverter implements Converter<MonthlyBudgetId, Long> {
+    static class MonthlyBudgetIdToStringConverter implements Converter<MonthlyBudgetId, String> {
 
         @Override
-        public Long convert(MonthlyBudgetId source) {
-            return source.value();
+        public String convert(MonthlyBudgetId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToMonthlyBudgetIdConverter implements Converter<Long, MonthlyBudgetId> {
+    static class StringToMonthlyBudgetIdConverter implements Converter<String, MonthlyBudgetId> {
 
         @Override
-        public MonthlyBudgetId convert(Long source) {
-            return new MonthlyBudgetId(source);
+        public MonthlyBudgetId convert(String source) {
+            return new MonthlyBudgetId(UUID.fromString(source));
         }
     }
 

@@ -39,6 +39,8 @@ class MonthlyBudgetRepositoryTest {
     private JdbcClient jdbcClient;
 
     final UUID USER_UUID = UUID.randomUUID();
+    final UUID BUDGET_UUID_1 = UUID.randomUUID();
+    final UUID BUDGET_UUID_2 = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -86,7 +88,7 @@ class MonthlyBudgetRepositoryTest {
                     (:id, :user_group_id, :year, :month, :budget_amount, :set_by_user_id, :created_at, :version)
                 """
             )
-            .param("id", 1L)
+            .param("id", BUDGET_UUID_1.toString())
             .param("user_group_id", 1L)
             .param("year", 2024)
             .param("month", 7)
@@ -105,7 +107,7 @@ class MonthlyBudgetRepositoryTest {
                     (:id, :user_group_id, :year, :month, :budget_amount, :set_by_user_id, :created_at, :version)
                 """
             )
-            .param("id", 2L)
+            .param("id", BUDGET_UUID_2.toString())
             .param("user_group_id", 1L)
             .param("year", 2024)
             .param("month", 11)
@@ -139,35 +141,35 @@ class MonthlyBudgetRepositoryTest {
         // DBから直接確認
         Long userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM monthly_budget WHERE id = ?")
-            .param(savedMonthlyBudget.id().value())
+            .param(savedMonthlyBudget.id().toString())
             .query(Long.class)
             .single();
         assertThat(userGroupIdFromDb).isEqualTo(userGroupId);
 
         Integer budgetAmountFromDb = jdbcClient
             .sql("SELECT budget_amount FROM monthly_budget WHERE id = ?")
-            .param(savedMonthlyBudget.id().value())
+            .param(savedMonthlyBudget.id().toString())
             .query(Integer.class)
             .single();
         assertThat(budgetAmountFromDb).isEqualTo(budgetAmount);
 
         Integer yearFromDb = jdbcClient
             .sql("SELECT year FROM monthly_budget WHERE id = ?")
-            .param(savedMonthlyBudget.id().value())
+            .param(savedMonthlyBudget.id().toString())
             .query(Integer.class)
             .single();
         assertThat(yearFromDb).isEqualTo(year);
 
         Integer monthFromDb = jdbcClient
             .sql("SELECT month FROM monthly_budget WHERE id = ?")
-            .param(savedMonthlyBudget.id().value())
+            .param(savedMonthlyBudget.id().toString())
             .query(Integer.class)
             .single();
         assertThat(monthFromDb).isEqualTo(month);
 
         String setByUserIdFromDb = jdbcClient
             .sql("SELECT set_by_user_id FROM monthly_budget WHERE id = ?")
-            .param(savedMonthlyBudget.id().value())
+            .param(savedMonthlyBudget.id().toString())
             .query(String.class)
             .single();
         assertThat(setByUserIdFromDb).isEqualTo(USER_UUID.toString());
@@ -176,7 +178,7 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testUpdate() {
         // Given
-        MonthlyBudgetId monthlyBudgetId = new MonthlyBudgetId(1L);
+        MonthlyBudgetId monthlyBudgetId = new MonthlyBudgetId(BUDGET_UUID_1);
         Money newBudgetAmount = new Money(120000);
 
         // When
@@ -188,7 +190,7 @@ class MonthlyBudgetRepositoryTest {
         // DBから直接確認
         Integer budgetAmountFromDb = jdbcClient
             .sql("SELECT budget_amount FROM monthly_budget WHERE id = ?")
-            .param(monthlyBudgetId.value())
+            .param(monthlyBudgetId.toString())
             .query(Integer.class)
             .single();
         assertThat(budgetAmountFromDb).isEqualTo(120000);
@@ -197,7 +199,7 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testFindById() {
         // Given
-        MonthlyBudgetId expectedId = new MonthlyBudgetId(1L);
+        MonthlyBudgetId expectedId = new MonthlyBudgetId(BUDGET_UUID_1);
         UserGroupId expectedUserGroupId = new UserGroupId(1L);
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);
@@ -227,7 +229,7 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testFindByUserGroupIdAndYearAndMonth() {
         // Given
-        MonthlyBudgetId expectedId = new MonthlyBudgetId(1L);
+        MonthlyBudgetId expectedId = new MonthlyBudgetId(BUDGET_UUID_1);
         UserGroupId expectedUserGroupId = new UserGroupId(1L);
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);

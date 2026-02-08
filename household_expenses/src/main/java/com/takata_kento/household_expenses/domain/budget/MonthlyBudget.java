@@ -69,8 +69,7 @@ public class MonthlyBudget {
         UserId setByUserId
     ) {
         LocalDateTime now = LocalDateTime.now();
-        Long idValue = Math.abs(UUID.randomUUID().getLeastSignificantBits());
-        MonthlyBudgetId id = new MonthlyBudgetId(idValue);
+        MonthlyBudgetId id = new MonthlyBudgetId(UUID.randomUUID());
         return new MonthlyBudget(id, userGroupId, year, month, budgetAmount, setByUserId, now, null, null);
     }
 
