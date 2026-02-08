@@ -378,8 +378,8 @@ classDiagram
 
     class MonthlyBudgetId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class DailyGroupTransactionId {
