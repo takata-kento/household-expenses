@@ -25,6 +25,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 class UserGroupRepositoryTest {
 
     private static final UserId TEST_USER_ID = new UserId(UUID.randomUUID());
+    private static final UserGroupId TEST_USER_GROUP_ID = new UserGroupId(UUID.randomUUID());
 
     @Container
     @ServiceConnection
@@ -64,7 +65,7 @@ class UserGroupRepositoryTest {
                     (:id, :group_name, :month_start_day, :created_by_user_id, :version)
                 """
             )
-            .param("id", 1L)
+            .param("id", TEST_USER_GROUP_ID.toString())
             .param("group_name", "Test Group")
             .param("month_start_day", 10)
             .param("created_by_user_id", TEST_USER_ID.toString())
@@ -88,21 +89,21 @@ class UserGroupRepositoryTest {
         // DBから直接確認
         String groupNameFromDb = jdbcClient
             .sql("SELECT group_name FROM user_group WHERE id = ?")
-            .param(savedUserGroup.id().value())
+            .param(savedUserGroup.id().toString())
             .query(String.class)
             .single();
         assertThat(groupNameFromDb).isEqualTo(groupName);
 
         Integer monthStartDayFromDb = jdbcClient
             .sql("SELECT month_start_day FROM user_group WHERE id = ?")
-            .param(savedUserGroup.id().value())
+            .param(savedUserGroup.id().toString())
             .query(Integer.class)
             .single();
         assertThat(monthStartDayFromDb).isEqualTo(monthStartDay);
 
         String createdByUserIdFromDb = jdbcClient
             .sql("SELECT created_by_user_id FROM user_group WHERE id = ?")
-            .param(savedUserGroup.id().value())
+            .param(savedUserGroup.id().toString())
             .query(String.class)
             .single();
         assertThat(createdByUserIdFromDb).isEqualTo(createdByUserId);
@@ -111,17 +112,15 @@ class UserGroupRepositoryTest {
     @Test
     void testFindById() {
         // Given
-        long expectedId = 1L;
         String expectedGroupName = "Test Group";
         int expectedMonthStartDay = 10;
-        UserGroupId userGroupId = new UserGroupId(expectedId);
 
         // When
-        Optional<UserGroup> actual = userGroupRepository.findById(userGroupId);
+        Optional<UserGroup> actual = userGroupRepository.findById(TEST_USER_GROUP_ID);
 
         // Then
         assertThat(actual).isPresent();
-        assertThat(actual.get().id()).isEqualTo(new UserGroupId(expectedId));
+        assertThat(actual.get().id()).isEqualTo(TEST_USER_GROUP_ID);
         assertThat(actual.get().name()).isEqualTo(new GroupName(expectedGroupName));
         assertThat(actual.get().monthStartDay()).isEqualTo(new Day(expectedMonthStartDay));
         assertThat(actual.get().createdByUserId()).isEqualTo(TEST_USER_ID);
@@ -130,7 +129,6 @@ class UserGroupRepositoryTest {
     @Test
     void testFindByGroupName() {
         // Given
-        long expectedId = 1L;
         String expectedGroupName = "Test Group";
         GroupName groupName = new GroupName(expectedGroupName);
 
@@ -139,7 +137,7 @@ class UserGroupRepositoryTest {
 
         // Then
         assertThat(actual).isPresent();
-        assertThat(actual.get().id()).isEqualTo(new UserGroupId(expectedId));
+        assertThat(actual.get().id()).isEqualTo(TEST_USER_GROUP_ID);
         assertThat(actual.get().name()).isEqualTo(new GroupName(expectedGroupName));
     }
 
@@ -159,12 +157,11 @@ class UserGroupRepositoryTest {
     @Test
     void testUpdate() {
         // Given
-        long userGroupId = 1L;
         String updatedGroupName = "Updated Group";
         int updatedMonthStartDay = 28;
 
         // When
-        UserGroup userGroup = userGroupRepository.findById(new UserGroupId(userGroupId)).orElseThrow();
+        UserGroup userGroup = userGroupRepository.findById(TEST_USER_GROUP_ID).orElseThrow();
         userGroup.updateGroupName(new GroupName(updatedGroupName));
         userGroup.updateMonthStartDay(new Day(updatedMonthStartDay));
 
@@ -174,21 +171,21 @@ class UserGroupRepositoryTest {
         // DBから直接確認
         String groupNameFromDb = jdbcClient
             .sql("SELECT group_name FROM user_group WHERE id = ?")
-            .param(userGroupId)
+            .param(TEST_USER_GROUP_ID.toString())
             .query(String.class)
             .single();
         assertThat(groupNameFromDb).isEqualTo(updatedGroupName);
 
         Integer monthStartDayFromDb = jdbcClient
             .sql("SELECT month_start_day FROM user_group WHERE id = ?")
-            .param(userGroupId)
+            .param(TEST_USER_GROUP_ID.toString())
             .query(Integer.class)
             .single();
         assertThat(monthStartDayFromDb).isEqualTo(updatedMonthStartDay);
 
         Boolean updatedAtIsNotNull = jdbcClient
             .sql("SELECT updated_at IS NOT NULL FROM user_group WHERE id = ?")
-            .param(userGroupId)
+            .param(TEST_USER_GROUP_ID.toString())
             .query(Boolean.class)
             .single();
         assertThat(updatedAtIsNotNull).isTrue();

@@ -7,7 +7,7 @@ erDiagram
         varchar id PK "ユーザーID"
         varchar username "ユーザー名 (UNIQUE)"
         varchar password_hash "パスワードハッシュ"
-        bigint user_group_id FK "所属グループID（NULL可）"
+        varchar user_group_id FK "所属グループID（NULL可）"
         timestamp created_at
         timestamp updated_at
         boolean enabled
@@ -22,7 +22,7 @@ erDiagram
 
     %% ユーザーグループ
     USER_GROUP {
-        bigint id PK
+        varchar id PK "ユーザーグループID (UUID)"
         varchar group_name "グループ名"
         int month_start_day "月の始まり日"
         varchar created_by_user_id FK
@@ -35,7 +35,7 @@ erDiagram
     %% グループ招待
     GROUP_INVITATION {
         varchar id PK "招待ID (UUID)"
-        bigint user_group_id FK
+        varchar user_group_id FK
         varchar invited_user_id FK
         varchar invited_by_user_id FK
         varchar status "PENDING/ACCEPTED/REJECTED"
@@ -71,7 +71,7 @@ erDiagram
     %% 月次予算
     MONTHLY_BUDGET {
         varchar id PK "予算ID (UUID)"
-        bigint user_group_id FK
+        varchar user_group_id FK
         int year "年"
         int month "月"
         integer budget_amount "予算額"
@@ -84,7 +84,7 @@ erDiagram
     %% 生活費分類
     LIVING_EXPENSE_CATEGORY {
         varchar id PK
-        bigint user_group_id FK
+        varchar user_group_id FK
         varchar category_name "分類名"
         varchar description "説明"
         boolean is_default "デフォルト分類フラグ"
@@ -96,7 +96,7 @@ erDiagram
     %% 日次グループ収支
     DAILY_GROUP_TRANSACTION {
         varchar id PK
-        bigint user_group_id FK
+        varchar user_group_id FK
         date transaction_date "取引日"
         timestamp created_at
         timestamp updated_at
@@ -140,7 +140,7 @@ erDiagram
 
     %% 日次予算残高
     DAILY_BUDGET_BALANCE {
-        bigint user_group_id PK,FK
+        varchar user_group_id PK,FK
         date transaction_date PK "取引日"
         integer total_living_expense "生活費合計"
         integer budget_balance "予算残金"
@@ -152,7 +152,7 @@ erDiagram
     %% 固定費分類
     FIXED_EXPENSE_CATEGORY {
         varchar id PK "UUID"
-        bigint user_group_id FK
+        varchar user_group_id FK
         varchar category_name "分類名"
         varchar description "説明"
         integer default_amount "デフォルト金額"

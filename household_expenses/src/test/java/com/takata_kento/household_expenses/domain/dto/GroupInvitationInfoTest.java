@@ -17,7 +17,7 @@ class GroupInvitationInfoTest {
     void testFromGroupInvitation() {
         // Given
         GroupInvitationId expectedGroupInvitationId = new GroupInvitationId(UUID.randomUUID());
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         UserId invitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
         LocalDateTime now = LocalDateTime.now();

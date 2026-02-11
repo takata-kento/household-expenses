@@ -33,6 +33,9 @@ class LivingExpenseCategoryRepositoryTest {
     @Autowired
     private JdbcClient jdbcClient;
 
+    private final UUID USER_GROUP_UUID_1 = UUID.randomUUID();
+    private final UUID USER_GROUP_UUID_2 = UUID.randomUUID();
+
     @BeforeEach
     void setUp() {
         // テストデータ挿入
@@ -48,7 +51,7 @@ class LivingExpenseCategoryRepositoryTest {
                     (:id, :group_name, :month_start_day, :version)
                 """
             )
-            .param("id", 100L)
+            .param("id", USER_GROUP_UUID_1.toString())
             .param("group_name", "Test Group 1")
             .param("month_start_day", 1)
             .param("version", 0)
@@ -63,7 +66,7 @@ class LivingExpenseCategoryRepositoryTest {
                     (:id, :group_name, :month_start_day, :version)
                 """
             )
-            .param("id", 200L)
+            .param("id", USER_GROUP_UUID_2.toString())
             .param("group_name", "Test Group 2")
             .param("month_start_day", 1)
             .param("version", 0)
@@ -73,10 +76,11 @@ class LivingExpenseCategoryRepositoryTest {
             .sql(
                 """
                 INSERT INTO living_expense_category (id, user_group_id, category_name, description, is_default, created_at, updated_at, version)
-                VALUES (:id, 100, '食費', '食材・外食費', true, :created_at, :updated_at, 0)
+                VALUES (:id, :user_group_id, '食費', '食材・外食費', true, :created_at, :updated_at, 0)
                 """
             )
             .param("id", UUID.randomUUID().toString())
+            .param("user_group_id", USER_GROUP_UUID_1.toString())
             .param("created_at", now)
             .param("updated_at", now)
             .update();
@@ -85,10 +89,11 @@ class LivingExpenseCategoryRepositoryTest {
             .sql(
                 """
                 INSERT INTO living_expense_category (id, user_group_id, category_name, description, is_default, created_at, updated_at, version)
-                VALUES (:id, 100, '交通費', '電車・バス代', false, :created_at, :updated_at, 0)
+                VALUES (:id, :user_group_id, '交通費', '電車・バス代', false, :created_at, :updated_at, 0)
                 """
             )
             .param("id", UUID.randomUUID().toString())
+            .param("user_group_id", USER_GROUP_UUID_1.toString())
             .param("created_at", now)
             .param("updated_at", now)
             .update();
@@ -97,10 +102,11 @@ class LivingExpenseCategoryRepositoryTest {
             .sql(
                 """
                 INSERT INTO living_expense_category (id, user_group_id, category_name, description, is_default, created_at, updated_at, version)
-                VALUES (:id, 200, '日用品', '生活雑貨', false, :created_at, :updated_at, 0)
+                VALUES (:id, :user_group_id, '日用品', '生活雑貨', false, :created_at, :updated_at, 0)
                 """
             )
             .param("id", UUID.randomUUID().toString())
+            .param("user_group_id", USER_GROUP_UUID_2.toString())
             .param("created_at", now)
             .param("updated_at", now)
             .update();
@@ -109,7 +115,7 @@ class LivingExpenseCategoryRepositoryTest {
     @Test
     void testFindByUserGroupId() {
         // Given
-        UserGroupId userGroupId = new UserGroupId(100L);
+        UserGroupId userGroupId = new UserGroupId(USER_GROUP_UUID_1);
 
         // When
         List<LivingExpenseCategory> actual = livingExpenseCategoryRepository.findByUserGroupId(userGroupId);
@@ -125,7 +131,7 @@ class LivingExpenseCategoryRepositoryTest {
     @Test
     void testFindByUserGroupIdAndIsDefault() {
         // Given
-        UserGroupId userGroupId = new UserGroupId(100L);
+        UserGroupId userGroupId = new UserGroupId(USER_GROUP_UUID_1);
 
         // When
         List<LivingExpenseCategory> actualDefault = livingExpenseCategoryRepository.findByUserGroupIdAndIsDefault(

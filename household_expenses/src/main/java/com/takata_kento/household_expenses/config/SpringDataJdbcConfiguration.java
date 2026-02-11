@@ -38,12 +38,12 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToUserIdConverter(),
             new UsernameToStringConverter(),
             new StringToUsernameConverter(),
-            new UserGroupIdToLongConverter(),
-            new LongToUserGroupIdConverter(),
+            new UserGroupIdToStringConverter(),
+            new StringToUserGroupIdConverter(),
             new GroupInvitationIdToStringConverter(),
             new StringToGroupInvitationIdConverter(),
-            new OptionalUserGroupIdToLongConverter(),
-            new LongToOptionalUserGroupIdConverter(),
+            new OptionalUserGroupIdToStringConverter(),
+            new StringToOptionalUserGroupIdConverter(),
             new GroupNameToStringConverter(),
             new StringToGroupNameConverter(),
             new DayToIntegerConverter(),
@@ -112,20 +112,20 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class UserGroupIdToLongConverter implements Converter<UserGroupId, Long> {
+    static class UserGroupIdToStringConverter implements Converter<UserGroupId, String> {
 
         @Override
-        public Long convert(UserGroupId source) {
-            return source.value();
+        public String convert(UserGroupId source) {
+            return source.toString();
         }
     }
 
     @ReadingConverter
-    static class LongToUserGroupIdConverter implements Converter<Long, UserGroupId> {
+    static class StringToUserGroupIdConverter implements Converter<String, UserGroupId> {
 
         @Override
-        public UserGroupId convert(Long source) {
-            return new UserGroupId(source);
+        public UserGroupId convert(String source) {
+            return new UserGroupId(UUID.fromString(source));
         }
     }
 
@@ -148,20 +148,20 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class OptionalUserGroupIdToLongConverter implements Converter<Optional<UserGroupId>, Long> {
+    static class OptionalUserGroupIdToStringConverter implements Converter<Optional<UserGroupId>, String> {
 
         @Override
-        public Long convert(Optional<UserGroupId> source) {
-            return source.map(UserGroupId::value).orElse(null);
+        public String convert(Optional<UserGroupId> source) {
+            return source.map(UserGroupId::toString).orElse(null);
         }
     }
 
     @ReadingConverter
-    static class LongToOptionalUserGroupIdConverter implements Converter<Long, Optional<UserGroupId>> {
+    static class StringToOptionalUserGroupIdConverter implements Converter<String, Optional<UserGroupId>> {
 
         @Override
-        public Optional<UserGroupId> convert(Long source) {
-            return source != null ? Optional.of(new UserGroupId(source)) : Optional.empty();
+        public Optional<UserGroupId> convert(String source) {
+            return source != null ? Optional.of(new UserGroupId(UUID.fromString(source))) : Optional.empty();
         }
     }
 

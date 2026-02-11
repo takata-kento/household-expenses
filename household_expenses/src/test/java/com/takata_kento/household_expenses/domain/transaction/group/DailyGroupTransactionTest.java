@@ -21,16 +21,17 @@ class DailyGroupTransactionTest {
 
     static Stream<Arguments> provideDailyGroupTransactionData() {
         UUID uuid = UUID.randomUUID();
+        UUID userGroupUUID = UUID.randomUUID();
         return Stream.of(
             Arguments.of(
                 new DailyGroupTransactionId(uuid),
-                new UserGroupId(1L),
+                new UserGroupId(userGroupUUID),
                 LocalDate.of(2025, 12, 18),
                 new ArrayList<DailyLivingExpense>(),
                 Integer.valueOf(1),
                 new DailyGroupTransaction(
                     new DailyGroupTransactionId(uuid),
-                    new UserGroupId(1L),
+                    new UserGroupId(userGroupUUID),
                     LocalDate.of(2025, 12, 18),
                     new ArrayList<DailyLivingExpense>(),
                     Integer.valueOf(1)
