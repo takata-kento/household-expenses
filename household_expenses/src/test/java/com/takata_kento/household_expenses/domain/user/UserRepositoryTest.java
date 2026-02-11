@@ -203,7 +203,13 @@ class UserRepositoryTest {
             .sql(
                 "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)"
             )
-            .params(invitationId, TEST_USER_GROUP_ID.toString(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), "PENDING")
+            .params(
+                invitationId,
+                TEST_USER_GROUP_ID.toString(),
+                TEST_USER_ID_2.toString(),
+                TEST_USER_ID_1.toString(),
+                "PENDING"
+            )
             .update();
 
         // When
@@ -286,7 +292,12 @@ class UserRepositoryTest {
             .sql(
                 "SELECT COUNT(*) FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
             )
-            .params(invitationId.toString(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), TEST_USER_GROUP_ID.toString())
+            .params(
+                invitationId.toString(),
+                TEST_USER_ID_2.toString(),
+                TEST_USER_ID_1.toString(),
+                TEST_USER_GROUP_ID.toString()
+            )
             .query(Integer.class)
             .single();
         assertThat(invitationCount).isEqualTo(1);
@@ -295,7 +306,12 @@ class UserRepositoryTest {
             .sql(
                 "SELECT status FROM group_invitation WHERE id = ? AND invited_user_id = ? AND invited_by_user_id = ? AND user_group_id = ?"
             )
-            .params(invitationId.toString(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), TEST_USER_GROUP_ID.toString())
+            .params(
+                invitationId.toString(),
+                TEST_USER_ID_2.toString(),
+                TEST_USER_ID_1.toString(),
+                TEST_USER_GROUP_ID.toString()
+            )
             .query(String.class)
             .single();
         assertThat(status).isEqualTo("PENDING");
@@ -311,7 +327,13 @@ class UserRepositoryTest {
             .sql(
                 "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)"
             )
-            .params(invitationId, TEST_USER_GROUP_ID.toString(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), "PENDING")
+            .params(
+                invitationId,
+                TEST_USER_GROUP_ID.toString(),
+                TEST_USER_ID_2.toString(),
+                TEST_USER_ID_1.toString(),
+                "PENDING"
+            )
             .update();
 
         // When
@@ -360,7 +382,13 @@ class UserRepositoryTest {
             .sql(
                 "INSERT INTO group_invitation (id, user_group_id, invited_user_id, invited_by_user_id, status) VALUES (?, ?, ?, ?, ?)"
             )
-            .params(invitationId, TEST_USER_GROUP_ID.toString(), TEST_USER_ID_2.toString(), TEST_USER_ID_1.toString(), "PENDING")
+            .params(
+                invitationId,
+                TEST_USER_GROUP_ID.toString(),
+                TEST_USER_ID_2.toString(),
+                TEST_USER_ID_1.toString(),
+                "PENDING"
+            )
             .update();
 
         // When
