@@ -311,8 +311,8 @@ classDiagram
 
     class UserGroupId {
         <<record>>
-        -long value
-        +value() long
+        -UUID value
+        +value() UUID
     }
 
     class GroupInvitationId {
@@ -587,13 +587,13 @@ classDiagram
 
     class MonthlyBudgetRepository {
         <<interface>>
-        +findByUserGroupIdAndYearAndMonth(Long, Integer, Integer) Optional~MonthlyBudget~
+        +findByUserGroupIdAndYearAndMonth(UserGroupId, Year, Month) Optional~MonthlyBudget~
     }
 
     class LivingExpenseCategoryRepository {
         <<interface>>
-        +findByUserGroupId(Long) List~LivingExpenseCategory~
-        +findByUserGroupIdAndIsDefault(Long, Boolean) List~LivingExpenseCategory~
+        +findByUserGroupId(UserGroupId) List~LivingExpenseCategory~
+        +findByUserGroupIdAndIsDefault(UserGroupId, Boolean) List~LivingExpenseCategory~
     }
 
     class DailyTransactionRepository {
@@ -616,7 +616,7 @@ classDiagram
 
     class FixedExpenseCategoryRepository {
         <<interface>>
-        +findByUserGroupId(Long) List~FixedExpenseCategory~
+        +findByUserGroupId(UserGroupId) List~FixedExpenseCategory~
     }
 
     class FixedExpenseHistoryRepository {
