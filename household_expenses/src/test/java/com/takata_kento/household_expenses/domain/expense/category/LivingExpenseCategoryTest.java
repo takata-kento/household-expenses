@@ -17,7 +17,7 @@ class LivingExpenseCategoryTest {
 
     static Stream<Arguments> provideLivingExpenseCategoryData() {
         LivingExpenseCategoryId id = new LivingExpenseCategoryId(UUID.randomUUID());
-        UserGroupId userGroupId = new UserGroupId(100L);
+        UserGroupId userGroupId = new UserGroupId(UUID.randomUUID());
         CategoryName categoryName = new CategoryName("食費");
         Description description = new Description("食材・外食費");
         Boolean isDefault = Boolean.TRUE;
@@ -273,7 +273,7 @@ class LivingExpenseCategoryTest {
     void testMarkAsDefault() {
         // Given
         LivingExpenseCategoryId expectedId = new LivingExpenseCategoryId(UUID.randomUUID());
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         CategoryName expectedCategoryName = new CategoryName("食費");
         Description expectedDescription = new Description("食材・外食費");
         Integer expectedVersion = 1;
@@ -331,7 +331,7 @@ class LivingExpenseCategoryTest {
         // Given
         CategoryName expectedCategoryName = new CategoryName("新規分類");
         Description expectedDescription = new Description("新規分類の説明");
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
 
         // When
         LivingExpenseCategory actual = LivingExpenseCategory.create(

@@ -25,7 +25,7 @@ class UserTest {
         // Given
         UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         Integer expectedVersion = null;
 
         // When
@@ -71,7 +71,7 @@ class UserTest {
         // Given
         UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         Integer expectedVersion = null;
         User user = new User(expectedUserId, expectedUsername, Optional.of(expectedUserGroupId), null, expectedVersion);
 
@@ -92,7 +92,7 @@ class UserTest {
         // Given
         UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         Integer expectedVersion = null;
         User user = new User(expectedUserId, expectedUsername, Optional.of(expectedUserGroupId), null, expectedVersion);
 
@@ -116,11 +116,13 @@ class UserTest {
         Integer expectedVersion = null;
         GroupInvitationId pendingInvitationId = new GroupInvitationId(UUID.randomUUID());
         GroupInvitationId acceptedInvitationId = new GroupInvitationId(UUID.randomUUID());
+        UserGroupId pendingInvitationUserGroupId = new UserGroupId(UUID.randomUUID());
+        UserGroupId acceptedInvitationUserGroupId = new UserGroupId(UUID.randomUUID());
 
         LocalDateTime now = LocalDateTime.now();
         GroupInvitation pendingInvitation = new GroupInvitation(
             pendingInvitationId,
-            new UserGroupId(100L),
+            pendingInvitationUserGroupId,
             expectedUserId,
             USER_ID_2,
             InvitationStatus.PENDING,
@@ -132,7 +134,7 @@ class UserTest {
 
         GroupInvitation acceptedInvitation = new GroupInvitation(
             acceptedInvitationId,
-            new UserGroupId(200L),
+            acceptedInvitationUserGroupId,
             expectedUserId,
             USER_ID_3,
             InvitationStatus.ACCEPTED,
@@ -152,7 +154,7 @@ class UserTest {
         assertThat(actual).hasSize(1);
         actual.forEach(info -> {
             assertThat(info.groupInvitationId()).isEqualTo(pendingInvitationId);
-            assertThat(info.userGroupId()).isEqualTo(new UserGroupId(100L));
+            assertThat(info.userGroupId()).isEqualTo(pendingInvitationUserGroupId);
             assertThat(info.invitedByUserId()).isEqualTo(USER_ID_2);
         });
         assertThat(user.id()).isEqualTo(expectedUserId);
@@ -170,11 +172,13 @@ class UserTest {
         Integer expectedVersion = null;
         GroupInvitationId invitationId1 = new GroupInvitationId(UUID.randomUUID());
         GroupInvitationId invitationId2 = new GroupInvitationId(UUID.randomUUID());
+        UserGroupId userGroupId1 = new UserGroupId(UUID.randomUUID());
+        UserGroupId userGroupId2 = new UserGroupId(UUID.randomUUID());
 
         LocalDateTime now = LocalDateTime.now();
         GroupInvitation invitation1 = new GroupInvitation(
             invitationId1,
-            new UserGroupId(100L),
+            userGroupId1,
             expectedUserId,
             USER_ID_2,
             InvitationStatus.PENDING,
@@ -186,7 +190,7 @@ class UserTest {
 
         GroupInvitation invitation2 = new GroupInvitation(
             invitationId2,
-            new UserGroupId(200L),
+            userGroupId2,
             expectedUserId,
             USER_ID_3,
             InvitationStatus.ACCEPTED,
@@ -210,7 +214,7 @@ class UserTest {
                 .anyMatch(
                     info ->
                         info.groupInvitationId().equals(invitationId1) &&
-                        info.userGroupId().equals(new UserGroupId(100L)) &&
+                        info.userGroupId().equals(userGroupId1) &&
                         info.invitedByUserId().equals(USER_ID_2)
                 )
         ).isTrue();
@@ -220,7 +224,7 @@ class UserTest {
                 .anyMatch(
                     info ->
                         info.groupInvitationId().equals(invitationId2) &&
-                        info.userGroupId().equals(new UserGroupId(200L)) &&
+                        info.userGroupId().equals(userGroupId2) &&
                         info.invitedByUserId().equals(USER_ID_3)
                 )
         ).isTrue();
@@ -236,7 +240,7 @@ class UserTest {
         // Given
         UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
-        UserGroupId userGroupId = new UserGroupId(100L);
+        UserGroupId userGroupId = new UserGroupId(UUID.randomUUID());
         Integer expectedVersion = null;
         User user = new User(expectedUserId, expectedUsername, Optional.of(userGroupId), null, expectedVersion);
 
@@ -278,7 +282,7 @@ class UserTest {
         // Given
         UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
-        UserGroupId userGroupId = new UserGroupId(100L);
+        UserGroupId userGroupId = new UserGroupId(UUID.randomUUID());
         Integer expectedVersion = null;
         User user = new User(expectedUserId, expectedUsername, Optional.of(userGroupId), null, expectedVersion);
 
@@ -300,7 +304,7 @@ class UserTest {
         // Given
         UserId expectedUserId = USER_ID_1;
         Username expectedUsername = new Username("testuser");
-        UserGroupId userGroupId = new UserGroupId(100L);
+        UserGroupId userGroupId = new UserGroupId(UUID.randomUUID());
         Integer expectedVersion = null;
         User user = new User(expectedUserId, expectedUsername, Optional.of(userGroupId), null, expectedVersion);
 
@@ -343,7 +347,7 @@ class UserTest {
         // Given
         UserId inviterUserId = USER_ID_1;
         Username inviterUsername = new Username("inviter");
-        UserGroupId userGroupId = new UserGroupId(100L);
+        UserGroupId userGroupId = new UserGroupId(UUID.randomUUID());
         UserId inviteeUserId = USER_ID_2;
         Integer expectedVersion = null;
         User inviter = new User(inviterUserId, inviterUsername, Optional.of(userGroupId), null, expectedVersion);
@@ -388,7 +392,7 @@ class UserTest {
         // Given
         UserId inviterUserId = USER_ID_1;
         Username inviterUsername = new Username("inviter");
-        UserGroupId userGroupId = new UserGroupId(100L);
+        UserGroupId userGroupId = new UserGroupId(UUID.randomUUID());
         UserId inviteeUserId = USER_ID_2;
         Username inviteeUsername = new Username("invitee");
         User invitee = new User(inviteeUserId, inviteeUsername, Optional.empty(), null, null);
@@ -427,7 +431,7 @@ class UserTest {
         // Given
         UserId invitedUserId = USER_ID_1;
         Username invitedUsername = new Username("invited");
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         GroupInvitationId invitationId = new GroupInvitationId(UUID.randomUUID());
         LocalDateTime now = LocalDateTime.now();
         GroupInvitation pendingInvitation = new GroupInvitation(
@@ -466,7 +470,7 @@ class UserTest {
         LocalDateTime now = LocalDateTime.now();
         GroupInvitation pendingInvitation = new GroupInvitation(
             invitationId,
-            new UserGroupId(100L),
+            new UserGroupId(UUID.randomUUID()),
             invitedUserId,
             USER_ID_2,
             InvitationStatus.PENDING,

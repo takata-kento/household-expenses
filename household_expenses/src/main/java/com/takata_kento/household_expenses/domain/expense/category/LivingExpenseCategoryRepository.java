@@ -9,11 +9,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface LivingExpenseCategoryRepository
     extends CrudRepository<LivingExpenseCategory, LivingExpenseCategoryId> {
-    @Query("SELECT * FROM living_expense_category WHERE user_group_id = :#{#userGroupId.value}")
+    @Query("SELECT * FROM living_expense_category WHERE user_group_id = :#{#userGroupId.toString()}")
     List<LivingExpenseCategory> findByUserGroupId(@Param("userGroupId") UserGroupId userGroupId);
 
     @Query(
-        "SELECT * FROM living_expense_category WHERE user_group_id = :#{#userGroupId.value} AND is_default = :isDefault"
+        "SELECT * FROM living_expense_category WHERE user_group_id = :#{#userGroupId.toString()} AND is_default = :isDefault"
     )
     List<LivingExpenseCategory> findByUserGroupIdAndIsDefault(
         @Param("userGroupId") UserGroupId userGroupId,

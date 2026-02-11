@@ -41,6 +41,7 @@ class MonthlyBudgetRepositoryTest {
     final UUID USER_UUID = UUID.randomUUID();
     final UUID BUDGET_UUID_1 = UUID.randomUUID();
     final UUID BUDGET_UUID_2 = UUID.randomUUID();
+    final UUID USER_GRORUP_UUID = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -71,7 +72,7 @@ class MonthlyBudgetRepositoryTest {
                     (:id, :group_name, :month_start_day, :created_by_user_id, :version)
                 """
             )
-            .param("id", 1L)
+            .param("id", USER_GRORUP_UUID.toString())
             .param("group_name", "Test Group")
             .param("month_start_day", 1)
             .param("created_by_user_id", USER_UUID.toString())
@@ -89,7 +90,7 @@ class MonthlyBudgetRepositoryTest {
                 """
             )
             .param("id", BUDGET_UUID_1.toString())
-            .param("user_group_id", 1L)
+            .param("user_group_id", USER_GRORUP_UUID.toString())
             .param("year", 2024)
             .param("month", 7)
             .param("budget_amount", 100000)
@@ -108,7 +109,7 @@ class MonthlyBudgetRepositoryTest {
                 """
             )
             .param("id", BUDGET_UUID_2.toString())
-            .param("user_group_id", 1L)
+            .param("user_group_id", USER_GRORUP_UUID.toString())
             .param("year", 2024)
             .param("month", 11)
             .param("budget_amount", 95000)
@@ -121,13 +122,12 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testSave() {
         // Given
-        long userGroupId = 1L;
         int year = 2024;
         int month = 6;
         int budgetAmount = 100000;
 
         MonthlyBudget monthlyBudget = MonthlyBudget.create(
-            new UserGroupId(userGroupId),
+            new UserGroupId(USER_GRORUP_UUID),
             new Year(year),
             new Month(month),
             new Money(budgetAmount),
@@ -139,12 +139,12 @@ class MonthlyBudgetRepositoryTest {
 
         // Then
         // DBから直接確認
-        Long userGroupIdFromDb = jdbcClient
+        String userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM monthly_budget WHERE id = ?")
             .param(savedMonthlyBudget.id().toString())
-            .query(Long.class)
+            .query(String.class)
             .single();
-        assertThat(userGroupIdFromDb).isEqualTo(userGroupId);
+        assertThat(userGroupIdFromDb).isEqualTo(USER_GRORUP_UUID.toString());
 
         Integer budgetAmountFromDb = jdbcClient
             .sql("SELECT budget_amount FROM monthly_budget WHERE id = ?")
@@ -200,7 +200,7 @@ class MonthlyBudgetRepositoryTest {
     void testFindById() {
         // Given
         MonthlyBudgetId expectedId = new MonthlyBudgetId(BUDGET_UUID_1);
-        UserGroupId expectedUserGroupId = new UserGroupId(1L);
+        UserGroupId expectedUserGroupId = new UserGroupId(USER_GRORUP_UUID);
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);
         Money expectedBudgetAmount = new Money(100000);
@@ -230,7 +230,7 @@ class MonthlyBudgetRepositoryTest {
     void testFindByUserGroupIdAndYearAndMonth() {
         // Given
         MonthlyBudgetId expectedId = new MonthlyBudgetId(BUDGET_UUID_1);
-        UserGroupId expectedUserGroupId = new UserGroupId(1L);
+        UserGroupId expectedUserGroupId = new UserGroupId(USER_GRORUP_UUID);
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);
         Money expectedBudgetAmount = new Money(100000);
@@ -263,7 +263,7 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testExistsByUserGroupIdAndYearAndMonth() {
         // Given
-        UserGroupId expectedUserGroupId = new UserGroupId(1L);
+        UserGroupId expectedUserGroupId = new UserGroupId(USER_GRORUP_UUID);
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);
 
@@ -290,7 +290,7 @@ class MonthlyBudgetRepositoryTest {
     @Test
     void testFindByUserGroupId() {
         // Given
-        UserGroupId expectedUserGroupId = new UserGroupId(1L);
+        UserGroupId expectedUserGroupId = new UserGroupId(USER_GRORUP_UUID);
         int expectedListSize = 2;
 
         // When

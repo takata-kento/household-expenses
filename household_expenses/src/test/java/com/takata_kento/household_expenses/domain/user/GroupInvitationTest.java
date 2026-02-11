@@ -13,7 +13,7 @@ class GroupInvitationTest {
     void testConstructor() {
         // Given
         GroupInvitationId expectedId = new GroupInvitationId(UUID.randomUUID());
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
         InvitationStatus expectedStatus = InvitationStatus.PENDING;
@@ -50,7 +50,7 @@ class GroupInvitationTest {
     @Test
     void testCreate() {
         // Given
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
 
@@ -77,7 +77,7 @@ class GroupInvitationTest {
     void testAccept() {
         // Given
         GroupInvitationId expectedId = new GroupInvitationId(UUID.randomUUID());
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
         LocalDateTime expectedInvitedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
@@ -115,7 +115,7 @@ class GroupInvitationTest {
     void testReject() {
         // Given
         GroupInvitationId expectedId = new GroupInvitationId(UUID.randomUUID());
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
         LocalDateTime expectedInvitedAt = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
@@ -154,7 +154,7 @@ class GroupInvitationTest {
         // Given
         GroupInvitationId expectedId1 = new GroupInvitationId(UUID.randomUUID());
         GroupInvitationId expectedId2 = new GroupInvitationId(UUID.randomUUID());
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
         LocalDateTime expectedDateTime = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
@@ -212,7 +212,7 @@ class GroupInvitationTest {
         // Given
         GroupInvitationId expectedId1 = new GroupInvitationId(UUID.randomUUID());
         GroupInvitationId expectedId2 = new GroupInvitationId(UUID.randomUUID());
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
         LocalDateTime expectedDateTime = LocalDateTime.of(2025, 8, 14, 10, 0, 0);
@@ -269,8 +269,8 @@ class GroupInvitationTest {
     void testIsFrom() {
         // Given
         GroupInvitationId expectedId = new GroupInvitationId(UUID.randomUUID());
-        UserGroupId expectedUserGroupId = new UserGroupId(100L);
-        UserGroupId differentUserGroupId = new UserGroupId(200L);
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
+        UserGroupId differentUserGroupId = new UserGroupId(UUID.randomUUID());
         UserId expectedInvitedUserId = new UserId(UUID.randomUUID());
         UserId expectedInvitedByUserId = new UserId(UUID.randomUUID());
         LocalDateTime expectedDateTime = LocalDateTime.of(2025, 8, 14, 10, 0, 0);

@@ -9,16 +9,13 @@ import org.junit.jupiter.api.Test;
 
 class UserGroupTest {
 
-    private static final UserId CREATOR_USER_ID = new UserId(UUID.fromString("550e8400-e29b-41d4-a716-446655440100"));
-    private static final UserId OTHER_USER_ID = new UserId(UUID.fromString("550e8400-e29b-41d4-a716-446655440200"));
-
     @Test
     void testConstructor() {
         // Given
-        UserGroupId expectedId = new UserGroupId(1L);
+        UserGroupId expectedId = new UserGroupId(UUID.randomUUID());
         GroupName expectedGroupName = new GroupName("テストグループ");
         Day expectedMonthStartDay = new Day(25);
-        UserId expectedCreatedByUserId = CREATOR_USER_ID;
+        UserId expectedCreatedByUserId = new UserId(UUID.randomUUID());
         LocalDateTime expectedCreatedAt = LocalDateTime.of(2025, 8, 7, 10, 0, 0);
         LocalDateTime expectedUpdatedAt = LocalDateTime.of(2025, 8, 7, 10, 0, 0);
         Integer expectedVersion = 1;
@@ -49,7 +46,7 @@ class UserGroupTest {
         // Given
         GroupName expectedGroupName = new GroupName("新規グループ");
         Day expectedMonthStartDay = new Day(1);
-        UserId expectedCreatedByUserId = CREATOR_USER_ID;
+        UserId expectedCreatedByUserId = new UserId(UUID.randomUUID());
 
         // When
         UserGroup actual = UserGroup.create(expectedGroupName, expectedMonthStartDay, expectedCreatedByUserId);
@@ -68,10 +65,10 @@ class UserGroupTest {
     void testUpdateGroupName() {
         // Given
         UserGroup userGroup = new UserGroup(
-            new UserGroupId(1L),
+            new UserGroupId(UUID.randomUUID()),
             new GroupName("元のグループ名"),
             new Day(1),
-            CREATOR_USER_ID,
+            new UserId(UUID.randomUUID()),
             LocalDateTime.of(2025, 8, 7, 10, 0, 0),
             LocalDateTime.of(2025, 8, 7, 10, 0, 0),
             1
@@ -89,10 +86,10 @@ class UserGroupTest {
     void testUpdateMonthStartDay() {
         // Given
         UserGroup userGroup = new UserGroup(
-            new UserGroupId(1L),
+            new UserGroupId(UUID.randomUUID()),
             new GroupName("テストグループ"),
             new Day(1),
-            CREATOR_USER_ID,
+            new UserId(UUID.randomUUID()),
             LocalDateTime.of(2025, 8, 7, 10, 0, 0),
             LocalDateTime.of(2025, 8, 7, 10, 0, 0),
             1
@@ -109,9 +106,10 @@ class UserGroupTest {
     @Test
     void testCanBeModifiedBy() {
         // Given
-        UserId createdByUserId = CREATOR_USER_ID;
+        UserId createdByUserId = new UserId(UUID.randomUUID());
+        UserId otherUserId = new UserId(UUID.randomUUID());
         UserGroup userGroup = new UserGroup(
-            new UserGroupId(1L),
+            new UserGroupId(UUID.randomUUID()),
             new GroupName("テストグループ"),
             new Day(1),
             createdByUserId,
@@ -122,7 +120,7 @@ class UserGroupTest {
 
         // When
         boolean actualCanModify = userGroup.canBeModifiedBy(createdByUserId);
-        boolean actualCannotModify = userGroup.canBeModifiedBy(OTHER_USER_ID);
+        boolean actualCannotModify = userGroup.canBeModifiedBy(otherUserId);
 
         // Then
         assertThat(actualCanModify).isTrue();

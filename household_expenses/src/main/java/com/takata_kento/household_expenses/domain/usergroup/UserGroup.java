@@ -52,7 +52,7 @@ public class UserGroup {
 
     public static UserGroup create(GroupName name, Day monthStartDay, UserId createdByUserId) {
         LocalDateTime now = LocalDateTime.now();
-        UserGroupId userGroupId = new UserGroupId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
+        UserGroupId userGroupId = new UserGroupId(UUID.randomUUID());
         return new UserGroup(userGroupId, name, monthStartDay, createdByUserId, now, null, null);
     }
 

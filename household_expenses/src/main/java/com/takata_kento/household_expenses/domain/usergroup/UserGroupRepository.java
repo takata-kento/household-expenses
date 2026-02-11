@@ -16,7 +16,7 @@ public interface UserGroupRepository extends CrudRepository<UserGroup, UserGroup
     @Query("SELECT EXISTS(SELECT 1 FROM user_group WHERE group_name = :#{#groupName.value})")
     boolean existsByGroupName(@Param("groupName") GroupName groupName);
 
-    @Query("SELECT * FROM user_group WHERE created_by_user_id = :#{#createdByUserId.value}")
+    @Query("SELECT * FROM user_group WHERE created_by_user_id = :#{#createdByUserId.toString()}")
     List<UserGroup> findByCreatedByUserId(@Param("createdByUserId") UserId createdByUserId);
 
     @Query("SELECT * FROM user_group WHERE group_name LIKE '%' || :groupNameFragment || '%'")
