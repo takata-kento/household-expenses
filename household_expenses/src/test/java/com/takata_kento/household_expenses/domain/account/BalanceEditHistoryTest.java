@@ -6,6 +6,7 @@ import com.takata_kento.household_expenses.domain.valueobject.BalanceEditHistory
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -17,6 +18,7 @@ public class BalanceEditHistoryTest {
 
     static Stream<Arguments> provideBalanceEditHistoryData() {
         LocalDateTime createdAt = LocalDateTime.of(2024, 1, 1, 10, 0, 0);
+        LocalDate editedAt = LocalDate.of(2024, 1, 1);
         UUID balanceEditHistoryUUID = UUID.randomUUID();
         UUID financialAccountUUID = UUID.randomUUID();
         return Stream.of(
@@ -26,6 +28,7 @@ public class BalanceEditHistoryTest {
                 new Money(50_000),
                 new Money(100_000),
                 new Description("Salary deposit"),
+                editedAt,
                 createdAt,
                 Integer.valueOf(1),
                 new BalanceEditHistory(
@@ -34,6 +37,7 @@ public class BalanceEditHistoryTest {
                     new Money(50_000),
                     new Money(100_000),
                     new Description("Salary deposit"),
+                    editedAt,
                     createdAt,
                     Integer.valueOf(1)
                 )
@@ -49,6 +53,7 @@ public class BalanceEditHistoryTest {
         Money oldBalance,
         Money newBalance,
         Description editReason,
+        LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
         BalanceEditHistory balanceEditHistory
@@ -60,6 +65,7 @@ public class BalanceEditHistoryTest {
             oldBalance,
             newBalance,
             editReason,
+            editedAt,
             createdAt,
             version
         );
@@ -80,6 +86,7 @@ public class BalanceEditHistoryTest {
         Money oldBalance,
         Money newBalance,
         Description editReason,
+        LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
         BalanceEditHistory balanceEditHistory
@@ -91,6 +98,7 @@ public class BalanceEditHistoryTest {
             oldBalance,
             newBalance,
             editReason,
+            editedAt,
             createdAt,
             version
         );
@@ -111,6 +119,7 @@ public class BalanceEditHistoryTest {
         Money expectedOldBalance,
         Money newBalance,
         Description editReason,
+        LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
         BalanceEditHistory balanceEditHistory
@@ -122,6 +131,7 @@ public class BalanceEditHistoryTest {
             expectedOldBalance,
             newBalance,
             editReason,
+            editedAt,
             createdAt,
             version
         );
@@ -142,6 +152,7 @@ public class BalanceEditHistoryTest {
         Money oldBalance,
         Money expectedNewBalance,
         Description editReason,
+        LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
         BalanceEditHistory balanceEditHistory
@@ -153,6 +164,7 @@ public class BalanceEditHistoryTest {
             oldBalance,
             expectedNewBalance,
             editReason,
+            editedAt,
             createdAt,
             version
         );
@@ -173,6 +185,7 @@ public class BalanceEditHistoryTest {
         Money oldBalance,
         Money newBalance,
         Description expectedEditReason,
+        LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
         BalanceEditHistory balanceEditHistory
@@ -184,6 +197,7 @@ public class BalanceEditHistoryTest {
             oldBalance,
             newBalance,
             expectedEditReason,
+            editedAt,
             createdAt,
             version
         );
@@ -198,12 +212,46 @@ public class BalanceEditHistoryTest {
 
     @ParameterizedTest
     @MethodSource("provideBalanceEditHistoryData")
+    void testEditedAt(
+        BalanceEditHistoryId id,
+        FinancialAccountId financialAccountId,
+        Money oldBalance,
+        Money newBalance,
+        Description editReason,
+        LocalDate expectedEditedAt,
+        LocalDateTime createdAt,
+        Integer version,
+        BalanceEditHistory balanceEditHistory
+    ) {
+        // Given
+        BalanceEditHistory expected = new BalanceEditHistory(
+            id,
+            financialAccountId,
+            oldBalance,
+            newBalance,
+            editReason,
+            expectedEditedAt,
+            createdAt,
+            version
+        );
+
+        // When
+        LocalDate actual = balanceEditHistory.editedAt();
+
+        // Then
+        then(actual).isEqualTo(expectedEditedAt);
+        then(balanceEditHistory).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideBalanceEditHistoryData")
     void testCreatedAt(
         BalanceEditHistoryId id,
         FinancialAccountId financialAccountId,
         Money oldBalance,
         Money newBalance,
         Description editReason,
+        LocalDate editedAt,
         LocalDateTime expectedCreatedAt,
         Integer version,
         BalanceEditHistory balanceEditHistory
@@ -215,6 +263,7 @@ public class BalanceEditHistoryTest {
             oldBalance,
             newBalance,
             editReason,
+            editedAt,
             expectedCreatedAt,
             version
         );
@@ -235,6 +284,7 @@ public class BalanceEditHistoryTest {
         Money expectedOldBalance,
         Money expectedNewBalance,
         Description expectedEditReason,
+        LocalDate expectedEditedAt,
         LocalDateTime createdAt,
         Integer version,
         BalanceEditHistory balanceEditHistory
@@ -247,7 +297,8 @@ public class BalanceEditHistoryTest {
             expectedFinancialAccountId,
             expectedOldBalance,
             expectedNewBalance,
-            expectedEditReason
+            expectedEditReason,
+            expectedEditedAt
         );
 
         // Then
@@ -256,6 +307,7 @@ public class BalanceEditHistoryTest {
         then(actual.oldBalance()).isEqualTo(expectedOldBalance);
         then(actual.newBalance()).isEqualTo(expectedNewBalance);
         then(actual.editReason()).isEqualTo(expectedEditReason);
+        then(actual.editedAt()).isEqualTo(expectedEditedAt);
         then(actual.createdAt()).isNull();
     }
 }

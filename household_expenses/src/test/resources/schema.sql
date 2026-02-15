@@ -70,6 +70,7 @@ CREATE TABLE balance_edit_history (
     old_balance INTEGER NOT NULL,
     new_balance INTEGER NOT NULL,
     edit_reason TEXT,
+    edited_at DATE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     version INTEGER DEFAULT 0
 );
