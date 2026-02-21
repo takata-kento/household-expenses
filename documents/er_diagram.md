@@ -64,6 +64,7 @@ erDiagram
         integer old_balance "変更前残高"
         integer new_balance "変更後残高"
         varchar edit_reason "編集理由"
+        date edited_at "編集日"
         timestamp created_at
         integer version "バージョン"
     }
