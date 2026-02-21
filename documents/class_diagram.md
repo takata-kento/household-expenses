@@ -53,14 +53,14 @@ classDiagram
 
     class FinancialAccount {
         -FinancialAccountId id
+        -UserId userId
         -AccountName accountName
         -Money balance
         -Boolean isMainAccount
-        -List~BalanceEditHistory~ editHistories
+        -Set~BalanceEditHistory~ editHistories
         -Integer version
-        +addEditHistory(Money, Money, Description) void
-        +getLatestEditHistory() BalanceEditHistory
-        +updateBalance(Money, Description) void
+        +latestEditHistory() Optional~BalanceEditHistory~
+        +updateBalance(Money, Description, LocalDate) void
     }
 
     class BalanceEditHistory {
@@ -69,9 +69,10 @@ classDiagram
         -Money oldBalance
         -Money newBalance
         -Description editReason
+        -LocalDate editedAt
         -LocalDateTime createdAt
         -Integer version
-        +create(FinancialAccountId, Money, Money, Description) BalanceEditHistory
+        +create(FinancialAccountId, Money, Money, Description, LocalDate) BalanceEditHistory
     }
 
     class MonthlyBudget {
@@ -575,9 +576,8 @@ classDiagram
 
     class FinancialAccountRepository {
         <<interface>>
-        +findById(FinancialAccountId) Optional~FinancialAccount~
-        +save(FinancialAccount) FinancialAccount
-        +deleteById(FinancialAccountId) void
+        <<extends CrudRepository~FinancialAccount, FinancialAccountId~>>
+        +findByUserId(UserId) List~FinancialAccount~
     }
 
     class BalanceEditHistoryRepository {

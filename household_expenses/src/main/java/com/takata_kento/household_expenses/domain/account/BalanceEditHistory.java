@@ -4,6 +4,7 @@ import com.takata_kento.household_expenses.domain.valueobject.BalanceEditHistory
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
@@ -29,6 +30,9 @@ class BalanceEditHistory {
     @Column("edit_reason")
     private Description editReason;
 
+    @Column("edited_at")
+    private LocalDate editedAt;
+
     @Column("created_at")
     private LocalDateTime createdAt;
 
@@ -41,6 +45,7 @@ class BalanceEditHistory {
         Money oldBalance,
         Money newBalance,
         Description editReason,
+        LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version
     ) {
@@ -49,6 +54,7 @@ class BalanceEditHistory {
         this.oldBalance = oldBalance;
         this.newBalance = newBalance;
         this.editReason = editReason;
+        this.editedAt = editedAt;
         this.createdAt = createdAt;
         this.version = version;
     }
@@ -57,10 +63,11 @@ class BalanceEditHistory {
         FinancialAccountId financialAccountId,
         Money oldBalance,
         Money newBalance,
-        Description editReason
+        Description editReason,
+        LocalDate editedAt
     ) {
         BalanceEditHistoryId id = new BalanceEditHistoryId(UUID.randomUUID());
-        return new BalanceEditHistory(id, financialAccountId, oldBalance, newBalance, editReason, null, null);
+        return new BalanceEditHistory(id, financialAccountId, oldBalance, newBalance, editReason, editedAt, null, null);
     }
 
     BalanceEditHistoryId id() {
@@ -81,6 +88,10 @@ class BalanceEditHistory {
 
     Description editReason() {
         return this.editReason;
+    }
+
+    LocalDate editedAt() {
+        return this.editedAt;
     }
 
     LocalDateTime createdAt() {

@@ -1,7 +1,10 @@
 package com.takata_kento.household_expenses.config;
 
+import com.takata_kento.household_expenses.domain.valueobject.AccountName;
+import com.takata_kento.household_expenses.domain.valueobject.BalanceEditHistoryId;
 import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.DailyGroupTransactionId;
+import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyLivingExpenseId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalExpenseId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyPersonalTransactionId;
@@ -71,7 +74,13 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new DailyPersonalExpenseIdToStringConverter(),
             new StringToDailyPersonalExpenseIdConverter(),
             new FixedExpenseCategoryIdToStringConverter(),
-            new StringToFixedExpenseCategoryIdConverter()
+            new StringToFixedExpenseCategoryIdConverter(),
+            new FinancialAccountIdToStringConverter(),
+            new StringToFinancialAccountIdConverter(),
+            new AccountNameToStringConverter(),
+            new StringToAccountNameConverter(),
+            new BalanceEditHistoryIdToStringConverter(),
+            new StringToBalanceEditHistoryIdConverter()
         );
     }
 
@@ -414,6 +423,60 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public FixedExpenseCategoryId convert(String source) {
             return new FixedExpenseCategoryId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class FinancialAccountIdToStringConverter implements Converter<FinancialAccountId, String> {
+
+        @Override
+        public String convert(FinancialAccountId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToFinancialAccountIdConverter implements Converter<String, FinancialAccountId> {
+
+        @Override
+        public FinancialAccountId convert(String source) {
+            return new FinancialAccountId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class AccountNameToStringConverter implements Converter<AccountName, String> {
+
+        @Override
+        public String convert(AccountName source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToAccountNameConverter implements Converter<String, AccountName> {
+
+        @Override
+        public AccountName convert(String source) {
+            return new AccountName(source);
+        }
+    }
+
+    @WritingConverter
+    static class BalanceEditHistoryIdToStringConverter implements Converter<BalanceEditHistoryId, String> {
+
+        @Override
+        public String convert(BalanceEditHistoryId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToBalanceEditHistoryIdConverter implements Converter<String, BalanceEditHistoryId> {
+
+        @Override
+        public BalanceEditHistoryId convert(String source) {
+            return new BalanceEditHistoryId(UUID.fromString(source));
         }
     }
 }
