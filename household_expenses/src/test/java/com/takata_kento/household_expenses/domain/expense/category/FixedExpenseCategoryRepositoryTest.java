@@ -154,25 +154,29 @@ class FixedExpenseCategoryRepositoryTest {
         String userGroupIdFromDb = jdbcClient
             .sql("SELECT user_group_id FROM fixed_expense_category WHERE id = ?")
             .param(savedCategory.id().toString())
-            .query(String.class).single();
+            .query(String.class)
+            .single();
         assertThat(userGroupIdFromDb).isEqualTo(USER_GROUP_UUID_1.toString());
 
         String categoryNameFromDb = jdbcClient
             .sql("SELECT category_name FROM fixed_expense_category WHERE id = ?")
             .param(savedCategory.id().toString())
-            .query(String.class).single();
+            .query(String.class)
+            .single();
         assertThat(categoryNameFromDb).isEqualTo(expectedCategoryName.value());
 
         String descriptionFromDb = jdbcClient
             .sql("SELECT description FROM fixed_expense_category WHERE id = ?")
             .param(savedCategory.id().toString())
-            .query(String.class).single();
+            .query(String.class)
+            .single();
         assertThat(descriptionFromDb).isEqualTo(expectedDescription.value());
 
         Integer defaultAmountFromDb = jdbcClient
             .sql("SELECT default_amount FROM fixed_expense_category WHERE id = ?")
             .param(savedCategory.id().toString())
-            .query(Integer.class).single();
+            .query(Integer.class)
+            .single();
         assertThat(defaultAmountFromDb).isEqualTo(expectedDefaultAmount.amount());
     }
 
@@ -195,19 +199,22 @@ class FixedExpenseCategoryRepositoryTest {
         String categoryNameFromDb = jdbcClient
             .sql("SELECT category_name FROM fixed_expense_category WHERE id = ?")
             .param(categoryId.toString())
-            .query(String.class).single();
+            .query(String.class)
+            .single();
         assertThat(categoryNameFromDb).isEqualTo(newCategoryName.value());
 
         String descriptionFromDb = jdbcClient
             .sql("SELECT description FROM fixed_expense_category WHERE id = ?")
             .param(categoryId.toString())
-            .query(String.class).single();
+            .query(String.class)
+            .single();
         assertThat(descriptionFromDb).isEqualTo(newDescription.value());
 
         Integer defaultAmountFromDb = jdbcClient
             .sql("SELECT default_amount FROM fixed_expense_category WHERE id = ?")
             .param(categoryId.toString())
-            .query(Integer.class).single();
+            .query(Integer.class)
+            .single();
         assertThat(defaultAmountFromDb).isEqualTo(newDefaultAmount.amount());
     }
 }

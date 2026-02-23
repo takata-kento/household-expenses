@@ -202,8 +202,7 @@ class FinancialAccountRepositoryTest {
         then(actual.get().isMainAccount()).isEqualTo(isMainAccount);
 
         then(actual.get().editHistories()).hasSize(2);
-        then(actual.get().editHistories())
-            .anySatisfy(history -> {
+        then(actual.get().editHistories()).anySatisfy(history -> {
                 then(history.id()).isEqualTo(new BalanceEditHistoryId(historyId1));
                 then(history.financialAccountId()).isEqualTo(accountId);
                 then(history.oldBalance()).isEqualTo(new Money(50_000));
@@ -211,8 +210,7 @@ class FinancialAccountRepositoryTest {
                 then(history.editReason()).isEqualTo(new Description("Deposit"));
                 then(history.editedAt()).isEqualTo(editedAt1);
             });
-        then(actual.get().editHistories())
-            .anySatisfy(history -> {
+        then(actual.get().editHistories()).anySatisfy(history -> {
                 then(history.id()).isEqualTo(new BalanceEditHistoryId(historyId2));
                 then(history.financialAccountId()).isEqualTo(accountId);
                 then(history.oldBalance()).isEqualTo(new Money(100_000));

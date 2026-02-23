@@ -344,8 +344,7 @@ class FinancialAccountTest {
         Set<BalanceEditHistoryInfo> actualEditHistories = financialAccount.editHistories();
         then(actualEditHistories).hasSize(expectedHistorySize);
 
-        then(actualEditHistories)
-            .anySatisfy(history -> {
+        then(actualEditHistories).anySatisfy(history -> {
                 then(history.financialAccountId()).isEqualTo(id);
                 then(history.oldBalance()).isEqualTo(expectedOldBalance);
                 then(history.newBalance()).isEqualTo(newBalance);

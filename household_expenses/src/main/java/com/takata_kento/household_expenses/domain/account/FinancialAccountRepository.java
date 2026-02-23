@@ -8,7 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface FinancialAccountRepository extends CrudRepository<FinancialAccount, FinancialAccountId> {
-
     @Query("SELECT * FROM financial_account WHERE user_id = :#{#userId.value.toString()}")
     List<FinancialAccount> findByUserId(@Param("userId") UserId userId);
 }
