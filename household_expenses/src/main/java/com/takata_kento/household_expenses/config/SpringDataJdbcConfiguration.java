@@ -17,6 +17,7 @@ import com.takata_kento.household_expenses.domain.valueobject.LivingExpenseCateg
 import com.takata_kento.household_expenses.domain.valueobject.Money;
 import com.takata_kento.household_expenses.domain.valueobject.Month;
 import com.takata_kento.household_expenses.domain.valueobject.MonthlyBudgetId;
+import com.takata_kento.household_expenses.domain.valueobject.MonthlySavingId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
@@ -45,7 +46,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToUserGroupIdConverter(),
             new GroupInvitationIdToStringConverter(),
             new StringToGroupInvitationIdConverter(),
-            new OptionalUserGroupIdToStringConverter(),
+            new OptionalToStringConverter(),
             new StringToOptionalUserGroupIdConverter(),
             new GroupNameToStringConverter(),
             new StringToGroupNameConverter(),
@@ -80,7 +81,10 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new AccountNameToStringConverter(),
             new StringToAccountNameConverter(),
             new BalanceEditHistoryIdToStringConverter(),
-            new StringToBalanceEditHistoryIdConverter()
+            new StringToBalanceEditHistoryIdConverter(),
+            new MonthlySavingIdToStringConverter(),
+            new StringToMonthlySavingIdConverter(),
+            new StringToOptionalDescriptionConverter()
         );
     }
 
@@ -157,11 +161,16 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
     }
 
     @WritingConverter
-    static class OptionalUserGroupIdToStringConverter implements Converter<Optional<UserGroupId>, String> {
+    @SuppressWarnings("rawtypes")
+    static class OptionalToStringConverter implements Converter<Optional, String> {
 
         @Override
-        public String convert(Optional<UserGroupId> source) {
-            return source.map(UserGroupId::toString).orElse(null);
+        public String convert(Optional source) {
+            if (source == null || source.isEmpty()) return null;
+            Object inner = source.get();
+            if (inner instanceof UserGroupId uid) return uid.toString();
+            if (inner instanceof Description desc) return desc.value();
+            throw new IllegalArgumentException("Unsupported Optional inner type: " + inner.getClass());
         }
     }
 
@@ -477,6 +486,33 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public BalanceEditHistoryId convert(String source) {
             return new BalanceEditHistoryId(UUID.fromString(source));
+        }
+    }
+
+    @WritingConverter
+    static class MonthlySavingIdToStringConverter implements Converter<MonthlySavingId, String> {
+
+        @Override
+        public String convert(MonthlySavingId source) {
+            return source.toString();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToMonthlySavingIdConverter implements Converter<String, MonthlySavingId> {
+
+        @Override
+        public MonthlySavingId convert(String source) {
+            return new MonthlySavingId(UUID.fromString(source));
+        }
+    }
+
+    @ReadingConverter
+    static class StringToOptionalDescriptionConverter implements Converter<String, Optional<Description>> {
+
+        @Override
+        public Optional<Description> convert(String source) {
+            return source != null ? Optional.of(new Description(source)) : Optional.empty();
         }
     }
 }
