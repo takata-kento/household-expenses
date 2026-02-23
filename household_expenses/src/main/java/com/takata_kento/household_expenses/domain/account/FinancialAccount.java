@@ -81,9 +81,7 @@ public class FinancialAccount {
     }
 
     public Set<BalanceEditHistoryInfo> editHistories() {
-        return this.editHistories.stream()
-            .map(BalanceEditHistoryInfo::from)
-            .collect(Collectors.toUnmodifiableSet());
+        return this.editHistories.stream().map(BalanceEditHistoryInfo::from).collect(Collectors.toUnmodifiableSet());
     }
 
     private void addEditHistory(Money oldBalance, Money newBalance, Description editReason, LocalDate editedAt) {
@@ -93,10 +91,7 @@ public class FinancialAccount {
 
     public Optional<BalanceEditHistoryInfo> latestEditHistory() {
         return this.editHistories.stream()
-            .max(Comparator.comparing(
-                BalanceEditHistory::createdAt,
-                Comparator.nullsFirst(Comparator.naturalOrder())
-            ))
+            .max(Comparator.comparing(BalanceEditHistory::createdAt, Comparator.nullsFirst(Comparator.naturalOrder())))
             .map(BalanceEditHistoryInfo::from);
     }
 
