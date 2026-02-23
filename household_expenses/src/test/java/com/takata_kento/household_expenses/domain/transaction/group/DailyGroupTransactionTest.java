@@ -9,8 +9,8 @@ import com.takata_kento.household_expenses.domain.valueobject.Money;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,13 +27,13 @@ class DailyGroupTransactionTest {
                 new DailyGroupTransactionId(uuid),
                 new UserGroupId(userGroupUUID),
                 LocalDate.of(2025, 12, 18),
-                new ArrayList<DailyLivingExpense>(),
+                new HashSet<DailyLivingExpense>(),
                 Integer.valueOf(1),
                 new DailyGroupTransaction(
                     new DailyGroupTransactionId(uuid),
                     new UserGroupId(userGroupUUID),
                     LocalDate.of(2025, 12, 18),
-                    new ArrayList<DailyLivingExpense>(),
+                    new HashSet<DailyLivingExpense>(),
                     Integer.valueOf(1)
                 )
             )
@@ -46,7 +46,7 @@ class DailyGroupTransactionTest {
         DailyGroupTransactionId expectedId,
         UserGroupId userGroupId,
         LocalDate transactionDate,
-        List<DailyLivingExpense> livingExpenses,
+        Set<DailyLivingExpense> livingExpenses,
         Integer version,
         DailyGroupTransaction dailyGroupTransaction
     ) {
@@ -73,7 +73,7 @@ class DailyGroupTransactionTest {
         DailyGroupTransactionId id,
         UserGroupId expectedUserGroupId,
         LocalDate transactionDate,
-        List<DailyLivingExpense> livingExpenses,
+        Set<DailyLivingExpense> livingExpenses,
         Integer version,
         DailyGroupTransaction dailyGroupTransaction
     ) {
@@ -100,7 +100,7 @@ class DailyGroupTransactionTest {
         DailyGroupTransactionId id,
         UserGroupId userGroupId,
         LocalDate expectedTransactionDate,
-        List<DailyLivingExpense> livingExpenses,
+        Set<DailyLivingExpense> livingExpenses,
         Integer version,
         DailyGroupTransaction dailyGroupTransaction
     ) {
@@ -127,7 +127,7 @@ class DailyGroupTransactionTest {
         DailyGroupTransactionId id,
         UserGroupId userGroupId,
         LocalDate transactionDate,
-        List<DailyLivingExpense> expectedLivingExpenses,
+        Set<DailyLivingExpense> expectedLivingExpenses,
         Integer version,
         DailyGroupTransaction dailyGroupTransaction
     ) {
@@ -141,7 +141,7 @@ class DailyGroupTransactionTest {
         );
 
         // When
-        List<DailyLivingExpense> actual = dailyGroupTransaction.livingExpenses();
+        Set<DailyLivingExpense> actual = dailyGroupTransaction.livingExpenses();
 
         // Then
         then(actual).isEqualTo(expectedLivingExpenses);
@@ -154,7 +154,7 @@ class DailyGroupTransactionTest {
         DailyGroupTransactionId id,
         UserGroupId userGroupId,
         LocalDate transactionDate,
-        List<DailyLivingExpense> livingExpenses,
+        Set<DailyLivingExpense> livingExpenses,
         Integer version,
         DailyGroupTransaction dailyGroupTransaction
     ) {
@@ -169,15 +169,16 @@ class DailyGroupTransactionTest {
         dailyGroupTransaction.addLivingExpense(userId, categoryId, amount, memo);
 
         // Then
-        List<DailyLivingExpense> actualLivingExpenses = dailyGroupTransaction.livingExpenses();
+        Set<DailyLivingExpense> actualLivingExpenses = dailyGroupTransaction.livingExpenses();
         then(actualLivingExpenses).hasSize(expectedSize);
 
-        DailyLivingExpense addedExpense = actualLivingExpenses.get(actualLivingExpenses.size() - 1);
-        then(addedExpense.userId()).isEqualTo(userId);
-        then(addedExpense.livingExpenseCategoryId()).isEqualTo(categoryId);
-        then(addedExpense.amount()).isEqualTo(amount);
-        then(addedExpense.memo()).isEqualTo(memo);
-        then(addedExpense.dailyGroupTransactionId()).isEqualTo(id);
+        then(actualLivingExpenses).anySatisfy(expense -> {
+                then(expense.userId()).isEqualTo(userId);
+                then(expense.livingExpenseCategoryId()).isEqualTo(categoryId);
+                then(expense.amount()).isEqualTo(amount);
+                then(expense.memo()).isEqualTo(memo);
+                then(expense.dailyGroupTransactionId()).isEqualTo(id);
+            });
     }
 
     @ParameterizedTest
@@ -186,7 +187,7 @@ class DailyGroupTransactionTest {
         DailyGroupTransactionId id,
         UserGroupId userGroupId,
         LocalDate transactionDate,
-        List<DailyLivingExpense> livingExpenses,
+        Set<DailyLivingExpense> livingExpenses,
         Integer version,
         DailyGroupTransaction dailyGroupTransaction
     ) {
