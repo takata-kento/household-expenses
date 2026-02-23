@@ -7,8 +7,8 @@ import com.takata_kento.household_expenses.domain.valueobject.Money;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
@@ -28,8 +28,8 @@ public class DailyGroupTransaction {
     @Column("transaction_date")
     private LocalDate transactionDate;
 
-    @MappedCollection(idColumn = "daily_group_transaction_id", keyColumn = "created_at")
-    private List<DailyLivingExpense> livingExpenses;
+    @MappedCollection(idColumn = "daily_group_transaction_id")
+    private Set<DailyLivingExpense> livingExpenses;
 
     @Version
     private Integer version;
@@ -38,13 +38,13 @@ public class DailyGroupTransaction {
         DailyGroupTransactionId id,
         UserGroupId userGroupId,
         LocalDate transactionDate,
-        List<DailyLivingExpense> livingExpenses,
+        Set<DailyLivingExpense> livingExpenses,
         Integer version
     ) {
         this.id = id;
         this.userGroupId = userGroupId;
         this.transactionDate = transactionDate;
-        this.livingExpenses = livingExpenses != null ? new ArrayList<>(livingExpenses) : new ArrayList<>();
+        this.livingExpenses = livingExpenses != null ? new HashSet<>(livingExpenses) : new HashSet<>();
         this.version = version;
     }
 
@@ -60,8 +60,8 @@ public class DailyGroupTransaction {
         return this.transactionDate;
     }
 
-    public List<DailyLivingExpense> livingExpenses() {
-        return new ArrayList<>(this.livingExpenses);
+    public Set<DailyLivingExpense> livingExpenses() {
+        return new HashSet<>(this.livingExpenses);
     }
 
     public void addLivingExpense(
