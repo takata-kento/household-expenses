@@ -173,12 +173,12 @@ class DailyGroupTransactionTest {
         then(actualLivingExpenses).hasSize(expectedSize);
 
         then(actualLivingExpenses).anySatisfy(expense -> {
-            then(expense.userId()).isEqualTo(userId);
-            then(expense.livingExpenseCategoryId()).isEqualTo(categoryId);
-            then(expense.amount()).isEqualTo(amount);
-            then(expense.memo()).isEqualTo(memo);
-            then(expense.dailyGroupTransactionId()).isEqualTo(id);
-        });
+                then(expense.userId()).isEqualTo(userId);
+                then(expense.livingExpenseCategoryId()).isEqualTo(categoryId);
+                then(expense.amount()).isEqualTo(amount);
+                then(expense.memo()).isEqualTo(memo);
+                then(expense.dailyGroupTransactionId()).isEqualTo(id);
+            });
     }
 
     @ParameterizedTest

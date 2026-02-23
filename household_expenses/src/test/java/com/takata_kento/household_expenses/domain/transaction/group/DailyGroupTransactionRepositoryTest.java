@@ -47,9 +47,7 @@ class DailyGroupTransactionRepositoryTest {
     void setUp() {
         // テストユーザーグループを挿入
         jdbcClient
-            .sql(
-                "INSERT INTO user_group (id, group_name, month_start_day) VALUES (:id, :groupName, :monthStartDay)"
-            )
+            .sql("INSERT INTO user_group (id, group_name, month_start_day) VALUES (:id, :groupName, :monthStartDay)")
             .param("id", TEST_USER_GROUP_UUID.toString())
             .param("groupName", "testgroup")
             .param("monthStartDay", 1)

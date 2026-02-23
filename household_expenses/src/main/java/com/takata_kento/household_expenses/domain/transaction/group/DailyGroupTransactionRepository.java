@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface DailyGroupTransactionRepository
     extends CrudRepository<DailyGroupTransaction, DailyGroupTransactionId> {
-
     @Query(
         "SELECT * FROM daily_group_transaction WHERE user_group_id = :#{#userGroupId.value.toString()} AND transaction_date = :transactionDate"
     )
