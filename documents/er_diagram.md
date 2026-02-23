@@ -178,9 +178,10 @@ erDiagram
 
     %% 月次貯金
     MONTHLY_SAVING {
-        varchar user_id PK,FK
-        int year PK "年"
-        int month PK "月"
+        varchar id PK "UUID"
+        varchar user_id FK
+        int year "年"
+        int month "月"
         integer saving_amount "貯金額"
         varchar financial_account_id FK "UUID"
         varchar memo "メモ"
@@ -297,10 +298,9 @@ erDiagram
 ### MONTHLY_SAVING（月次貯金）
 - ユーザーごとの月次貯金実績を記録
 - 非共有データ（記録者のみ閲覧可能）
-- **設計補足**: 複合主キーは`user_id + year + month`を採用
-  - `user_id`を含む理由: 同一口座を複数ユーザーが使用する場合でも、各ユーザーの貯金記録を個別に管理するため
-  - 権限制御: 貯金額は非共有データであり、記録者本人のみが閲覧可能
+- **設計補足**: UUID単一PKを採用し、`UNIQUE (user_id, year, month)` 制約で一意性を保証
   - `financial_account_id`は外部キーとして貯金先口座を特定
+  - 権限制御: 貯金額は非共有データであり、記録者本人のみが閲覧可能
 
 ## データ共有ポリシー
 

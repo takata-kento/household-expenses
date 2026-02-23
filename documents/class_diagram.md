@@ -184,6 +184,7 @@ classDiagram
     }
 
     class MonthlySaving {
+        -MonthlySavingId id
         -UserId userId
         -Year year
         -Month month
@@ -193,13 +194,10 @@ classDiagram
         -LocalDateTime createdAt
         -LocalDateTime updatedAt
         -Integer version
+        +create(UserId, Year, Month, Money, FinancialAccountId, Optional~Description~) MonthlySaving$
         +updateSavingAmount(Money) void
         +updateFinancialAccount(FinancialAccountId) void
-        +updateMemo(Description) void
-        +validateSavingAmount(Money) boolean
-        +isForUser(UserId) boolean
-        +isForPeriod(Year, Month) boolean
-        +canBeDeleted() boolean
+        +updateMemo(Optional~Description~) void
     }
 
     %% リクエストクラス
@@ -378,6 +376,12 @@ classDiagram
     }
 
     class MonthlyBudgetId {
+        <<record>>
+        -UUID value
+        +value() UUID
+    }
+
+    class MonthlySavingId {
         <<record>>
         -UUID value
         +value() UUID
@@ -627,6 +631,7 @@ classDiagram
 
     class MonthlySavingRepository {
         <<interface>>
+        <<extends CrudRepository~MonthlySaving, MonthlySavingId~>>
         +findByUserIdAndYearAndMonth(UserId, Year, Month) Optional~MonthlySaving~
         +findByUserIdAndYear(UserId, Year) List~MonthlySaving~
     }
