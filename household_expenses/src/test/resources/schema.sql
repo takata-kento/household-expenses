@@ -189,6 +189,7 @@ CREATE TABLE fixed_expense_history (
 
 -- 月次貯金テーブル
 CREATE TABLE monthly_saving (
+    id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
@@ -198,7 +199,7 @@ CREATE TABLE monthly_saving (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
     version INTEGER DEFAULT 0,
-    PRIMARY KEY (user_id, year, month)
+    UNIQUE (user_id, year, month)
 );
 
 -- インデックスの作成（パフォーマンス向上のため）
