@@ -10,7 +10,6 @@ import com.takata_kento.household_expenses.domain.valueobject.Month;
 import com.takata_kento.household_expenses.domain.valueobject.MonthlySavingId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Year;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;

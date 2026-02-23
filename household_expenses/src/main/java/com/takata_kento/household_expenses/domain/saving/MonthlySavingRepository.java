@@ -11,8 +11,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface MonthlySavingRepository extends CrudRepository<MonthlySaving, MonthlySavingId> {
-
-    @Query("SELECT * FROM monthly_saving WHERE user_id = :#{#userId.value.toString()} AND year = :#{#year.value()} AND month = :#{#month.value()}")
+    @Query(
+        "SELECT * FROM monthly_saving WHERE user_id = :#{#userId.value.toString()} AND year = :#{#year.value()} AND month = :#{#month.value()}"
+    )
     Optional<MonthlySaving> findByUserIdAndYearAndMonth(
         @Param("userId") UserId userId,
         @Param("year") Year year,
@@ -20,8 +21,5 @@ public interface MonthlySavingRepository extends CrudRepository<MonthlySaving, M
     );
 
     @Query("SELECT * FROM monthly_saving WHERE user_id = :#{#userId.value.toString()} AND year = :#{#year.value()}")
-    List<MonthlySaving> findByUserIdAndYear(
-        @Param("userId") UserId userId,
-        @Param("year") Year year
-    );
+    List<MonthlySaving> findByUserIdAndYear(@Param("userId") UserId userId, @Param("year") Year year);
 }
