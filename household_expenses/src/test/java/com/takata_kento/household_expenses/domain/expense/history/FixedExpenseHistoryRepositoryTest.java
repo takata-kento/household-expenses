@@ -262,8 +262,12 @@ class FixedExpenseHistoryRepositoryTest {
             .update();
 
         // When
-        Optional<FixedExpenseHistory> actual = fixedExpenseHistoryRepository
-            .findByFixedExpenseCategoryIdAndYearAndMonth(expectedCategoryId, expectedYear, expectedMonth);
+        Optional<FixedExpenseHistory> actual =
+            fixedExpenseHistoryRepository.findByFixedExpenseCategoryIdAndYearAndMonth(
+                expectedCategoryId,
+                expectedYear,
+                expectedMonth
+            );
 
         // Then
         assertThat(actual).isPresent();

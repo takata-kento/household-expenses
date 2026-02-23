@@ -10,7 +10,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface FixedExpenseHistoryRepository extends CrudRepository<FixedExpenseHistory, FixedExpenseHistoryId> {
-
     @Query(
         "SELECT * FROM fixed_expense_history " +
         "WHERE fixed_expense_category_id = :#{#categoryId.toString()} " +
