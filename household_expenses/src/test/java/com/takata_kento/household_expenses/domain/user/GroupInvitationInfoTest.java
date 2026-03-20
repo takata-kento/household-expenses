@@ -1,8 +1,7 @@
-package com.takata_kento.household_expenses.domain.dto;
+package com.takata_kento.household_expenses.domain.user;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.takata_kento.household_expenses.domain.user.GroupInvitation;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.InvitationStatus;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
