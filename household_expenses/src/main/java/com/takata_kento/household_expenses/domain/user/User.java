@@ -1,6 +1,5 @@
 package com.takata_kento.household_expenses.domain.user;
 
-import com.takata_kento.household_expenses.domain.dto.GroupInvitationInfo;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
