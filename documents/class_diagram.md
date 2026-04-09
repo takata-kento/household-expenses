@@ -416,18 +416,10 @@ classDiagram
     %% サービスクラス
     class UserService {
         -UserRepository userRepository
-        -GroupInvitationRepository groupInvitationRepository
-        -PasswordEncoder passwordEncoder
-        +registerUser(UserRegistrationRequest) User
-        +authenticateUser(UserLoginRequest) User
-        +getCurrentUser() User
-        +findByUsername(Username) Optional~User~
-        +acceptGroupInvitation(UserId) void
-        +rejectGroupInvitation(UserId) void
-        +addAccountToUser(UserId, FinancialAccount) void
-        +removeAccountFromUser(UserId, FinancialAccountId) void
-        +setMainAccount(UserId, FinancialAccountId) void
-        +canRemoveAccount(UserId, FinancialAccountId) boolean
+        -CognitoUserContext cognitoUserContext
+        -getCurrentUser() User
+        +acceptGroupInvitation(GroupInvitationId) void
+        +rejectGroupInvitation(GroupInvitationId) void
     }
 
     class UserGroupService {
@@ -495,12 +487,8 @@ classDiagram
     %% コントローラークラス
     class UserController {
         -UserService userService
-        +register(UserRegistrationRequest) ResponseEntity~User~
-        +login(UserLoginRequest) ResponseEntity~String~
-        +getCurrentUser() ResponseEntity~User~
-        +logout() ResponseEntity~Void~
-        +acceptGroupInvitation(UserId) ResponseEntity~Void~
-        +rejectGroupInvitation(UserId) ResponseEntity~Void~
+        +acceptGroupInvitation(GroupInvitationId) ResponseEntity~Void~
+        +rejectGroupInvitation(GroupInvitationId) ResponseEntity~Void~
     }
 
     class UserGroupController {
@@ -633,6 +621,7 @@ classDiagram
     SavingController ..> SavingService
 
     UserService ..> UserRepository
+    UserService ..> CognitoUserContext
     UserGroupService ..> UserGroupRepository
     BudgetService ..> MonthlyBudgetRepository
     ExpenseService ..> LivingExpenseCategoryRepository
