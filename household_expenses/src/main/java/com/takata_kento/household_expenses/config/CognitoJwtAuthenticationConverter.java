@@ -23,7 +23,8 @@ class CognitoJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthen
         if (groups == null) {
             return List.of();
         }
-        return groups.stream()
+        return groups
+            .stream()
             .map(group -> new SimpleGrantedAuthority("ROLE_" + group.toUpperCase()))
             .collect(Collectors.toUnmodifiableList());
     }

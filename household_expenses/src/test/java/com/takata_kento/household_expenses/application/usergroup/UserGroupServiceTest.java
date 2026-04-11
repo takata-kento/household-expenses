@@ -41,7 +41,9 @@ class UserGroupServiceTest {
 
     private static final UserId CURRENT_USER_ID = new UserId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
     private static final UserId OTHER_USER_ID = new UserId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
-    private static final UserGroupId USER_GROUP_ID = new UserGroupId(UUID.fromString("00000000-0000-0000-0000-000000000010"));
+    private static final UserGroupId USER_GROUP_ID = new UserGroupId(
+        UUID.fromString("00000000-0000-0000-0000-000000000010")
+    );
 
     @Test
     void testCreateGroup() {
@@ -75,8 +77,7 @@ class UserGroupServiceTest {
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.createGroup(groupName))
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.createGroup(groupName)).isInstanceOf(IllegalStateException.class);
         verify(userGroupRepository, never()).save(any());
         verify(userRepository, never()).save(any());
     }
@@ -115,8 +116,9 @@ class UserGroupServiceTest {
         when(userRepository.findByUsername(inviteeUsername)).thenReturn(Optional.of(invitee));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.inviteUser(inviteeUsername))
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.inviteUser(inviteeUsername)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(userRepository, never()).save(any());
     }
 
@@ -130,8 +132,9 @@ class UserGroupServiceTest {
         when(userRepository.findByUsername(nonExistentUsername)).thenReturn(Optional.empty());
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.inviteUser(nonExistentUsername))
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.inviteUser(nonExistentUsername)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(userRepository, never()).save(any());
     }
 
@@ -160,8 +163,7 @@ class UserGroupServiceTest {
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.leaveGroup())
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.leaveGroup()).isInstanceOf(IllegalStateException.class);
         verify(userRepository, never()).save(any());
     }
 
@@ -192,8 +194,7 @@ class UserGroupServiceTest {
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.getGroupMembers())
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.getGroupMembers()).isInstanceOf(IllegalStateException.class);
         verify(userRepository, never()).findByUserGroupId(any());
     }
 
@@ -228,8 +229,9 @@ class UserGroupServiceTest {
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.updateGroupName(newGroupName))
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.updateGroupName(newGroupName)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(userGroupRepository, never()).save(any());
     }
 
@@ -242,8 +244,9 @@ class UserGroupServiceTest {
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.updateGroupName(newGroupName))
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.updateGroupName(newGroupName)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(userGroupRepository, never()).save(any());
     }
 
@@ -275,8 +278,9 @@ class UserGroupServiceTest {
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.updateMonthStartDay(newDay))
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.updateMonthStartDay(newDay)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(userGroupRepository, never()).save(any());
     }
 }
