@@ -80,6 +80,13 @@ public class User {
             .collect(Collectors.toUnmodifiableSet());
     }
 
+    public void joinGroup(UserGroupId userGroupId) {
+        if (this.isBelongsToGroup()) {
+            throw new IllegalStateException("User already belongs to a group");
+        }
+        this.userGroupId = Optional.of(userGroupId);
+    }
+
     public void leaveGroup() {
         this.userGroupId = Optional.empty();
     }
