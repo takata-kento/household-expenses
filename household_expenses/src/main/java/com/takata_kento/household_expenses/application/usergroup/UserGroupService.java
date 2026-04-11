@@ -35,7 +35,8 @@ public class UserGroupService {
 
     private User getCurrentUser() {
         UserId userId = cognitoUserContext.currentUserId();
-        return userRepository.findById(userId)
+        return userRepository
+            .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
     }
 
@@ -53,7 +54,8 @@ public class UserGroupService {
 
     public GroupInvitationId inviteUser(Username username) {
         User currentUser = getCurrentUser();
-        User invitee = userRepository.findByUsername(username)
+        User invitee = userRepository
+            .findByUsername(username)
             .orElseThrow(() -> new IllegalStateException("User not found: " + username));
         GroupInvitationId invitationId = currentUser.invite(invitee);
         userRepository.save(invitee);
@@ -71,16 +73,19 @@ public class UserGroupService {
 
     public List<User> getGroupMembers() {
         User currentUser = getCurrentUser();
-        UserGroupId userGroupId = currentUser.userGroupId()
+        UserGroupId userGroupId = currentUser
+            .userGroupId()
             .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
         return userRepository.findByUserGroupId(userGroupId);
     }
 
     public UserGroup updateGroupName(GroupName groupName) {
         User currentUser = getCurrentUser();
-        UserGroupId userGroupId = currentUser.userGroupId()
+        UserGroupId userGroupId = currentUser
+            .userGroupId()
             .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
-        UserGroup userGroup = userGroupRepository.findById(userGroupId)
+        UserGroup userGroup = userGroupRepository
+            .findById(userGroupId)
             .orElseThrow(() -> new IllegalStateException("UserGroup not found: " + userGroupId));
         if (!userGroup.canBeModifiedBy(currentUser.id())) {
             throw new IllegalStateException("Only the group creator can update the group name");
@@ -91,9 +96,11 @@ public class UserGroupService {
 
     public UserGroup updateMonthStartDay(Day day) {
         User currentUser = getCurrentUser();
-        UserGroupId userGroupId = currentUser.userGroupId()
+        UserGroupId userGroupId = currentUser
+            .userGroupId()
             .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
-        UserGroup userGroup = userGroupRepository.findById(userGroupId)
+        UserGroup userGroup = userGroupRepository
+            .findById(userGroupId)
             .orElseThrow(() -> new IllegalStateException("UserGroup not found: " + userGroupId));
         userGroup.updateMonthStartDay(day);
         return userGroupRepository.save(userGroup);

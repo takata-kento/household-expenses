@@ -22,7 +22,8 @@ public class UserService {
 
     private User getCurrentUser() {
         UserId userId = cognitoUserContext.currentUserId();
-        return userRepository.findById(userId)
+        return userRepository
+            .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
     }
 

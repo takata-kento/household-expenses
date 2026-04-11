@@ -488,8 +488,7 @@ class UserTest {
         User user = new User(USER_ID_1, new Username("testuser"), Optional.of(existingGroupId), null, null);
 
         // When / Then
-        assertThatThrownBy(() -> user.joinGroup(newGroupId))
-            .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> user.joinGroup(newGroupId)).isInstanceOf(IllegalStateException.class);
         assertThat(user.userGroupId()).isEqualTo(Optional.of(existingGroupId));
     }
 

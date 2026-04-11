@@ -12,7 +12,6 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
