@@ -424,12 +424,14 @@ classDiagram
 
     class UserGroupService {
         -UserGroupRepository userGroupRepository
-        -GroupInvitationRepository groupInvitationRepository
         -UserRepository userRepository
+        -CognitoUserContext cognitoUserContext
         +createGroup(GroupName) UserGroup
-        +inviteUser(GroupInvitationRequest) GroupInvitation
-        +leaveGroup(UserGroupId) void
-        +getGroupMembers(UserGroupId) List~User~
+        +inviteUser(Username) GroupInvitationId
+        +leaveGroup() void
+        +getGroupMembers() List~User~
+        +updateGroupName(GroupName) UserGroup
+        +updateMonthStartDay(Day) UserGroup
     }
 
     class TransactionService {
