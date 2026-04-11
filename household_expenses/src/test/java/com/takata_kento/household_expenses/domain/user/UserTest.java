@@ -461,6 +461,39 @@ class UserTest {
     }
 
     @Test
+    void testJoinGroup() {
+        // Given
+        UserId expectedUserId = USER_ID_1;
+        Username expectedUsername = new Username("testuser");
+        UserGroupId userGroupId = new UserGroupId(UUID.randomUUID());
+        User user = new User(expectedUserId, expectedUsername, Optional.empty(), null, null);
+
+        // When
+        user.joinGroup(userGroupId);
+
+        // Then
+        assertThat(user.userGroupId()).isEqualTo(Optional.of(userGroupId));
+        assertThat(user.isBelongsToGroup()).isTrue();
+        assertThat(user.id()).isEqualTo(expectedUserId);
+        assertThat(user.name()).isEqualTo(expectedUsername);
+        assertThat(user.receivedInvitations()).isEmpty();
+        assertThat(user.version()).isNull();
+    }
+
+    @Test
+    void testJoinGroupWhenAlreadyInGroup() {
+        // Given
+        UserGroupId existingGroupId = new UserGroupId(UUID.randomUUID());
+        UserGroupId newGroupId = new UserGroupId(UUID.randomUUID());
+        User user = new User(USER_ID_1, new Username("testuser"), Optional.of(existingGroupId), null, null);
+
+        // When / Then
+        assertThatThrownBy(() -> user.joinGroup(newGroupId))
+            .isInstanceOf(IllegalStateException.class);
+        assertThat(user.userGroupId()).isEqualTo(Optional.of(existingGroupId));
+    }
+
+    @Test
     void testReject() {
         // Given
         UserId invitedUserId = USER_ID_1;

@@ -1,7 +1,9 @@
 package com.takata_kento.household_expenses.domain.user;
 
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
+import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -13,4 +15,7 @@ public interface UserRepository extends CrudRepository<User, UserId> {
 
     @Query("SELECT EXISTS(SELECT 1 FROM users WHERE username = :#{#username.value})")
     boolean existsByUsername(@Param("username") Username username);
+
+    @Query("SELECT * FROM users WHERE user_group_id = :#{#userGroupId.toString()}")
+    List<User> findByUserGroupId(@Param("userGroupId") UserGroupId userGroupId);
 }

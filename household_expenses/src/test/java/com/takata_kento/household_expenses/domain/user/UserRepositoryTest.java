@@ -6,6 +6,7 @@ import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
 import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -369,6 +370,33 @@ class UserRepositoryTest {
             .query(Boolean.class)
             .single();
         assertThat(respondedAtIsNotNull).isTrue();
+    }
+
+    @Test
+    void testFindByUserGroupId() {
+        // Given
+        UserGroupId userGroupId = TEST_USER_GROUP_ID;
+
+        // When
+        List<User> actual = userRepository.findByUserGroupId(userGroupId);
+
+        // Then
+        assertThat(actual).hasSize(1);
+        assertThat(actual.get(0).id()).isEqualTo(TEST_USER_ID_1);
+        assertThat(actual.get(0).userGroupId()).isEqualTo(Optional.of(TEST_USER_GROUP_ID));
+        assertThat(actual.get(0).isBelongsToGroup()).isTrue();
+    }
+
+    @Test
+    void testFindByUserGroupIdNotFound() {
+        // Given
+        UserGroupId nonExistentGroupId = new UserGroupId(UUID.randomUUID());
+
+        // When
+        List<User> actual = userRepository.findByUserGroupId(nonExistentGroupId);
+
+        // Then
+        assertThat(actual).isEmpty();
     }
 
     @Test
