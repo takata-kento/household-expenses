@@ -22,11 +22,7 @@ public class UserGroupService {
     private final UserGroupRepository userGroupRepository;
     private final UserRepository userRepository;
 
-    public UserGroupService(
-        UserGroupRepository userGroupRepository,
-        UserRepository userRepository,
-        CognitoUserContext cognitoUserContext
-    ) {
+    public UserGroupService(UserGroupRepository userGroupRepository, UserRepository userRepository) {
         this.userGroupRepository = userGroupRepository;
         this.userRepository = userRepository;
     }

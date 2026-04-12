@@ -4,9 +4,7 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import java.util.UUID;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.stereotype.Component;
 
-@Component
 public class CognitoUserContext {
 
     public CognitoUserContext() {
