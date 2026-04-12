@@ -9,7 +9,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class CognitoUserContext {
 
-    public UserId currentUserId() {
+    public CognitoUserContext() {
+        throw new AssertionError();
+    }
+
+    public static UserId currentUserId() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
             throw new IllegalStateException("No authenticated JWT principal found in SecurityContext");

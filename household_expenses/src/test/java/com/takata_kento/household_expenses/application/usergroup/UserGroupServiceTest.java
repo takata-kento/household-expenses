@@ -18,10 +18,15 @@ import com.takata_kento.household_expenses.domain.valueobject.Username;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.junit.jupiter.api.AutoClose;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,8 +38,8 @@ class UserGroupServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private CognitoUserContext cognitoUserContext;
+    @AutoClose
+    private MockedStatic<CognitoUserContext> cognitoUserContext;
 
     @InjectMocks
     private UserGroupService userGroupService;
@@ -45,13 +50,18 @@ class UserGroupServiceTest {
         UUID.fromString("00000000-0000-0000-0000-000000000010")
     );
 
+    @BeforeEach
+    void setUp() {
+        cognitoUserContext = Mockito.mockStatic(CognitoUserContext.class);
+    }
+
     @Test
     void testCreateGroup() {
         // Given
         GroupName groupName = new GroupName("テストグループ");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
         UserGroup savedUserGroup = UserGroup.create(groupName, new Day(1), CURRENT_USER_ID);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.save(any(UserGroup.class))).thenReturn(savedUserGroup);
         when(userRepository.save(currentUser)).thenReturn(currentUser);
@@ -73,7 +83,7 @@ class UserGroupServiceTest {
         // Given
         GroupName groupName = new GroupName("テストグループ");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
@@ -88,7 +98,7 @@ class UserGroupServiceTest {
         Username inviteeUsername = new Username("invitee");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
         User invitee = new User(OTHER_USER_ID, inviteeUsername, Optional.empty(), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.findByUsername(inviteeUsername)).thenReturn(Optional.of(invitee));
         when(userRepository.save(invitee)).thenReturn(invitee);
@@ -111,7 +121,7 @@ class UserGroupServiceTest {
         Username inviteeUsername = new Username("invitee");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
         User invitee = new User(OTHER_USER_ID, inviteeUsername, Optional.empty(), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.findByUsername(inviteeUsername)).thenReturn(Optional.of(invitee));
 
@@ -127,7 +137,7 @@ class UserGroupServiceTest {
         // Given
         Username nonExistentUsername = new Username("nonexistent");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.findByUsername(nonExistentUsername)).thenReturn(Optional.empty());
 
@@ -142,7 +152,7 @@ class UserGroupServiceTest {
     void testLeaveGroup() {
         // Given
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.save(currentUser)).thenReturn(currentUser);
 
@@ -159,7 +169,7 @@ class UserGroupServiceTest {
     void testLeaveGroupWhenNotInGroup() {
         // Given
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
@@ -173,7 +183,7 @@ class UserGroupServiceTest {
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
         User member2 = new User(OTHER_USER_ID, new Username("member2"), Optional.of(USER_GROUP_ID), null, null);
         List<User> members = List.of(currentUser, member2);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.findByUserGroupId(USER_GROUP_ID)).thenReturn(members);
 
@@ -190,7 +200,7 @@ class UserGroupServiceTest {
     void testGetGroupMembersWhenNotInGroup() {
         // Given
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
@@ -204,7 +214,7 @@ class UserGroupServiceTest {
         GroupName newGroupName = new GroupName("新グループ名");
         UserGroup userGroup = UserGroup.create(new GroupName("旧グループ名"), new Day(1), CURRENT_USER_ID);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
         when(userGroupRepository.save(userGroup)).thenReturn(userGroup);
@@ -224,7 +234,7 @@ class UserGroupServiceTest {
         // OTHER_USER_ID がグループ作成者、CURRENT_USER_ID は作成者でない
         UserGroup userGroup = UserGroup.create(new GroupName("旧グループ名"), new Day(1), OTHER_USER_ID);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
 
@@ -240,7 +250,7 @@ class UserGroupServiceTest {
         // Given
         GroupName newGroupName = new GroupName("新グループ名");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
@@ -256,7 +266,7 @@ class UserGroupServiceTest {
         Day newDay = new Day(25);
         UserGroup userGroup = UserGroup.create(new GroupName("テストグループ"), new Day(1), CURRENT_USER_ID);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
         when(userGroupRepository.save(userGroup)).thenReturn(userGroup);
@@ -274,7 +284,7 @@ class UserGroupServiceTest {
         // Given
         Day newDay = new Day(25);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        when(cognitoUserContext.currentUserId()).thenReturn(CURRENT_USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
