@@ -12,10 +12,14 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Username;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.AutoClose;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,14 +28,19 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private CognitoUserContext cognitoUserContext;
+    @AutoClose
+    private MockedStatic<CognitoUserContext> cognitoUserContext;
 
     @InjectMocks
     private UserService userService;
 
     private static final UserId USER_ID = new UserId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
     private static final UserId INVITER_ID = new UserId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
+
+    @BeforeEach
+    void setUp() {
+        cognitoUserContext = Mockito.mockStatic(CognitoUserContext.class);
+    }
 
     @Test
     void testAcceptGroupInvitation() {
@@ -41,7 +50,7 @@ class UserServiceTest {
         User user = new User(USER_ID, new Username("testuser"), Optional.empty(), null, null);
         GroupInvitationId invitationId = inviter.invite(user);
 
-        when(cognitoUserContext.currentUserId()).thenReturn(USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(USER_ID);
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(userRepository.save(user)).thenReturn(user);
 
@@ -62,7 +71,7 @@ class UserServiceTest {
         User user = new User(USER_ID, new Username("testuser"), Optional.empty(), null, null);
         GroupInvitationId invitationId = inviter.invite(user);
 
-        when(cognitoUserContext.currentUserId()).thenReturn(USER_ID);
+        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(USER_ID);
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(userRepository.save(user)).thenReturn(user);
 

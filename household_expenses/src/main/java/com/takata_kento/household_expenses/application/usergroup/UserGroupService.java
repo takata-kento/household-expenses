@@ -21,20 +21,14 @@ public class UserGroupService {
 
     private final UserGroupRepository userGroupRepository;
     private final UserRepository userRepository;
-    private final CognitoUserContext cognitoUserContext;
 
-    public UserGroupService(
-        UserGroupRepository userGroupRepository,
-        UserRepository userRepository,
-        CognitoUserContext cognitoUserContext
-    ) {
+    public UserGroupService(UserGroupRepository userGroupRepository, UserRepository userRepository) {
         this.userGroupRepository = userGroupRepository;
         this.userRepository = userRepository;
-        this.cognitoUserContext = cognitoUserContext;
     }
 
     private User getCurrentUser() {
-        UserId userId = cognitoUserContext.currentUserId();
+        UserId userId = CognitoUserContext.currentUserId();
         return userRepository
             .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));

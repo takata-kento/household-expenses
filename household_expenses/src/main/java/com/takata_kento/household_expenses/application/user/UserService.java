@@ -13,15 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final CognitoUserContext cognitoUserContext;
 
-    public UserService(UserRepository userRepository, CognitoUserContext cognitoUserContext) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.cognitoUserContext = cognitoUserContext;
     }
 
     private User getCurrentUser() {
-        UserId userId = cognitoUserContext.currentUserId();
+        UserId userId = CognitoUserContext.currentUserId();
         return userRepository
             .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
