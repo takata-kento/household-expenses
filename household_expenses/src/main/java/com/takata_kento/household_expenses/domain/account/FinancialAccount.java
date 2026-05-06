@@ -84,7 +84,12 @@ public class FinancialAccount {
         return this.editHistories.stream().map(BalanceEditHistoryInfo::from).collect(Collectors.toUnmodifiableSet());
     }
 
-    private void addEditHistory(Money oldBalance, Money newBalance, Description editReason, LocalDate editedAt) {
+    private void addEditHistory(
+        Money oldBalance,
+        Money newBalance,
+        Optional<Description> editReason,
+        LocalDate editedAt
+    ) {
         BalanceEditHistory history = BalanceEditHistory.create(this.id, oldBalance, newBalance, editReason, editedAt);
         this.editHistories.add(history);
     }
@@ -95,8 +100,13 @@ public class FinancialAccount {
             .map(BalanceEditHistoryInfo::from);
     }
 
+    public void updateBalance(Money newBalance, LocalDate editedAt) {
+        addEditHistory(this.balance, newBalance, Optional.empty(), editedAt);
+        this.balance = newBalance;
+    }
+
     public void updateBalance(Money newBalance, Description reason, LocalDate editedAt) {
-        addEditHistory(this.balance, newBalance, reason, editedAt);
+        addEditHistory(this.balance, newBalance, Optional.of(reason), editedAt);
         this.balance = newBalance;
     }
 }
