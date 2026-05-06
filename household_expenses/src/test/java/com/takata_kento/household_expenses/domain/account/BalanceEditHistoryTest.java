@@ -8,6 +8,7 @@ import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId
 import com.takata_kento.household_expenses.domain.valueobject.Money;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,7 +28,7 @@ public class BalanceEditHistoryTest {
                 new FinancialAccountId(financialAccountUUID),
                 new Money(50_000),
                 new Money(100_000),
-                new Description("Salary deposit"),
+                Optional.of(new Description("Salary deposit")),
                 editedAt,
                 createdAt,
                 Integer.valueOf(1),
@@ -36,7 +37,7 @@ public class BalanceEditHistoryTest {
                     new FinancialAccountId(financialAccountUUID),
                     new Money(50_000),
                     new Money(100_000),
-                    new Description("Salary deposit"),
+                    Optional.of(new Description("Salary deposit")),
                     editedAt,
                     createdAt,
                     Integer.valueOf(1)
@@ -52,7 +53,7 @@ public class BalanceEditHistoryTest {
         FinancialAccountId financialAccountId,
         Money oldBalance,
         Money newBalance,
-        Description editReason,
+        Optional<Description> editReason,
         LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
@@ -85,7 +86,7 @@ public class BalanceEditHistoryTest {
         FinancialAccountId expectedFinancialAccountId,
         Money oldBalance,
         Money newBalance,
-        Description editReason,
+        Optional<Description> editReason,
         LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
@@ -118,7 +119,7 @@ public class BalanceEditHistoryTest {
         FinancialAccountId financialAccountId,
         Money expectedOldBalance,
         Money newBalance,
-        Description editReason,
+        Optional<Description> editReason,
         LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
@@ -151,7 +152,7 @@ public class BalanceEditHistoryTest {
         FinancialAccountId financialAccountId,
         Money oldBalance,
         Money expectedNewBalance,
-        Description editReason,
+        Optional<Description> editReason,
         LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
@@ -184,7 +185,7 @@ public class BalanceEditHistoryTest {
         FinancialAccountId financialAccountId,
         Money oldBalance,
         Money newBalance,
-        Description expectedEditReason,
+        Optional<Description> expectedEditReason,
         LocalDate editedAt,
         LocalDateTime createdAt,
         Integer version,
@@ -203,7 +204,7 @@ public class BalanceEditHistoryTest {
         );
 
         // When
-        Description actual = balanceEditHistory.editReason();
+        Optional<Description> actual = balanceEditHistory.editReason();
 
         // Then
         then(actual).isEqualTo(expectedEditReason);
@@ -217,7 +218,7 @@ public class BalanceEditHistoryTest {
         FinancialAccountId financialAccountId,
         Money oldBalance,
         Money newBalance,
-        Description editReason,
+        Optional<Description> editReason,
         LocalDate expectedEditedAt,
         LocalDateTime createdAt,
         Integer version,
@@ -250,7 +251,7 @@ public class BalanceEditHistoryTest {
         FinancialAccountId financialAccountId,
         Money oldBalance,
         Money newBalance,
-        Description editReason,
+        Optional<Description> editReason,
         LocalDate editedAt,
         LocalDateTime expectedCreatedAt,
         Integer version,
@@ -283,7 +284,7 @@ public class BalanceEditHistoryTest {
         FinancialAccountId expectedFinancialAccountId,
         Money expectedOldBalance,
         Money expectedNewBalance,
-        Description expectedEditReason,
+        Optional<Description> expectedEditReason,
         LocalDate expectedEditedAt,
         LocalDateTime createdAt,
         Integer version,
