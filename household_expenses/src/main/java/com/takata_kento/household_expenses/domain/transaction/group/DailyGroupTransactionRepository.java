@@ -21,4 +21,13 @@ public interface DailyGroupTransactionRepository
 
     @Query("SELECT * FROM daily_group_transaction WHERE user_group_id = :#{#userGroupId.value.toString()}")
     List<DailyGroupTransaction> findByUserGroupId(@Param("userGroupId") UserGroupId userGroupId);
+
+    @Query(
+        "SELECT * FROM daily_group_transaction WHERE user_group_id = :#{#userGroupId.value.toString()} AND transaction_date BETWEEN :from AND :to"
+    )
+    List<DailyGroupTransaction> findByUserGroupIdAndTransactionDateBetween(
+        @Param("userGroupId") UserGroupId userGroupId,
+        @Param("from") LocalDate from,
+        @Param("to") LocalDate to
+    );
 }
