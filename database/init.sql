@@ -146,18 +146,6 @@ CREATE TABLE daily_personal_expense (
     version INTEGER DEFAULT 0
 );
 
--- 日次予算残高テーブル
-CREATE TABLE daily_budget_balance (
-    user_group_id VARCHAR(36) NOT NULL REFERENCES user_group(id) ON DELETE CASCADE,
-    transaction_date DATE NOT NULL,
-    total_living_expense INTEGER NOT NULL DEFAULT 0,
-    budget_balance INTEGER NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE,
-    version INTEGER DEFAULT 0,
-    PRIMARY KEY (user_group_id, transaction_date)
-);
-
 -- 固定費分類テーブル
 CREATE TABLE fixed_expense_category (
     id VARCHAR(36) PRIMARY KEY,
@@ -211,7 +199,6 @@ CREATE INDEX idx_daily_living_expense_user ON daily_living_expense(user_id);
 CREATE INDEX idx_daily_personal_transaction_date ON daily_personal_transaction(transaction_date);
 CREATE INDEX idx_daily_personal_transaction_user ON daily_personal_transaction(user_id, transaction_date);
 CREATE INDEX idx_daily_personal_expense_transaction ON daily_personal_expense(daily_personal_transaction_id);
-CREATE INDEX idx_daily_budget_balance_date ON daily_budget_balance(transaction_date);
 CREATE INDEX idx_monthly_budget_year_month ON monthly_budget(year, month);
 CREATE INDEX idx_fixed_expense_history_year_month ON fixed_expense_history(year, month);
 CREATE INDEX idx_monthly_saving_year_month ON monthly_saving(year, month);
@@ -236,7 +223,6 @@ CREATE TRIGGER update_daily_group_transaction_updated_at BEFORE UPDATE ON daily_
 CREATE TRIGGER update_daily_living_expense_updated_at BEFORE UPDATE ON daily_living_expense FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_daily_personal_transaction_updated_at BEFORE UPDATE ON daily_personal_transaction FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_daily_personal_expense_updated_at BEFORE UPDATE ON daily_personal_expense FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_daily_budget_balance_updated_at BEFORE UPDATE ON daily_budget_balance FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_fixed_expense_category_updated_at BEFORE UPDATE ON fixed_expense_category FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_fixed_expense_history_updated_at BEFORE UPDATE ON fixed_expense_history FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_monthly_saving_updated_at BEFORE UPDATE ON monthly_saving FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
