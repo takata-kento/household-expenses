@@ -63,6 +63,7 @@ classDiagram
         -Integer version
         +editHistories() Set~BalanceEditHistoryInfo~
         +latestEditHistory() Optional~BalanceEditHistoryInfo~
+        +updateBalance(Money, LocalDate) void
         +updateBalance(Money, Description, LocalDate) void
     }
 
@@ -71,11 +72,11 @@ classDiagram
         -FinancialAccountId financialAccountId
         -Money oldBalance
         -Money newBalance
-        -Description editReason
+        -Optional~Description~ editReason
         -LocalDate editedAt
         -LocalDateTime createdAt
         -Integer version
-        ~create(FinancialAccountId, Money, Money, Description, LocalDate) BalanceEditHistory
+        ~create(FinancialAccountId, Money, Money, Optional~Description~, LocalDate) BalanceEditHistory
     }
 
     class MonthlyBudget {
@@ -467,13 +468,11 @@ classDiagram
 
     class AccountService {
         -FinancialAccountRepository financialAccountRepository
-        -BalanceEditHistoryRepository balanceEditHistoryRepository
-        -UserRepository userRepository
-        +createAccount(UserId, AccountName, Money, Boolean) FinancialAccount
+        +createAccount(AccountName, Money, Boolean) FinancialAccount
         +updateBalance(FinancialAccountId, Money) FinancialAccount
-        +editBalance(FinancialAccountId, Money, Description) FinancialAccount
+        +updateBalance(FinancialAccountId, Money, Description) FinancialAccount
         +calculateNewBalance(FinancialAccountId, Money, Money, Money, Money) Money
-        +getUserAccounts(UserId) List~FinancialAccount~
+        +getUserAccounts() List~FinancialAccount~
     }
 
     class SavingService {
@@ -529,7 +528,7 @@ classDiagram
         -AccountService accountService
         +createAccount(AccountName, Money, Boolean) ResponseEntity~FinancialAccount~
         +updateBalance(FinancialAccountId, Money) ResponseEntity~FinancialAccount~
-        +editBalance(FinancialAccountId, Money, Description) ResponseEntity~FinancialAccount~
+        +updateBalance(FinancialAccountId, Money, Description) ResponseEntity~FinancialAccount~
         +getUserAccounts() ResponseEntity~List~FinancialAccount~~
     }
 
@@ -630,7 +629,6 @@ classDiagram
     ExpenseService ..> FixedExpenseCategoryRepository
     ExpenseService ..> FixedExpenseHistoryRepository
     AccountService ..> FinancialAccountRepository
-    AccountService ..> UserRepository
     SavingService ..> UserRepository
     SavingService ..> MonthlySavingRepository
 ```
@@ -660,3 +658,11 @@ classDiagram
 - データアクセス層
 - Spring Data JDBCを使用
 - カスタムクエリメソッドを定義
+
+## サービスクラスの業務ルール
+
+### AccountService
+- **現在ユーザーの取得**: `CognitoUserContext.currentUserId()`から取得（メソッド引数では受け取らない）
+- **メイン口座の一意性**: `createAccount`で`isMainAccount=true`を指定する場合、同一ユーザーに既に`isMainAccount=true`の口座があれば`IllegalStateException`をスローする（要件定義「金融口座のうち一つの口座を変動費の記録機能群で使用される残高として設定する」に基づく）
+- **所有権チェック**: `updateBalance` / `calculateNewBalance`は対象口座の`userId`が現在ユーザーと一致しない場合`IllegalStateException`をスローする（要件定義「非共有データ：預金残高は記録者本人のみ閲覧可能」に基づく）
+- **残高更新と編集履歴**: `updateBalance(FinancialAccountId, Money)`（自動計算用）と`updateBalance(FinancialAccountId, Money, Description)`（手動編集用）の2つのオーバーロードを提供。両方とも編集履歴を記録するが、前者は編集理由なし（`Optional.empty`）、後者は編集理由ありで記録する
