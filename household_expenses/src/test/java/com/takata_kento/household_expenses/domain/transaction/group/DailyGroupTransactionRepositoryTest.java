@@ -243,6 +243,59 @@ class DailyGroupTransactionRepositoryTest {
     }
 
     @Test
+    void testFindByUserGroupIdAndTransactionDateBetween() {
+        // Given
+        UserGroupId userGroupId = new UserGroupId(TEST_USER_GROUP_UUID);
+        DailyGroupTransactionId beforeRange = new DailyGroupTransactionId(UUID.randomUUID());
+        DailyGroupTransactionId rangeStart = new DailyGroupTransactionId(UUID.randomUUID());
+        DailyGroupTransactionId rangeMiddle = new DailyGroupTransactionId(UUID.randomUUID());
+        DailyGroupTransactionId rangeEnd = new DailyGroupTransactionId(UUID.randomUUID());
+        DailyGroupTransactionId afterRange = new DailyGroupTransactionId(UUID.randomUUID());
+
+        insertDailyGroupTransaction(beforeRange, userGroupId, LocalDate.of(2025, 11, 30));
+        insertDailyGroupTransaction(rangeStart, userGroupId, LocalDate.of(2025, 12, 1));
+        insertDailyGroupTransaction(rangeMiddle, userGroupId, LocalDate.of(2025, 12, 15));
+        insertDailyGroupTransaction(rangeEnd, userGroupId, LocalDate.of(2025, 12, 31));
+        insertDailyGroupTransaction(afterRange, userGroupId, LocalDate.of(2026, 1, 1));
+
+        LocalDate from = LocalDate.of(2025, 12, 1);
+        LocalDate to = LocalDate.of(2025, 12, 31);
+
+        // When
+        List<DailyGroupTransaction> actual = repository.findByUserGroupIdAndTransactionDateBetween(
+            userGroupId,
+            from,
+            to
+        );
+
+        // Then
+        then(actual).hasSize(3);
+        then(actual).extracting(DailyGroupTransaction::id).containsExactlyInAnyOrder(rangeStart, rangeMiddle, rangeEnd);
+    }
+
+    @Test
+    void testFindByUserGroupIdAndTransactionDateBetweenWhenNoMatch() {
+        // Given
+        UserGroupId userGroupId = new UserGroupId(TEST_USER_GROUP_UUID);
+        DailyGroupTransactionId transactionId = new DailyGroupTransactionId(UUID.randomUUID());
+
+        insertDailyGroupTransaction(transactionId, userGroupId, LocalDate.of(2025, 11, 30));
+
+        LocalDate from = LocalDate.of(2025, 12, 1);
+        LocalDate to = LocalDate.of(2025, 12, 31);
+
+        // When
+        List<DailyGroupTransaction> actual = repository.findByUserGroupIdAndTransactionDateBetween(
+            userGroupId,
+            from,
+            to
+        );
+
+        // Then
+        then(actual).isEmpty();
+    }
+
+    @Test
     void testDelete() {
         // Given
         UserGroupId userGroupId = new UserGroupId(TEST_USER_GROUP_UUID);

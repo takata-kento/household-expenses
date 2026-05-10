@@ -448,10 +448,14 @@ classDiagram
     }
 
     class BudgetService {
+        -UserRepository userRepository
+        -UserGroupRepository userGroupRepository
         -MonthlyBudgetRepository monthlyBudgetRepository
-        +setMonthlyBudget(MonthlyBudgetRequest) MonthlyBudget
-        +getMonthlyBudget(Long, Integer, Integer) MonthlyBudget
-        +calculateBudgetBalance(Long, LocalDate, BigDecimal) BigDecimal
+        -DailyGroupTransactionRepository dailyGroupTransactionRepository
+        +setMonthlyBudget(Year, Month, Money) MonthlyBudget
+        +getMonthlyBudget(Year, Month) MonthlyBudget
+        +getMonthlyBudgetsByYear(Year) List~MonthlyBudget~
+        +calculateBudgetBalance(LocalDate) Money
     }
 
     class ExpenseService {
@@ -562,7 +566,11 @@ classDiagram
 
     class MonthlyBudgetRepository {
         <<interface>>
+        <<extends CrudRepository~MonthlyBudget, MonthlyBudgetId~>>
         +findByUserGroupIdAndYearAndMonth(UserGroupId, Year, Month) Optional~MonthlyBudget~
+        +findByUserGroupId(UserGroupId) List~MonthlyBudget~
+        +existsByUserGroupIdAndYearAndMonth(UserGroupId, Year, Month) boolean
+        +findByUserGroupIdAndYear(UserGroupId, Year) List~MonthlyBudget~
     }
 
     class LivingExpenseCategoryRepository {
@@ -594,6 +602,7 @@ classDiagram
         <<extends CrudRepository~DailyGroupTransaction, DailyGroupTransactionId~>>
         +findByUserGroupIdAndTransactionDate(UserGroupId, LocalDate) Optional~DailyGroupTransaction~
         +findByUserGroupId(UserGroupId) List~DailyGroupTransaction~
+        +findByUserGroupIdAndTransactionDateBetween(UserGroupId, LocalDate, LocalDate) List~DailyGroupTransaction~
     }
 
     class DailyPersonalTransactionRepository {
@@ -624,7 +633,10 @@ classDiagram
     UserService ..> UserRepository
     UserService ..> CognitoUserContext
     UserGroupService ..> UserGroupRepository
+    BudgetService ..> UserRepository
+    BudgetService ..> UserGroupRepository
     BudgetService ..> MonthlyBudgetRepository
+    BudgetService ..> DailyGroupTransactionRepository
     ExpenseService ..> LivingExpenseCategoryRepository
     ExpenseService ..> FixedExpenseCategoryRepository
     ExpenseService ..> FixedExpenseHistoryRepository
