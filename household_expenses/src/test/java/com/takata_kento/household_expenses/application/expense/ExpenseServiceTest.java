@@ -165,9 +165,9 @@ class ExpenseServiceTest {
         when(livingExpenseCategoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
         // When / Then
-        thenThrownBy(() ->
-            expenseService.updateLivingExpenseCategory(categoryId, name, description)
-        ).isInstanceOf(IllegalStateException.class);
+        thenThrownBy(() -> expenseService.updateLivingExpenseCategory(categoryId, name, description)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -189,9 +189,9 @@ class ExpenseServiceTest {
         when(livingExpenseCategoryRepository.findById(categoryId)).thenReturn(Optional.of(otherGroupCategory));
 
         // When / Then
-        thenThrownBy(() ->
-            expenseService.updateLivingExpenseCategory(categoryId, name, description)
-        ).isInstanceOf(IllegalStateException.class);
+        thenThrownBy(() -> expenseService.updateLivingExpenseCategory(categoryId, name, description)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -204,9 +204,9 @@ class ExpenseServiceTest {
         mockCurrentUserNotInGroup();
 
         // When / Then
-        thenThrownBy(() ->
-            expenseService.updateLivingExpenseCategory(categoryId, name, description)
-        ).isInstanceOf(IllegalStateException.class);
+        thenThrownBy(() -> expenseService.updateLivingExpenseCategory(categoryId, name, description)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -323,9 +323,9 @@ class ExpenseServiceTest {
         mockCurrentUserNotInGroup();
 
         // When / Then
-        thenThrownBy(() ->
-            expenseService.createFixedExpenseCategory(name, description, defaultAmount)
-        ).isInstanceOf(IllegalStateException.class);
+        thenThrownBy(() -> expenseService.createFixedExpenseCategory(name, description, defaultAmount)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(fixedExpenseCategoryRepository, never()).save(any());
     }
 
@@ -598,9 +598,7 @@ class ExpenseServiceTest {
         mockCurrentUserNotInGroup();
 
         // When / Then
-        thenThrownBy(() -> expenseService.getFixedExpenses(year, month)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() -> expenseService.getFixedExpenses(year, month)).isInstanceOf(IllegalStateException.class);
         verify(fixedExpenseCategoryRepository, never()).findByUserGroupId(any());
     }
 }
