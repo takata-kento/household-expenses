@@ -348,4 +348,45 @@ class LivingExpenseCategoryTest {
         assertThat(actual.isDefault()).isFalse();
         assertThat(actual.version()).isNull();
     }
+
+    @Test
+    void testBelongsToReturnsTrueWhenSameUserGroup() {
+        // Given
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
+        LivingExpenseCategory category = new LivingExpenseCategory(
+            new LivingExpenseCategoryId(UUID.randomUUID()),
+            expectedUserGroupId,
+            new CategoryName("食費"),
+            new Description("食材・外食費"),
+            false,
+            1
+        );
+
+        // When
+        boolean actual = category.belongsTo(expectedUserGroupId);
+
+        // Then
+        then(actual).isTrue();
+    }
+
+    @Test
+    void testBelongsToReturnsFalseWhenDifferentUserGroup() {
+        // Given
+        UserGroupId ownerUserGroupId = new UserGroupId(UUID.randomUUID());
+        UserGroupId otherUserGroupId = new UserGroupId(UUID.randomUUID());
+        LivingExpenseCategory category = new LivingExpenseCategory(
+            new LivingExpenseCategoryId(UUID.randomUUID()),
+            ownerUserGroupId,
+            new CategoryName("食費"),
+            new Description("食材・外食費"),
+            false,
+            1
+        );
+
+        // When
+        boolean actual = category.belongsTo(otherUserGroupId);
+
+        // Then
+        then(actual).isFalse();
+    }
 }

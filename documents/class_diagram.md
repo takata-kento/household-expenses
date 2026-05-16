@@ -109,6 +109,7 @@ classDiagram
         +updateDescription(Description) void
         +markAsDefault() void
         +unmarkAsDefault() void
+        +belongsTo(UserGroupId) boolean
     }
 
     class DailyLivingExpense {
@@ -162,6 +163,7 @@ classDiagram
         +updateCategoryName(CategoryName) void
         +updateDescription(Description) void
         +updateDefaultAmount(Money) void
+        +belongsTo(UserGroupId) boolean
     }
 
     class FixedExpenseHistory {
@@ -459,15 +461,18 @@ classDiagram
     }
 
     class ExpenseService {
+        -UserRepository userRepository
         -LivingExpenseCategoryRepository livingExpenseCategoryRepository
         -FixedExpenseCategoryRepository fixedExpenseCategoryRepository
         -FixedExpenseHistoryRepository fixedExpenseHistoryRepository
-        +createLivingExpenseCategory(Long, String, String) LivingExpenseCategory
-        +updateLivingExpenseCategory(Long, String, String) LivingExpenseCategory
-        +deleteLivingExpenseCategory(Long) void
-        +createFixedExpenseCategory(Long, String, String, BigDecimal) FixedExpenseCategory
-        +setFixedExpenseAmount(Long, Integer, Integer, BigDecimal) FixedExpenseHistory
-        +getFixedExpenses(Long, Integer, Integer) List~FixedExpenseHistory~
+        -getCurrentUser() User
+        -getCurrentUserGroupId() UserGroupId
+        +createLivingExpenseCategory(CategoryName, Description) LivingExpenseCategory
+        +updateLivingExpenseCategory(LivingExpenseCategoryId, CategoryName, Description) LivingExpenseCategory
+        +deleteLivingExpenseCategory(LivingExpenseCategoryId) void
+        +createFixedExpenseCategory(CategoryName, Description, Money) FixedExpenseCategory
+        +setFixedExpenseAmount(FixedExpenseCategoryId, Year, Month, Money, LocalDate, Optional~Description~) FixedExpenseHistory
+        +getFixedExpenses(Year, Month) List~FixedExpenseHistory~
     }
 
     class AccountService {
@@ -586,8 +591,9 @@ classDiagram
 
     class FixedExpenseHistoryRepository {
         <<interface>>
-        +findByFixedExpenseCategoryIdAndYearAndMonth(Long, Integer, Integer) Optional~FixedExpenseHistory~
-        +findByFixedExpenseCategoryIdInAndYear(List~Long~, Integer) List~FixedExpenseHistory~
+        <<extends CrudRepository~FixedExpenseHistory, FixedExpenseHistoryId~>>
+        +findByFixedExpenseCategoryIdAndYearAndMonth(FixedExpenseCategoryId, Year, Month) Optional~FixedExpenseHistory~
+        +findByFixedExpenseCategoryIdInAndYearAndMonth(Collection~FixedExpenseCategoryId~, Year, Month) List~FixedExpenseHistory~
     }
 
     class MonthlySavingRepository {
@@ -637,6 +643,7 @@ classDiagram
     BudgetService ..> UserGroupRepository
     BudgetService ..> MonthlyBudgetRepository
     BudgetService ..> DailyGroupTransactionRepository
+    ExpenseService ..> UserRepository
     ExpenseService ..> LivingExpenseCategoryRepository
     ExpenseService ..> FixedExpenseCategoryRepository
     ExpenseService ..> FixedExpenseHistoryRepository

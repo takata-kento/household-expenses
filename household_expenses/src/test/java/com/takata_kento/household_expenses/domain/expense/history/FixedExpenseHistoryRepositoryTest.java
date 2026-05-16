@@ -10,6 +10,7 @@ import com.takata_kento.household_expenses.domain.valueobject.Month;
 import com.takata_kento.household_expenses.domain.valueobject.Year;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -213,6 +214,75 @@ class FixedExpenseHistoryRepositoryTest {
             .query(String.class)
             .single();
         assertThat(memoFromDb).isEqualTo(newMemo.get().value());
+    }
+
+    @Test
+    void testFindByFixedExpenseCategoryIdInAndYearAndMonth() {
+        // Given
+        FixedExpenseCategoryId categoryId1 = new FixedExpenseCategoryId(CATEGORY_UUID_1);
+        FixedExpenseCategoryId categoryId2 = new FixedExpenseCategoryId(CATEGORY_UUID_2);
+        Year expectedYear = new Year(2026);
+        Month expectedMonth = new Month(2);
+
+        // 別カテゴリ・同月の履歴を追加（検索対象）
+        LocalDateTime now = LocalDateTime.now();
+        UUID category2HistoryId = UUID.randomUUID();
+        jdbcClient
+            .sql(
+                """
+                INSERT INTO fixed_expense_history (id, fixed_expense_category_id, year, month, amount, effective_date, memo, created_at, updated_at, version)
+                VALUES (:id, :fixed_expense_category_id, :year, :month, :amount, :effective_date, :memo, :created_at, :updated_at, 0)
+                """
+            )
+            .param("id", category2HistoryId.toString())
+            .param("fixed_expense_category_id", CATEGORY_UUID_2.toString())
+            .param("year", 2026)
+            .param("month", 2)
+            .param("amount", 15_000)
+            .param("effective_date", LocalDate.of(2026, 2, 1))
+            .param("memo", "光熱費")
+            .param("created_at", now)
+            .param("updated_at", now)
+            .update();
+
+        // 同カテゴリ別月の履歴を追加（検索対象外）
+        jdbcClient
+            .sql(
+                """
+                INSERT INTO fixed_expense_history (id, fixed_expense_category_id, year, month, amount, effective_date, memo, created_at, updated_at, version)
+                VALUES (:id, :fixed_expense_category_id, :year, :month, :amount, :effective_date, :memo, :created_at, :updated_at, 0)
+                """
+            )
+            .param("id", UUID.randomUUID().toString())
+            .param("fixed_expense_category_id", CATEGORY_UUID_1.toString())
+            .param("year", 2026)
+            .param("month", 3)
+            .param("amount", 80_000)
+            .param("effective_date", LocalDate.of(2026, 3, 1))
+            .param("memo", "3月の家賃")
+            .param("created_at", now)
+            .param("updated_at", now)
+            .update();
+
+        // When
+        List<FixedExpenseHistory> actual = fixedExpenseHistoryRepository.findByFixedExpenseCategoryIdInAndYearAndMonth(
+            List.of(categoryId1, categoryId2),
+            expectedYear,
+            expectedMonth
+        );
+
+        // Then
+        assertThat(actual).hasSize(2);
+        assertThat(actual)
+            .extracting(FixedExpenseHistory::id)
+            .containsExactlyInAnyOrder(
+                new FixedExpenseHistoryId(HISTORY_UUID_1),
+                new FixedExpenseHistoryId(category2HistoryId)
+            );
+        assertThat(actual).allSatisfy(history -> {
+                assertThat(history.year()).isEqualTo(expectedYear);
+                assertThat(history.month()).isEqualTo(expectedMonth);
+            });
     }
 
     @Test
