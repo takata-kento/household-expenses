@@ -5,13 +5,14 @@ import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
 import java.time.LocalDate;
+import java.util.Optional;
 
 public record BalanceEditHistoryInfo(
     BalanceEditHistoryId id,
     FinancialAccountId financialAccountId,
     Money oldBalance,
     Money newBalance,
-    Description editReason,
+    Optional<Description> editReason,
     LocalDate editedAt
 ) {
     static BalanceEditHistoryInfo from(BalanceEditHistory history) {

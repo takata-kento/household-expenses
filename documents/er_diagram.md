@@ -139,17 +139,6 @@ erDiagram
         integer version "バージョン"
     }
 
-    %% 日次予算残高
-    DAILY_BUDGET_BALANCE {
-        varchar user_group_id PK,FK
-        date transaction_date PK "取引日"
-        integer total_living_expense "生活費合計"
-        integer budget_balance "予算残金"
-        timestamp created_at
-        timestamp updated_at
-        integer version "バージョン"
-    }
-
     %% 固定費分類
     FIXED_EXPENSE_CATEGORY {
         varchar id PK "UUID"
@@ -217,11 +206,6 @@ erDiagram
     LIVING_EXPENSE_CATEGORY ||--o{ DAILY_LIVING_EXPENSE : "分類"
     
     FIXED_EXPENSE_CATEGORY ||--o{ FIXED_EXPENSE_HISTORY : "履歴"
-    
-    USER_GROUP ||--o{ DAILY_BUDGET_BALANCE : "予算残高管理"
-    
-    MONTHLY_BUDGET ||--o{ DAILY_BUDGET_BALANCE : "予算基準"
-    DAILY_LIVING_EXPENSE }o--|| DAILY_BUDGET_BALANCE : "生活費集計"
 ```
 
 ## エンティティ説明
@@ -281,11 +265,10 @@ erDiagram
 - メモ（使用目的）を記録
 - 非共有データ（記録者本人のみ閲覧可能）
 
-### DAILY_BUDGET_BALANCE（日次予算残高）
-- グループごとの日次予算残高を管理
-- 生活費合計と予算残金を記録
-- 共有データ（グループメンバー全員が閲覧可能）
-- 計算式: 前日予算残金 - 当日生活費合計
+### 予算残金の取り扱い
+- 永続化テーブルは持たず、`MONTHLY_BUDGET` と `DAILY_LIVING_EXPENSE` から都度計算する
+- 計算式: 月予算 - (月の始まり日 〜 対象日 までの生活費合計)
+- 過去日の生活費修正・削除がいつでも許可される要件下では、集計値を別テーブルに保持すると整合性管理コストが過大になるため
 
 ### FIXED_EXPENSE_CATEGORY（固定費分類）
 - 固定費の分類をグループごとに管理
