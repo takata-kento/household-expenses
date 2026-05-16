@@ -94,4 +94,8 @@ public class FixedExpenseCategory {
     public void updateDefaultAmount(Money defaultAmount) {
         this.defaultAmount = defaultAmount;
     }
+
+    public boolean belongsTo(UserGroupId userGroupId) {
+        return this.userGroupId.equals(userGroupId);
+    }
 }
