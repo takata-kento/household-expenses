@@ -4,6 +4,8 @@ import com.takata_kento.household_expenses.domain.valueobject.FixedExpenseCatego
 import com.takata_kento.household_expenses.domain.valueobject.FixedExpenseHistoryId;
 import com.takata_kento.household_expenses.domain.valueobject.Month;
 import com.takata_kento.household_expenses.domain.valueobject.Year;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,6 +20,18 @@ public interface FixedExpenseHistoryRepository extends CrudRepository<FixedExpen
     )
     Optional<FixedExpenseHistory> findByFixedExpenseCategoryIdAndYearAndMonth(
         @Param("categoryId") FixedExpenseCategoryId categoryId,
+        @Param("year") Year year,
+        @Param("month") Month month
+    );
+
+    @Query(
+        "SELECT * FROM fixed_expense_history " +
+        "WHERE fixed_expense_category_id IN (:#{#categoryIds.![toString()]}) " +
+        "AND year = :#{#year.value()} " +
+        "AND month = :#{#month.value()}"
+    )
+    List<FixedExpenseHistory> findByFixedExpenseCategoryIdInAndYearAndMonth(
+        @Param("categoryIds") Collection<FixedExpenseCategoryId> categoryIds,
         @Param("year") Year year,
         @Param("month") Month month
     );
