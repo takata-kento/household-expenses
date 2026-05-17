@@ -96,4 +96,8 @@ public class LivingExpenseCategory {
     public void unmarkAsDefault() {
         this.isDefault = false;
     }
+
+    public boolean belongsTo(UserGroupId userGroupId) {
+        return this.userGroupId.equals(userGroupId);
+    }
 }

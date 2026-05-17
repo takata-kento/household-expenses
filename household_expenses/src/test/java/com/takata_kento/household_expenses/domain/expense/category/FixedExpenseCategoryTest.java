@@ -352,4 +352,45 @@ class FixedExpenseCategoryTest {
         assertThat(actual.userGroupId()).isEqualTo(expectedUserGroupId);
         assertThat(actual.version()).isNull();
     }
+
+    @Test
+    void testBelongsToReturnsTrueWhenSameUserGroup() {
+        // Given
+        UserGroupId expectedUserGroupId = new UserGroupId(UUID.randomUUID());
+        FixedExpenseCategory category = new FixedExpenseCategory(
+            new FixedExpenseCategoryId(UUID.randomUUID()),
+            expectedUserGroupId,
+            new CategoryName("家賃"),
+            new Description("毎月の家賃"),
+            new Money(80000),
+            1
+        );
+
+        // When
+        boolean actual = category.belongsTo(expectedUserGroupId);
+
+        // Then
+        then(actual).isTrue();
+    }
+
+    @Test
+    void testBelongsToReturnsFalseWhenDifferentUserGroup() {
+        // Given
+        UserGroupId ownerUserGroupId = new UserGroupId(UUID.randomUUID());
+        UserGroupId otherUserGroupId = new UserGroupId(UUID.randomUUID());
+        FixedExpenseCategory category = new FixedExpenseCategory(
+            new FixedExpenseCategoryId(UUID.randomUUID()),
+            ownerUserGroupId,
+            new CategoryName("家賃"),
+            new Description("毎月の家賃"),
+            new Money(80000),
+            1
+        );
+
+        // When
+        boolean actual = category.belongsTo(otherUserGroupId);
+
+        // Then
+        then(actual).isFalse();
+    }
 }

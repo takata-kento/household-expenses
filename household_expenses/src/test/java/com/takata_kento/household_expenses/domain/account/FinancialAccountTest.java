@@ -275,7 +275,7 @@ class FinancialAccountTest {
             id,
             new Money(50_000),
             new Money(100_000),
-            new Description("First edit"),
+            Optional.of(new Description("First edit")),
             LocalDate.of(2025, 1, 1),
             olderCreatedAt,
             Integer.valueOf(1)
@@ -285,7 +285,7 @@ class FinancialAccountTest {
             id,
             new Money(100_000),
             new Money(150_000),
-            new Description("Second edit"),
+            Optional.of(new Description("Second edit")),
             LocalDate.of(2025, 6, 1),
             newerCreatedAt,
             Integer.valueOf(1)
@@ -313,7 +313,7 @@ class FinancialAccountTest {
         then(actual.get().editedAt()).isEqualTo(LocalDate.of(2025, 6, 1));
         then(actual.get().oldBalance()).isEqualTo(new Money(100_000));
         then(actual.get().newBalance()).isEqualTo(new Money(150_000));
-        then(actual.get().editReason()).isEqualTo(new Description("Second edit"));
+        then(actual.get().editReason()).isEqualTo(Optional.of(new Description("Second edit")));
     }
 
     @ParameterizedTest
@@ -348,7 +348,43 @@ class FinancialAccountTest {
                 then(history.financialAccountId()).isEqualTo(id);
                 then(history.oldBalance()).isEqualTo(expectedOldBalance);
                 then(history.newBalance()).isEqualTo(newBalance);
-                then(history.editReason()).isEqualTo(reason);
+                then(history.editReason()).isEqualTo(Optional.of(reason));
+                then(history.editedAt()).isEqualTo(editedAt);
+            });
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideFinancialAccountData")
+    void testUpdateBalanceWithoutReason(
+        FinancialAccountId id,
+        UserId userId,
+        AccountName accountName,
+        Money balance,
+        Boolean isMainAccount,
+        Set<BalanceEditHistory> editHistories,
+        Integer version,
+        FinancialAccount financialAccount
+    ) {
+        // Given
+        Money newBalance = new Money(200_000);
+        LocalDate editedAt = LocalDate.of(2026, 2, 15);
+        Money expectedOldBalance = balance;
+        int expectedHistorySize = editHistories.size() + 1;
+
+        // When
+        financialAccount.updateBalance(newBalance, editedAt);
+
+        // Then
+        then(financialAccount.balance()).isEqualTo(newBalance);
+
+        Set<BalanceEditHistoryInfo> actualEditHistories = financialAccount.editHistories();
+        then(actualEditHistories).hasSize(expectedHistorySize);
+
+        then(actualEditHistories).anySatisfy(history -> {
+                then(history.financialAccountId()).isEqualTo(id);
+                then(history.oldBalance()).isEqualTo(expectedOldBalance);
+                then(history.newBalance()).isEqualTo(newBalance);
+                then(history.editReason()).isEqualTo(Optional.empty());
                 then(history.editedAt()).isEqualTo(editedAt);
             });
     }
