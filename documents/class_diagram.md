@@ -485,13 +485,18 @@ classDiagram
     }
 
     class SavingService {
-        -UserRepository userRepository
         -MonthlySavingRepository monthlySavingRepository
-        +recordMonthlySaving(UserId, Year, Month, Money, FinancialAccountId, Description) MonthlySaving
-        +getMonthlySaving(UserId, Year, Month) MonthlySaving
-        +updateMonthlySaving(UserId, Year, Month, Money, Description) MonthlySaving
-        +deleteMonthlySaving(UserId, Year, Month) void
-        +getSavingsByYear(UserId, Year) List~MonthlySaving~
+        -FinancialAccountRepository financialAccountRepository
+        -UserRepository userRepository
+        -CognitoUserContext cognitoUserContext
+        -getCurrentUser() User
+        -verifyAccountOwnedBy(FinancialAccountId, UserId) void
+        -loadOwnedSaving(Year, Month, UserId) MonthlySaving
+        +recordMonthlySaving(Year, Month, Money, FinancialAccountId, Optional~Description~) MonthlySaving
+        +getMonthlySaving(Year, Month) MonthlySaving
+        +updateMonthlySaving(Year, Month, Money, FinancialAccountId, Optional~Description~) MonthlySaving
+        +deleteMonthlySaving(Year, Month) void
+        +getSavingsByYear(Year) List~MonthlySaving~
     }
 
     %% コントローラークラス
@@ -543,9 +548,9 @@ classDiagram
 
     class SavingController {
         -SavingService savingService
-        +recordMonthlySaving(Year, Month, Money, FinancialAccountId, Description) ResponseEntity~MonthlySaving~
+        +recordMonthlySaving(Year, Month, Money, FinancialAccountId, Optional~Description~) ResponseEntity~MonthlySaving~
         +getMonthlySaving(Year, Month) ResponseEntity~MonthlySaving~
-        +updateMonthlySaving(Year, Month, Money, Description) ResponseEntity~MonthlySaving~
+        +updateMonthlySaving(Year, Month, Money, FinancialAccountId, Optional~Description~) ResponseEntity~MonthlySaving~
         +deleteMonthlySaving(Year, Month) ResponseEntity~Void~
         +getSavingsByYear(Year) ResponseEntity~List~MonthlySaving~~
     }
@@ -648,8 +653,12 @@ classDiagram
     ExpenseService ..> FixedExpenseCategoryRepository
     ExpenseService ..> FixedExpenseHistoryRepository
     AccountService ..> FinancialAccountRepository
+    AccountService ..> UserRepository
     SavingService ..> UserRepository
     SavingService ..> MonthlySavingRepository
+    SavingService ..> FinancialAccountRepository
+    SavingService ..> UserRepository
+    SavingService ..> CognitoUserContext
 ```
 
 ## クラス設計の特徴
