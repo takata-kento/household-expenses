@@ -318,9 +318,10 @@ classDiagram
 
     class FinancialAccountId {
         <<record>>
-        -long value
-        +value() long
+        -String value
+        +value() String
     }
+    %% FinancialAccountId は銀行の口座番号（6〜8桁の数字文字列）。生成時に検証する。
 
     class Day {
         <<record>>
@@ -477,7 +478,7 @@ classDiagram
 
     class AccountService {
         -FinancialAccountRepository financialAccountRepository
-        +createAccount(AccountName, Money, Boolean) FinancialAccount
+        +createAccount(FinancialAccountId, AccountName, Money, Boolean) FinancialAccount
         +updateBalance(FinancialAccountId, Money) FinancialAccount
         +updateBalance(FinancialAccountId, Money, Description) FinancialAccount
         +calculateNewBalance(FinancialAccountId, Money, Money, Money, Money) Money
@@ -540,7 +541,7 @@ classDiagram
 
     class AccountController {
         -AccountService accountService
-        +createAccount(AccountName, Money, Boolean) ResponseEntity~FinancialAccount~
+        +createAccount(FinancialAccountId, AccountName, Money, Boolean) ResponseEntity~FinancialAccount~
         +updateBalance(FinancialAccountId, Money) ResponseEntity~FinancialAccount~
         +updateBalance(FinancialAccountId, Money, Description) ResponseEntity~FinancialAccount~
         +getUserAccounts() ResponseEntity~List~FinancialAccount~~
