@@ -50,7 +50,7 @@ CREATE TABLE group_invitation (
 
 -- 金融口座テーブル
 CREATE TABLE financial_account (
-    id VARCHAR(36) PRIMARY KEY,
+    id VARCHAR(8) PRIMARY KEY CHECK (id ~ '^[0-9]{6,8}$'),
     user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
     account_name VARCHAR(255) NOT NULL,
     balance INTEGER NOT NULL DEFAULT 0,
@@ -63,7 +63,7 @@ CREATE TABLE financial_account (
 -- 預金残高編集履歴テーブル
 CREATE TABLE balance_edit_history (
     id VARCHAR(36) PRIMARY KEY,
-    financial_account_id VARCHAR(36) NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
+    financial_account_id VARCHAR(8) NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
     old_balance INTEGER NOT NULL,
     new_balance INTEGER NOT NULL,
     edit_reason TEXT,
@@ -179,7 +179,7 @@ CREATE TABLE monthly_saving (
     year INTEGER NOT NULL,
     month INTEGER NOT NULL CHECK (month >= 1 AND month <= 12),
     saving_amount INTEGER NOT NULL,
-    financial_account_id VARCHAR(36) NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
+    financial_account_id VARCHAR(8) NOT NULL REFERENCES financial_account(id) ON DELETE CASCADE,
     memo TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE,
