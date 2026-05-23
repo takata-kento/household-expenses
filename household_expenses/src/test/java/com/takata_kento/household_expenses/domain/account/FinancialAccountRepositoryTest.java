@@ -60,7 +60,7 @@ class FinancialAccountRepositoryTest {
     void testSave() {
         // Given
         UserId userId = new UserId(TEST_USER_UUID);
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("1234567");
         AccountName accountName = new AccountName("メイン口座");
         Money balance = new Money(100_000);
         Boolean isMainAccount = Boolean.TRUE;
@@ -119,7 +119,7 @@ class FinancialAccountRepositoryTest {
     void testSaveWithEditHistories() {
         // Given
         UserId userId = new UserId(TEST_USER_UUID);
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("2345678");
         AccountName accountName = new AccountName("貯金口座");
         Money balance = new Money(500_000);
 
@@ -175,7 +175,7 @@ class FinancialAccountRepositoryTest {
     void testFindById() {
         // Given
         UserId userId = new UserId(TEST_USER_UUID);
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("3456789");
         AccountName accountName = new AccountName("メイン口座");
         Money balance = new Money(100_000);
         Boolean isMainAccount = Boolean.TRUE;
@@ -223,7 +223,7 @@ class FinancialAccountRepositoryTest {
     @Test
     void testFindByIdNotFound() {
         // Given
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("9999999");
 
         // When
         Optional<FinancialAccount> actual = repository.findById(accountId);
@@ -236,8 +236,8 @@ class FinancialAccountRepositoryTest {
     void testFindByUserId() {
         // Given
         UserId userId = new UserId(TEST_USER_UUID);
-        FinancialAccountId accountId1 = new FinancialAccountId(UUID.randomUUID());
-        FinancialAccountId accountId2 = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId1 = new FinancialAccountId("1111111");
+        FinancialAccountId accountId2 = new FinancialAccountId("2222222");
 
         insertFinancialAccount(accountId1, userId, new AccountName("メイン口座"), new Money(100_000), Boolean.TRUE);
         insertFinancialAccount(accountId2, userId, new AccountName("貯金口座"), new Money(500_000), Boolean.FALSE);
@@ -266,7 +266,7 @@ class FinancialAccountRepositoryTest {
     void testDelete() {
         // Given
         UserId userId = new UserId(TEST_USER_UUID);
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("4567890");
 
         insertFinancialAccount(accountId, userId, new AccountName("メイン口座"), new Money(100_000), Boolean.TRUE);
 

@@ -40,7 +40,7 @@ class MonthlySavingRepositoryTest {
 
     private final UUID USER_UUID_1 = UUID.randomUUID();
     private final UUID USER_UUID_2 = UUID.randomUUID();
-    private final UUID FINANCIAL_ACCOUNT_UUID = UUID.randomUUID();
+    private final String FINANCIAL_ACCOUNT_NUMBER = "1234567";
     private final UUID SAVING_UUID_1 = UUID.randomUUID();
     private final UUID SAVING_UUID_2 = UUID.randomUUID();
 
@@ -89,7 +89,7 @@ class MonthlySavingRepositoryTest {
                     (:id, :user_id, :account_name, :balance, :is_main_account, :version)
                 """
             )
-            .param("id", FINANCIAL_ACCOUNT_UUID.toString())
+            .param("id", FINANCIAL_ACCOUNT_NUMBER)
             .param("user_id", USER_UUID_1.toString())
             .param("account_name", "テスト口座")
             .param("balance", 100000)
@@ -112,7 +112,7 @@ class MonthlySavingRepositoryTest {
             .param("year", 2024)
             .param("month", 6)
             .param("saving_amount", 50000)
-            .param("financial_account_id", FINANCIAL_ACCOUNT_UUID.toString())
+            .param("financial_account_id", FINANCIAL_ACCOUNT_NUMBER)
             .param("memo", "6月の貯金")
             .param("version", 0)
             .update();
@@ -131,7 +131,7 @@ class MonthlySavingRepositoryTest {
             .param("year", 2024)
             .param("month", 7)
             .param("saving_amount", 60000)
-            .param("financial_account_id", FINANCIAL_ACCOUNT_UUID.toString())
+            .param("financial_account_id", FINANCIAL_ACCOUNT_NUMBER)
             .param("memo", (String) null)
             .param("version", 0)
             .update();
@@ -179,7 +179,7 @@ class MonthlySavingRepositoryTest {
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(8);
         Money expectedSavingAmount = new Money(70_000);
-        FinancialAccountId expectedFinancialAccountId = new FinancialAccountId(FINANCIAL_ACCOUNT_UUID);
+        FinancialAccountId expectedFinancialAccountId = new FinancialAccountId(FINANCIAL_ACCOUNT_NUMBER);
         Optional<Description> expectedMemo = Optional.of(new Description("8月の貯金"));
 
         MonthlySaving newSaving = MonthlySaving.create(
@@ -228,7 +228,7 @@ class MonthlySavingRepositoryTest {
             .param(savedSaving.id().toString())
             .query(String.class)
             .single();
-        assertThat(financialAccountIdFromDb).isEqualTo(FINANCIAL_ACCOUNT_UUID.toString());
+        assertThat(financialAccountIdFromDb).isEqualTo(FINANCIAL_ACCOUNT_NUMBER);
 
         String memoFromDb = jdbcClient
             .sql("SELECT memo FROM monthly_saving WHERE id = ?")

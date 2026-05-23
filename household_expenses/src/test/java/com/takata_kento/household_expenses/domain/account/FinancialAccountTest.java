@@ -22,11 +22,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 class FinancialAccountTest {
 
     static Stream<Arguments> provideFinancialAccountData() {
-        UUID financialAccountUUID = UUID.randomUUID();
+        String financialAccountNumber = "1234567";
         UUID userUUID = UUID.randomUUID();
         return Stream.of(
             Arguments.of(
-                new FinancialAccountId(financialAccountUUID),
+                new FinancialAccountId(financialAccountNumber),
                 new UserId(userUUID),
                 new AccountName("メイン口座"),
                 new Money(100_000),
@@ -34,7 +34,7 @@ class FinancialAccountTest {
                 new HashSet<BalanceEditHistory>(),
                 Integer.valueOf(1),
                 new FinancialAccount(
-                    new FinancialAccountId(financialAccountUUID),
+                    new FinancialAccountId(financialAccountNumber),
                     new UserId(userUUID),
                     new AccountName("メイン口座"),
                     new Money(100_000),

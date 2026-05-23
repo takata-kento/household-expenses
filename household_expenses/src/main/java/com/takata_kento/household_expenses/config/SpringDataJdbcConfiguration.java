@@ -461,7 +461,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
 
         @Override
         public String convert(FinancialAccountId source) {
-            return source.toString();
+            return source.value();
         }
     }
 
@@ -470,7 +470,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
 
         @Override
         public FinancialAccountId convert(String source) {
-            return new FinancialAccountId(UUID.fromString(source));
+            return new FinancialAccountId(source);
         }
     }
 

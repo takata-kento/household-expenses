@@ -21,11 +21,11 @@ public class BalanceEditHistoryTest {
         LocalDateTime createdAt = LocalDateTime.of(2024, 1, 1, 10, 0, 0);
         LocalDate editedAt = LocalDate.of(2024, 1, 1);
         UUID balanceEditHistoryUUID = UUID.randomUUID();
-        UUID financialAccountUUID = UUID.randomUUID();
+        String financialAccountNumber = "1234567";
         return Stream.of(
             Arguments.of(
                 new BalanceEditHistoryId(balanceEditHistoryUUID),
-                new FinancialAccountId(financialAccountUUID),
+                new FinancialAccountId(financialAccountNumber),
                 new Money(50_000),
                 new Money(100_000),
                 Optional.of(new Description("Salary deposit")),
@@ -34,7 +34,7 @@ public class BalanceEditHistoryTest {
                 Integer.valueOf(1),
                 new BalanceEditHistory(
                     new BalanceEditHistoryId(balanceEditHistoryUUID),
-                    new FinancialAccountId(financialAccountUUID),
+                    new FinancialAccountId(financialAccountNumber),
                     new Money(50_000),
                     new Money(100_000),
                     Optional.of(new Description("Salary deposit")),

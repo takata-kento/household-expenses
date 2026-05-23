@@ -47,7 +47,7 @@ erDiagram
 
     %% 金融口座
     FINANCIAL_ACCOUNT {
-        varchar id PK "UUID"
+        varchar id PK "口座番号（6〜8桁の数字）"
         varchar user_id FK
         varchar account_name "口座名"
         integer balance "残高"
@@ -60,7 +60,7 @@ erDiagram
     %% 預金残高編集履歴
     BALANCE_EDIT_HISTORY {
         varchar id PK "UUID"
-        varchar financial_account_id FK "UUID"
+        varchar financial_account_id FK "口座番号（6〜8桁の数字）"
         integer old_balance "変更前残高"
         integer new_balance "変更後残高"
         varchar edit_reason "編集理由"
@@ -172,7 +172,7 @@ erDiagram
         int year "年"
         int month "月"
         integer saving_amount "貯金額"
-        varchar financial_account_id FK "UUID"
+        varchar financial_account_id FK "口座番号（6〜8桁の数字）"
         varchar memo "メモ"
         timestamp created_at
         timestamp updated_at
@@ -229,6 +229,7 @@ erDiagram
 - ユーザーごとの金融口座情報を管理
 - メイン口座（変動費記録用）の識別
 - 非共有データ（所有者のみ閲覧可能）
+- **ID**: 銀行の口座番号（6〜8桁の数字文字列）。`VARCHAR(8) CHECK (id ~ '^[0-9]{6,8}$')` で型・形式をDB側でも保証。先頭ゼロを保持するため文字列で扱う。
 
 ### BALANCE_EDIT_HISTORY（預金残高編集履歴）
 - 預金残高の手動編集履歴を記録

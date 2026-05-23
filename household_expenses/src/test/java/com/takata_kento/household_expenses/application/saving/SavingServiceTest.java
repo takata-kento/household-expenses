@@ -53,12 +53,8 @@ class SavingServiceTest {
 
     private static final UserId CURRENT_USER_ID = new UserId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
     private static final UserId OTHER_USER_ID = new UserId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
-    private static final FinancialAccountId ACCOUNT_ID = new FinancialAccountId(
-        UUID.fromString("00000000-0000-0000-0000-000000000010")
-    );
-    private static final FinancialAccountId OTHER_ACCOUNT_ID = new FinancialAccountId(
-        UUID.fromString("00000000-0000-0000-0000-000000000011")
-    );
+    private static final FinancialAccountId ACCOUNT_ID = new FinancialAccountId("1000010");
+    private static final FinancialAccountId OTHER_ACCOUNT_ID = new FinancialAccountId("1000011");
 
     @BeforeEach
     void setUp() {
@@ -280,9 +276,7 @@ class SavingServiceTest {
         Year year = new Year(2026);
         Month month = new Month(5);
         Money newAmount = new Money(80_000);
-        FinancialAccountId newAccountId = new FinancialAccountId(
-            UUID.fromString("00000000-0000-0000-0000-000000000020")
-        );
+        FinancialAccountId newAccountId = new FinancialAccountId("1000020");
         Optional<Description> newMemo = Optional.of(new Description("更新後メモ"));
         MonthlySaving saving = existingSaving(year, month);
         FinancialAccount newAccount = new FinancialAccount(
