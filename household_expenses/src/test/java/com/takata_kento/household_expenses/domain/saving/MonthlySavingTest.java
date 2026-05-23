@@ -26,7 +26,7 @@ class MonthlySavingTest {
         Year year = new Year(2024);
         Month month = new Month(6);
         Money savingAmount = new Money(50_000);
-        FinancialAccountId financialAccountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId financialAccountId = new FinancialAccountId("1234567");
         Optional<Description> memo = Optional.of(new Description("6月の貯金"));
         Integer version = Integer.valueOf(1);
 
@@ -385,7 +385,7 @@ class MonthlySavingTest {
         MonthlySaving monthlySaving
     ) {
         // Given
-        FinancialAccountId expectedNewFinancialAccountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId expectedNewFinancialAccountId = new FinancialAccountId("7654321");
         MonthlySaving expected = new MonthlySaving(
             expectedId,
             expectedUserId,
@@ -444,7 +444,7 @@ class MonthlySavingTest {
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(6);
         Money expectedSavingAmount = new Money(50_000);
-        FinancialAccountId expectedFinancialAccountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId expectedFinancialAccountId = new FinancialAccountId("2222222");
         Optional<Description> expectedMemo = Optional.of(new Description("6月の貯金"));
 
         // When
@@ -475,7 +475,7 @@ class MonthlySavingTest {
         Year expectedYear = new Year(2024);
         Month expectedMonth = new Month(7);
         Money expectedSavingAmount = new Money(30000);
-        FinancialAccountId expectedFinancialAccountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId expectedFinancialAccountId = new FinancialAccountId("3333333");
         Optional<Description> expectedMemo = Optional.empty();
 
         // When

@@ -60,6 +60,7 @@ class AccountServiceTest {
     @Test
     void testCreateAccount() {
         // Given
+        FinancialAccountId accountId = new FinancialAccountId("1234567");
         AccountName accountName = new AccountName("メイン口座");
         Money initialBalance = new Money(100_000);
         Boolean isMainAccount = Boolean.TRUE;
@@ -68,10 +69,11 @@ class AccountServiceTest {
         when(financialAccountRepository.save(any(FinancialAccount.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // When
-        FinancialAccount actual = accountService.createAccount(accountName, initialBalance, isMainAccount);
+        FinancialAccount actual = accountService.createAccount(accountId, accountName, initialBalance, isMainAccount);
 
         // Then
         then(actual).isNotNull();
+        then(actual.id()).isEqualTo(accountId);
         then(actual.userId()).isEqualTo(CURRENT_USER_ID);
         then(actual.accountName()).isEqualTo(accountName);
         then(actual.balance()).isEqualTo(initialBalance);
@@ -82,11 +84,12 @@ class AccountServiceTest {
     @Test
     void testCreateAccountAsMainWhenAlreadyHasMain() {
         // Given
+        FinancialAccountId accountId = new FinancialAccountId("2345678");
         AccountName accountName = new AccountName("もう一つのメイン口座");
         Money initialBalance = new Money(50_000);
         Boolean isMainAccount = Boolean.TRUE;
         FinancialAccount existingMain = buildAccount(
-            new FinancialAccountId(UUID.randomUUID()),
+            new FinancialAccountId("1111111"),
             CURRENT_USER_ID,
             new Money(100_000),
             Boolean.TRUE
@@ -95,15 +98,16 @@ class AccountServiceTest {
         when(financialAccountRepository.findByUserId(CURRENT_USER_ID)).thenReturn(List.of(existingMain));
 
         // When / Then
-        thenThrownBy(() -> accountService.createAccount(accountName, initialBalance, isMainAccount)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() ->
+            accountService.createAccount(accountId, accountName, initialBalance, isMainAccount)
+        ).isInstanceOf(IllegalStateException.class);
         verify(financialAccountRepository, never()).save(any());
     }
 
     @Test
     void testCreateAccountAsNonMain() {
         // Given
+        FinancialAccountId accountId = new FinancialAccountId("3456789");
         AccountName accountName = new AccountName("貯金口座");
         Money initialBalance = new Money(500_000);
         Boolean isMainAccount = Boolean.FALSE;
@@ -111,10 +115,11 @@ class AccountServiceTest {
         when(financialAccountRepository.save(any(FinancialAccount.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // When
-        FinancialAccount actual = accountService.createAccount(accountName, initialBalance, isMainAccount);
+        FinancialAccount actual = accountService.createAccount(accountId, accountName, initialBalance, isMainAccount);
 
         // Then
         then(actual).isNotNull();
+        then(actual.id()).isEqualTo(accountId);
         then(actual.isMainAccount()).isFalse();
         verify(financialAccountRepository).save(any(FinancialAccount.class));
         verify(financialAccountRepository, never()).findByUserId(any());
@@ -123,7 +128,7 @@ class AccountServiceTest {
     @Test
     void testUpdateBalanceWithoutDescription() {
         // Given
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("4444444");
         Money newBalance = new Money(200_000);
         FinancialAccount account = buildAccount(accountId, CURRENT_USER_ID, new Money(100_000), Boolean.TRUE);
         cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
@@ -143,7 +148,7 @@ class AccountServiceTest {
     @Test
     void testUpdateBalanceWithDescription() {
         // Given
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("5555555");
         Money newBalance = new Money(200_000);
         Description reason = new Description("Balance correction");
         FinancialAccount account = buildAccount(accountId, CURRENT_USER_ID, new Money(100_000), Boolean.TRUE);
@@ -164,7 +169,7 @@ class AccountServiceTest {
     @Test
     void testUpdateBalanceWhenNotOwner() {
         // Given
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("6666666");
         Money newBalance = new Money(200_000);
         FinancialAccount account = buildAccount(accountId, OTHER_USER_ID, new Money(100_000), Boolean.TRUE);
         cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
@@ -180,7 +185,7 @@ class AccountServiceTest {
     @Test
     void testUpdateBalanceWithDescriptionWhenNotOwner() {
         // Given
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("7777777");
         Money newBalance = new Money(200_000);
         Description reason = new Description("Balance correction");
         FinancialAccount account = buildAccount(accountId, OTHER_USER_ID, new Money(100_000), Boolean.TRUE);
@@ -197,7 +202,7 @@ class AccountServiceTest {
     @Test
     void testUpdateBalanceWhenAccountNotFound() {
         // Given
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("8888888");
         Money newBalance = new Money(200_000);
         cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(financialAccountRepository.findById(accountId)).thenReturn(Optional.empty());
@@ -212,7 +217,7 @@ class AccountServiceTest {
     @Test
     void testCalculateNewBalance() {
         // Given
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("9999999");
         Money currentBalance = new Money(100_000);
         Money income = new Money(300_000);
         Money totalExpense = new Money(50_000);
@@ -234,7 +239,7 @@ class AccountServiceTest {
     @Test
     void testCalculateNewBalanceWhenNotOwner() {
         // Given
-        FinancialAccountId accountId = new FinancialAccountId(UUID.randomUUID());
+        FinancialAccountId accountId = new FinancialAccountId("1010101");
         FinancialAccount account = buildAccount(accountId, OTHER_USER_ID, new Money(100_000), Boolean.TRUE);
         cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(financialAccountRepository.findById(accountId)).thenReturn(Optional.of(account));
@@ -255,13 +260,13 @@ class AccountServiceTest {
     void testGetUserAccounts() {
         // Given
         FinancialAccount account1 = buildAccount(
-            new FinancialAccountId(UUID.randomUUID()),
+            new FinancialAccountId("2020202"),
             CURRENT_USER_ID,
             new Money(100_000),
             Boolean.TRUE
         );
         FinancialAccount account2 = buildAccount(
-            new FinancialAccountId(UUID.randomUUID()),
+            new FinancialAccountId("3030303"),
             CURRENT_USER_ID,
             new Money(500_000),
             Boolean.FALSE
