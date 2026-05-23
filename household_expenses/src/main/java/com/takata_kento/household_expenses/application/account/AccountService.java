@@ -11,7 +11,6 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +24,12 @@ public class AccountService {
         this.financialAccountRepository = financialAccountRepository;
     }
 
-    public FinancialAccount createAccount(AccountName accountName, Money initialBalance, Boolean isMainAccount) {
+    public FinancialAccount createAccount(
+        FinancialAccountId id,
+        AccountName accountName,
+        Money initialBalance,
+        Boolean isMainAccount
+    ) {
         UserId userId = CognitoUserContext.currentUserId();
         if (isMainAccount) {
             boolean alreadyHasMain = financialAccountRepository
@@ -37,7 +41,7 @@ public class AccountService {
             }
         }
         FinancialAccount account = new FinancialAccount(
-            new FinancialAccountId(UUID.randomUUID()),
+            id,
             userId,
             accountName,
             initialBalance,
