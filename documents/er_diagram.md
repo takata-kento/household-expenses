@@ -49,7 +49,8 @@ erDiagram
     FINANCIAL_ACCOUNT {
         varchar id PK "口座番号（6〜8桁の数字）"
         varchar user_id FK
-        varchar account_name "口座名"
+        varchar bank_name "銀行名"
+        varchar account_name "口座名（任意ラベル、NULL可）"
         integer balance "残高"
         boolean is_main_account "メイン口座フラグ"
         timestamp created_at
@@ -230,6 +231,8 @@ erDiagram
 - メイン口座（変動費記録用）の識別
 - 非共有データ（所有者のみ閲覧可能）
 - **ID**: 銀行の口座番号（6〜8桁の数字文字列）。`VARCHAR(8) CHECK (id ~ '^[0-9]{6,8}$')` で型・形式をDB側でも保証。先頭ゼロを保持するため文字列で扱う。
+- **bank_name**: 銀行名（NOT NULL）。口座登録時の必須入力。
+- **account_name**: ユーザーが任意で付けるラベル（NULL可）。登録時は省略可、後から `updateAccountName` で設定・変更できる。
 
 ### BALANCE_EDIT_HISTORY（預金残高編集履歴）
 - 預金残高の手動編集履歴を記録
