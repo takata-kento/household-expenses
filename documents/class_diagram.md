@@ -56,7 +56,8 @@ classDiagram
     class FinancialAccount {
         -FinancialAccountId id
         -UserId userId
-        -AccountName accountName
+        -BankName bankName
+        -Optional~AccountName~ accountName
         -Money balance
         -Boolean isMainAccount
         -Set~BalanceEditHistory~ editHistories
@@ -65,6 +66,7 @@ classDiagram
         +latestEditHistory() Optional~BalanceEditHistoryInfo~
         +updateBalance(Money, LocalDate) void
         +updateBalance(Money, Description, LocalDate) void
+        +updateAccountName(AccountName) void
     }
 
     class BalanceEditHistory {
@@ -298,6 +300,12 @@ classDiagram
         +value() String
     }
 
+    class BankName {
+        <<record>>
+        -String value
+        +value() String
+    }
+
     class UserId {
         <<record>>
         -UUID value
@@ -478,7 +486,8 @@ classDiagram
 
     class AccountService {
         -FinancialAccountRepository financialAccountRepository
-        +createAccount(FinancialAccountId, AccountName, Money, Boolean) FinancialAccount
+        +createAccount(FinancialAccountId, BankName, Optional~AccountName~, Money, Boolean) FinancialAccount
+        +updateAccountName(FinancialAccountId, AccountName) FinancialAccount
         +updateBalance(FinancialAccountId, Money) FinancialAccount
         +updateBalance(FinancialAccountId, Money, Description) FinancialAccount
         +calculateNewBalance(FinancialAccountId, Money, Money, Money, Money) Money
@@ -541,7 +550,8 @@ classDiagram
 
     class AccountController {
         -AccountService accountService
-        +createAccount(FinancialAccountId, AccountName, Money, Boolean) ResponseEntity~FinancialAccount~
+        +createAccount(FinancialAccountId, BankName, Optional~AccountName~, Money, Boolean) ResponseEntity~FinancialAccount~
+        +updateAccountName(FinancialAccountId, AccountName) ResponseEntity~FinancialAccount~
         +updateBalance(FinancialAccountId, Money) ResponseEntity~FinancialAccount~
         +updateBalance(FinancialAccountId, Money, Description) ResponseEntity~FinancialAccount~
         +getUserAccounts() ResponseEntity~List~FinancialAccount~~
@@ -692,6 +702,10 @@ classDiagram
 
 ### AccountService
 - **現在ユーザーの取得**: `CognitoUserContext.currentUserId()`から取得（メソッド引数では受け取らない）
+- **口座番号の重複検査**: `createAccount`では事前に`findById`で同一口座番号の既存口座を確認し、存在する場合は`IllegalStateException`をスローする。所有者で区別したメッセージを返す。
+  - 既存口座が現在ユーザー所有 → `"Account is already registered: {id}"`（メイン口座か否かを問わず重複登録不可）
+  - 既存口座が他ユーザー所有 → `"Account number is already used by another user: {id}"`
 - **メイン口座の一意性**: `createAccount`で`isMainAccount=true`を指定する場合、同一ユーザーに既に`isMainAccount=true`の口座があれば`IllegalStateException`をスローする（要件定義「金融口座のうち一つの口座を変動費の記録機能群で使用される残高として設定する」に基づく）
-- **所有権チェック**: `updateBalance` / `calculateNewBalance`は対象口座の`userId`が現在ユーザーと一致しない場合`IllegalStateException`をスローする（要件定義「非共有データ：預金残高は記録者本人のみ閲覧可能」に基づく）
+- **口座名の任意設定**: `accountName`は作成時に`Optional<AccountName>`として受け取り省略可。後から`updateAccountName(FinancialAccountId, AccountName)`で設定・更新できる（所有者チェック付き）。
+- **所有権チェック**: `updateAccountName` / `updateBalance` / `calculateNewBalance`は対象口座の`userId`が現在ユーザーと一致しない場合`IllegalStateException`をスローする（要件定義「非共有データ：預金残高は記録者本人のみ閲覧可能」に基づく）
 - **残高更新と編集履歴**: `updateBalance(FinancialAccountId, Money)`（自動計算用）と`updateBalance(FinancialAccountId, Money, Description)`（手動編集用）の2つのオーバーロードを提供。両方とも編集履歴を記録するが、前者は編集理由なし（`Optional.empty`）、後者は編集理由ありで記録する

@@ -3,6 +3,7 @@ package com.takata_kento.household_expenses.application.account;
 import com.takata_kento.household_expenses.domain.account.FinancialAccount;
 import com.takata_kento.household_expenses.domain.account.FinancialAccountRepository;
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
+import com.takata_kento.household_expenses.domain.valueobject.BankName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
@@ -10,6 +11,7 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +28,19 @@ public class AccountService {
     public FinancialAccount createAccount(
         UserId currentUserId,
         FinancialAccountId id,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money initialBalance,
         Boolean isMainAccount
     ) {
+        financialAccountRepository
+            .findById(id)
+            .ifPresent(existing -> {
+                if (existing.userId().equals(currentUserId)) {
+                    throw new IllegalStateException("Account is already registered: " + id);
+                }
+                throw new IllegalStateException("Account number is already used by another user: " + id);
+            });
         if (isMainAccount) {
             boolean alreadyHasMain = financialAccountRepository
                 .findByUserId(currentUserId)
@@ -42,12 +53,19 @@ public class AccountService {
         FinancialAccount account = new FinancialAccount(
             id,
             currentUserId,
+            bankName,
             accountName,
             initialBalance,
             isMainAccount,
             new HashSet<>(),
             null
         );
+        return financialAccountRepository.save(account);
+    }
+
+    public FinancialAccount updateAccountName(UserId currentUserId, FinancialAccountId id, AccountName accountName) {
+        FinancialAccount account = findOwnedAccount(id, currentUserId);
+        account.updateAccountName(accountName);
         return financialAccountRepository.save(account);
     }
 

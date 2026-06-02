@@ -1,6 +1,7 @@
 package com.takata_kento.household_expenses.domain.account;
 
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
+import com.takata_kento.household_expenses.domain.valueobject.BankName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
@@ -27,8 +28,11 @@ public class FinancialAccount {
     @Column("user_id")
     private UserId userId;
 
+    @Column("bank_name")
+    private BankName bankName;
+
     @Column("account_name")
-    private AccountName accountName;
+    private Optional<AccountName> accountName;
 
     @Column("balance")
     private Money balance;
@@ -45,7 +49,8 @@ public class FinancialAccount {
     public FinancialAccount(
         FinancialAccountId id,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -53,7 +58,8 @@ public class FinancialAccount {
     ) {
         this.id = id;
         this.userId = userId;
-        this.accountName = accountName;
+        this.bankName = bankName;
+        this.accountName = accountName != null ? accountName : Optional.empty();
         this.balance = balance;
         this.isMainAccount = isMainAccount;
         this.editHistories = editHistories != null ? new HashSet<>(editHistories) : new HashSet<>();
@@ -68,7 +74,11 @@ public class FinancialAccount {
         return this.userId;
     }
 
-    public AccountName accountName() {
+    public BankName bankName() {
+        return this.bankName;
+    }
+
+    public Optional<AccountName> accountName() {
         return this.accountName;
     }
 
@@ -108,5 +118,9 @@ public class FinancialAccount {
     public void updateBalance(Money newBalance, Description reason, LocalDate editedAt) {
         addEditHistory(this.balance, newBalance, Optional.of(reason), editedAt);
         this.balance = newBalance;
+    }
+
+    public void updateAccountName(AccountName newAccountName) {
+        this.accountName = Optional.of(newAccountName);
     }
 }

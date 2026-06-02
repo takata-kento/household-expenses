@@ -11,6 +11,7 @@ import com.takata_kento.household_expenses.domain.saving.MonthlySavingRepository
 import com.takata_kento.household_expenses.domain.user.User;
 import com.takata_kento.household_expenses.domain.user.UserRepository;
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
+import com.takata_kento.household_expenses.domain.valueobject.BankName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
@@ -56,7 +57,8 @@ class SavingServiceTest {
         return new FinancialAccount(
             ACCOUNT_ID,
             CURRENT_USER_ID,
-            new AccountName("メイン口座"),
+            new BankName("三菱UFJ銀行"),
+            Optional.of(new AccountName("メイン口座")),
             new Money(0),
             false,
             null,
@@ -68,7 +70,8 @@ class SavingServiceTest {
         return new FinancialAccount(
             OTHER_ACCOUNT_ID,
             OTHER_USER_ID,
-            new AccountName("他人の口座"),
+            new BankName("三菱UFJ銀行"),
+            Optional.of(new AccountName("他人の口座")),
             new Money(0),
             false,
             null,
@@ -278,7 +281,8 @@ class SavingServiceTest {
         FinancialAccount newAccount = new FinancialAccount(
             newAccountId,
             CURRENT_USER_ID,
-            new AccountName("貯金口座"),
+            new BankName("三菱UFJ銀行"),
+            Optional.of(new AccountName("貯金口座")),
             new Money(0),
             false,
             null,

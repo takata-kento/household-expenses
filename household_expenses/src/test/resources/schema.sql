@@ -55,7 +55,8 @@ CREATE TABLE group_invitation (
 CREATE TABLE financial_account (
     id VARCHAR(8) PRIMARY KEY CHECK (id ~ '^[0-9]{6,8}$'),
     user_id VARCHAR(36) NOT NULL REFERENCES "users"(id) ON DELETE CASCADE,
-    account_name VARCHAR(255) NOT NULL,
+    bank_name VARCHAR(255) NOT NULL,
+    account_name VARCHAR(255),
     balance INTEGER NOT NULL DEFAULT 0,
     is_main_account BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
