@@ -1,6 +1,5 @@
 package com.takata_kento.household_expenses.application.user;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.user.User;
 import com.takata_kento.household_expenses.domain.user.UserRepository;
 import com.takata_kento.household_expenses.domain.valueobject.GroupInvitationId;
@@ -18,21 +17,20 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    private User getCurrentUser() {
-        UserId userId = CognitoUserContext.currentUserId();
+    private User getCurrentUser(UserId userId) {
         return userRepository
             .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
     }
 
-    public void acceptGroupInvitation(GroupInvitationId invitationId) {
-        User user = getCurrentUser();
+    public void acceptGroupInvitation(UserId currentUserId, GroupInvitationId invitationId) {
+        User user = getCurrentUser(currentUserId);
         user.accept(invitationId);
         userRepository.save(user);
     }
 
-    public void rejectGroupInvitation(GroupInvitationId invitationId) {
-        User user = getCurrentUser();
+    public void rejectGroupInvitation(UserId currentUserId, GroupInvitationId invitationId) {
+        User user = getCurrentUser(currentUserId);
         user.reject(invitationId);
         userRepository.save(user);
     }

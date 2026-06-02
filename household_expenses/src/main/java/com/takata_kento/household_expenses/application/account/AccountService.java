@@ -1,6 +1,5 @@
 package com.takata_kento.household_expenses.application.account;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.account.FinancialAccount;
 import com.takata_kento.household_expenses.domain.account.FinancialAccountRepository;
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
@@ -25,15 +24,15 @@ public class AccountService {
     }
 
     public FinancialAccount createAccount(
+        UserId currentUserId,
         FinancialAccountId id,
         AccountName accountName,
         Money initialBalance,
         Boolean isMainAccount
     ) {
-        UserId userId = CognitoUserContext.currentUserId();
         if (isMainAccount) {
             boolean alreadyHasMain = financialAccountRepository
-                .findByUserId(userId)
+                .findByUserId(currentUserId)
                 .stream()
                 .anyMatch(FinancialAccount::isMainAccount);
             if (alreadyHasMain) {
@@ -42,7 +41,7 @@ public class AccountService {
         }
         FinancialAccount account = new FinancialAccount(
             id,
-            userId,
+            currentUserId,
             accountName,
             initialBalance,
             isMainAccount,
@@ -52,36 +51,40 @@ public class AccountService {
         return financialAccountRepository.save(account);
     }
 
-    public FinancialAccount updateBalance(FinancialAccountId id, Money newBalance) {
-        FinancialAccount account = findOwnedAccount(id);
+    public FinancialAccount updateBalance(UserId currentUserId, FinancialAccountId id, Money newBalance) {
+        FinancialAccount account = findOwnedAccount(id, currentUserId);
         account.updateBalance(newBalance, LocalDate.now());
         return financialAccountRepository.save(account);
     }
 
-    public FinancialAccount updateBalance(FinancialAccountId id, Money newBalance, Description reason) {
-        FinancialAccount account = findOwnedAccount(id);
+    public FinancialAccount updateBalance(
+        UserId currentUserId,
+        FinancialAccountId id,
+        Money newBalance,
+        Description reason
+    ) {
+        FinancialAccount account = findOwnedAccount(id, currentUserId);
         account.updateBalance(newBalance, reason, LocalDate.now());
         return financialAccountRepository.save(account);
     }
 
     public Money calculateNewBalance(
+        UserId currentUserId,
         FinancialAccountId id,
         Money income,
         Money totalExpense,
         Money fixedExpense,
         Money saving
     ) {
-        FinancialAccount account = findOwnedAccount(id);
+        FinancialAccount account = findOwnedAccount(id, currentUserId);
         return account.balance().add(income).subtract(totalExpense).subtract(fixedExpense).subtract(saving);
     }
 
-    public List<FinancialAccount> getUserAccounts() {
-        UserId userId = CognitoUserContext.currentUserId();
-        return financialAccountRepository.findByUserId(userId);
+    public List<FinancialAccount> getUserAccounts(UserId currentUserId) {
+        return financialAccountRepository.findByUserId(currentUserId);
     }
 
-    private FinancialAccount findOwnedAccount(FinancialAccountId id) {
-        UserId userId = CognitoUserContext.currentUserId();
+    private FinancialAccount findOwnedAccount(FinancialAccountId id, UserId userId) {
         FinancialAccount account = financialAccountRepository
             .findById(id)
             .orElseThrow(() -> new IllegalStateException("FinancialAccount not found: " + id));

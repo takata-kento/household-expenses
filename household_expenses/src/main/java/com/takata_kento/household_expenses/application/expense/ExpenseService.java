@@ -1,6 +1,5 @@
 package com.takata_kento.household_expenses.application.expense;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategory;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategoryRepository;
 import com.takata_kento.household_expenses.domain.expense.category.LivingExpenseCategory;
@@ -45,31 +44,35 @@ public class ExpenseService {
         this.fixedExpenseHistoryRepository = fixedExpenseHistoryRepository;
     }
 
-    private User getCurrentUser() {
-        UserId userId = CognitoUserContext.currentUserId();
+    private User getCurrentUser(UserId userId) {
         return userRepository
             .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
     }
 
-    private UserGroupId getCurrentUserGroupId() {
-        return getCurrentUser()
+    private UserGroupId getCurrentUserGroupId(UserId userId) {
+        return getCurrentUser(userId)
             .userGroupId()
             .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
     }
 
-    public LivingExpenseCategory createLivingExpenseCategory(CategoryName name, Description description) {
-        UserGroupId userGroupId = getCurrentUserGroupId();
+    public LivingExpenseCategory createLivingExpenseCategory(
+        UserId currentUserId,
+        CategoryName name,
+        Description description
+    ) {
+        UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         LivingExpenseCategory category = LivingExpenseCategory.create(name, description, userGroupId);
         return livingExpenseCategoryRepository.save(category);
     }
 
     public LivingExpenseCategory updateLivingExpenseCategory(
+        UserId currentUserId,
         LivingExpenseCategoryId id,
         CategoryName name,
         Description description
     ) {
-        UserGroupId userGroupId = getCurrentUserGroupId();
+        UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         LivingExpenseCategory category = livingExpenseCategoryRepository
             .findById(id)
             .orElseThrow(() -> new IllegalStateException("LivingExpenseCategory not found: " + id));
@@ -81,8 +84,8 @@ public class ExpenseService {
         return livingExpenseCategoryRepository.save(category);
     }
 
-    public void deleteLivingExpenseCategory(LivingExpenseCategoryId id) {
-        UserGroupId userGroupId = getCurrentUserGroupId();
+    public void deleteLivingExpenseCategory(UserId currentUserId, LivingExpenseCategoryId id) {
+        UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         LivingExpenseCategory category = livingExpenseCategoryRepository
             .findById(id)
             .orElseThrow(() -> new IllegalStateException("LivingExpenseCategory not found: " + id));
@@ -93,16 +96,18 @@ public class ExpenseService {
     }
 
     public FixedExpenseCategory createFixedExpenseCategory(
+        UserId currentUserId,
         CategoryName name,
         Description description,
         Money defaultAmount
     ) {
-        UserGroupId userGroupId = getCurrentUserGroupId();
+        UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         FixedExpenseCategory category = FixedExpenseCategory.create(name, description, defaultAmount, userGroupId);
         return fixedExpenseCategoryRepository.save(category);
     }
 
     public FixedExpenseHistory setFixedExpenseAmount(
+        UserId currentUserId,
         FixedExpenseCategoryId categoryId,
         Year year,
         Month month,
@@ -110,7 +115,7 @@ public class ExpenseService {
         LocalDate effectiveDate,
         Optional<Description> memo
     ) {
-        UserGroupId userGroupId = getCurrentUserGroupId();
+        UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         FixedExpenseCategory category = fixedExpenseCategoryRepository
             .findById(categoryId)
             .orElseThrow(() -> new IllegalStateException("FixedExpenseCategory not found: " + categoryId));
@@ -129,8 +134,8 @@ public class ExpenseService {
         return fixedExpenseHistoryRepository.save(history);
     }
 
-    public List<FixedExpenseHistory> getFixedExpenses(Year year, Month month) {
-        UserGroupId userGroupId = getCurrentUserGroupId();
+    public List<FixedExpenseHistory> getFixedExpenses(UserId currentUserId, Year year, Month month) {
+        UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         List<FixedExpenseCategoryId> categoryIds = fixedExpenseCategoryRepository
             .findByUserGroupId(userGroupId)
             .stream()
