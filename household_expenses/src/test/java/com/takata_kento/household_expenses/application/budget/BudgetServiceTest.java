@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudget;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudgetRepository;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyGroupTransaction;
@@ -29,14 +28,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.AutoClose;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,9 +49,6 @@ class BudgetServiceTest {
     @Mock
     private DailyGroupTransactionRepository dailyGroupTransactionRepository;
 
-    @AutoClose
-    private MockedStatic<CognitoUserContext> cognitoUserContext;
-
     @InjectMocks
     private BudgetService budgetService;
 
@@ -69,11 +61,6 @@ class BudgetServiceTest {
         UUID.fromString("00000000-0000-0000-0000-000000000aaa")
     );
 
-    @BeforeEach
-    void setUp() {
-        cognitoUserContext = Mockito.mockStatic(CognitoUserContext.class);
-    }
-
     @Test
     void testSetMonthlyBudget() {
         // Given
@@ -81,7 +68,6 @@ class BudgetServiceTest {
         Month month = new Month(6);
         Money budgetAmount = new Money(100_000);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(monthlyBudgetRepository.findByUserGroupIdAndYearAndMonth(USER_GROUP_ID, year, month)).thenReturn(
             Optional.empty()
@@ -89,7 +75,7 @@ class BudgetServiceTest {
         when(monthlyBudgetRepository.save(any(MonthlyBudget.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // When
-        MonthlyBudget actual = budgetService.setMonthlyBudget(year, month, budgetAmount);
+        MonthlyBudget actual = budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, budgetAmount);
 
         // Then
         assertThat(actual.userGroupId()).isEqualTo(USER_GROUP_ID);
@@ -115,7 +101,6 @@ class BudgetServiceTest {
             previousSetByUserId
         );
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(monthlyBudgetRepository.findByUserGroupIdAndYearAndMonth(USER_GROUP_ID, year, month)).thenReturn(
             Optional.of(existing)
@@ -123,7 +108,7 @@ class BudgetServiceTest {
         when(monthlyBudgetRepository.save(existing)).thenReturn(existing);
 
         // When
-        MonthlyBudget actual = budgetService.setMonthlyBudget(year, month, newBudgetAmount);
+        MonthlyBudget actual = budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, newBudgetAmount);
 
         // Then
         assertThat(actual.budgetAmount()).isEqualTo(newBudgetAmount);
@@ -138,11 +123,10 @@ class BudgetServiceTest {
         Month month = new Month(6);
         Money budgetAmount = new Money(100_000);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> budgetService.setMonthlyBudget(year, month, budgetAmount)).isInstanceOf(
+        assertThatThrownBy(() -> budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, budgetAmount)).isInstanceOf(
             IllegalStateException.class
         );
         verify(monthlyBudgetRepository, never()).save(any());
@@ -155,14 +139,13 @@ class BudgetServiceTest {
         Month month = new Month(6);
         MonthlyBudget budget = MonthlyBudget.create(USER_GROUP_ID, year, month, new Money(100_000), CURRENT_USER_ID);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(monthlyBudgetRepository.findByUserGroupIdAndYearAndMonth(USER_GROUP_ID, year, month)).thenReturn(
             Optional.of(budget)
         );
 
         // When
-        MonthlyBudget actual = budgetService.getMonthlyBudget(year, month);
+        MonthlyBudget actual = budgetService.getMonthlyBudget(CURRENT_USER_ID, year, month);
 
         // Then
         assertThat(actual).isEqualTo(budget);
@@ -174,14 +157,15 @@ class BudgetServiceTest {
         Year year = new Year(2024);
         Month month = new Month(6);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(monthlyBudgetRepository.findByUserGroupIdAndYearAndMonth(USER_GROUP_ID, year, month)).thenReturn(
             Optional.empty()
         );
 
         // When / Then
-        assertThatThrownBy(() -> budgetService.getMonthlyBudget(year, month)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> budgetService.getMonthlyBudget(CURRENT_USER_ID, year, month)).isInstanceOf(
+            IllegalStateException.class
+        );
     }
 
     @Test
@@ -190,11 +174,12 @@ class BudgetServiceTest {
         Year year = new Year(2024);
         Month month = new Month(6);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> budgetService.getMonthlyBudget(year, month)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> budgetService.getMonthlyBudget(CURRENT_USER_ID, year, month)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(monthlyBudgetRepository, never()).findByUserGroupIdAndYearAndMonth(any(), any(), any());
     }
 
@@ -217,12 +202,11 @@ class BudgetServiceTest {
             CURRENT_USER_ID
         );
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(monthlyBudgetRepository.findByUserGroupIdAndYear(USER_GROUP_ID, year)).thenReturn(List.of(june, july));
 
         // When
-        List<MonthlyBudget> actual = budgetService.getMonthlyBudgetsByYear(year);
+        List<MonthlyBudget> actual = budgetService.getMonthlyBudgetsByYear(CURRENT_USER_ID, year);
 
         // Then
         assertThat(actual).containsExactly(june, july);
@@ -233,11 +217,12 @@ class BudgetServiceTest {
         // Given
         Year year = new Year(2024);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> budgetService.getMonthlyBudgetsByYear(year)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> budgetService.getMonthlyBudgetsByYear(CURRENT_USER_ID, year)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(monthlyBudgetRepository, never()).findByUserGroupIdAndYear(any(), any());
     }
 
@@ -281,7 +266,6 @@ class BudgetServiceTest {
         );
         tx2.addLivingExpense(CATEGORY_USER_ID, CATEGORY_ID, new Money(1500), new Description("食費"));
 
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
         when(monthlyBudgetRepository.findByUserGroupIdAndYearAndMonth(USER_GROUP_ID, year, month)).thenReturn(
@@ -296,7 +280,7 @@ class BudgetServiceTest {
         ).thenReturn(List.of(tx1, tx2));
 
         // When
-        Money actual = budgetService.calculateBudgetBalance(targetDate);
+        Money actual = budgetService.calculateBudgetBalance(CURRENT_USER_ID, targetDate);
 
         // Then
         // 100,000 - (2,000 + 3,000 + 1,500) = 93,500
@@ -334,7 +318,6 @@ class BudgetServiceTest {
         );
         tx.addLivingExpense(CATEGORY_USER_ID, CATEGORY_ID, new Money(20_000), new Description("食費"));
 
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
         when(monthlyBudgetRepository.findByUserGroupIdAndYearAndMonth(USER_GROUP_ID, year, month)).thenReturn(
@@ -349,7 +332,7 @@ class BudgetServiceTest {
         ).thenReturn(List.of(tx));
 
         // When
-        Money actual = budgetService.calculateBudgetBalance(targetDate);
+        Money actual = budgetService.calculateBudgetBalance(CURRENT_USER_ID, targetDate);
 
         // Then
         // 80,000 - 20,000 = 60,000
@@ -378,7 +361,6 @@ class BudgetServiceTest {
         MonthlyBudget budget = MonthlyBudget.create(USER_GROUP_ID, year, month, new Money(50_000), CURRENT_USER_ID);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
 
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
         when(monthlyBudgetRepository.findByUserGroupIdAndYearAndMonth(USER_GROUP_ID, year, month)).thenReturn(
@@ -393,7 +375,7 @@ class BudgetServiceTest {
         ).thenReturn(List.of());
 
         // When
-        Money actual = budgetService.calculateBudgetBalance(targetDate);
+        Money actual = budgetService.calculateBudgetBalance(CURRENT_USER_ID, targetDate);
 
         // Then
         assertThat(actual).isEqualTo(new Money(50_000));
@@ -414,7 +396,6 @@ class BudgetServiceTest {
         );
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
 
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
         when(
@@ -422,7 +403,7 @@ class BudgetServiceTest {
         ).thenReturn(Optional.empty());
 
         // When / Then
-        assertThatThrownBy(() -> budgetService.calculateBudgetBalance(targetDate)).isInstanceOf(
+        assertThatThrownBy(() -> budgetService.calculateBudgetBalance(CURRENT_USER_ID, targetDate)).isInstanceOf(
             IllegalStateException.class
         );
         verify(dailyGroupTransactionRepository, never()).findByUserGroupIdAndTransactionDateBetween(
@@ -437,11 +418,10 @@ class BudgetServiceTest {
         // Given
         LocalDate targetDate = LocalDate.of(2024, 6, 15);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> budgetService.calculateBudgetBalance(targetDate)).isInstanceOf(
+        assertThatThrownBy(() -> budgetService.calculateBudgetBalance(CURRENT_USER_ID, targetDate)).isInstanceOf(
             IllegalStateException.class
         );
         verify(userGroupRepository, never()).findById(any());

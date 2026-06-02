@@ -3,7 +3,6 @@ package com.takata_kento.household_expenses.application.usergroup;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.user.GroupInvitationInfo;
 import com.takata_kento.household_expenses.domain.user.User;
 import com.takata_kento.household_expenses.domain.user.UserRepository;
@@ -18,14 +17,10 @@ import com.takata_kento.household_expenses.domain.valueobject.Username;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.AutoClose;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,9 +32,6 @@ class UserGroupServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @AutoClose
-    private MockedStatic<CognitoUserContext> cognitoUserContext;
-
     @InjectMocks
     private UserGroupService userGroupService;
 
@@ -49,24 +41,18 @@ class UserGroupServiceTest {
         UUID.fromString("00000000-0000-0000-0000-000000000010")
     );
 
-    @BeforeEach
-    void setUp() {
-        cognitoUserContext = Mockito.mockStatic(CognitoUserContext.class);
-    }
-
     @Test
     void testCreateGroup() {
         // Given
         GroupName groupName = new GroupName("テストグループ");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
         UserGroup savedUserGroup = UserGroup.create(groupName, new Day(1), CURRENT_USER_ID);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.save(any(UserGroup.class))).thenReturn(savedUserGroup);
         when(userRepository.save(currentUser)).thenReturn(currentUser);
 
         // When
-        UserGroup actual = userGroupService.createGroup(groupName);
+        UserGroup actual = userGroupService.createGroup(CURRENT_USER_ID, groupName);
 
         // Then
         assertThat(actual).isNotNull();
@@ -82,11 +68,10 @@ class UserGroupServiceTest {
         // Given
         GroupName groupName = new GroupName("テストグループ");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.createGroup(groupName)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.createGroup(CURRENT_USER_ID, groupName)).isInstanceOf(IllegalStateException.class);
         verify(userGroupRepository, never()).save(any());
         verify(userRepository, never()).save(any());
     }
@@ -97,13 +82,12 @@ class UserGroupServiceTest {
         Username inviteeUsername = new Username("invitee");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
         User invitee = new User(OTHER_USER_ID, inviteeUsername, Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.findByUsername(inviteeUsername)).thenReturn(Optional.of(invitee));
         when(userRepository.save(invitee)).thenReturn(invitee);
 
         // When
-        GroupInvitationId actual = userGroupService.inviteUser(inviteeUsername);
+        GroupInvitationId actual = userGroupService.inviteUser(CURRENT_USER_ID, inviteeUsername);
 
         // Then
         assertThat(actual).isNotNull();
@@ -120,12 +104,11 @@ class UserGroupServiceTest {
         Username inviteeUsername = new Username("invitee");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
         User invitee = new User(OTHER_USER_ID, inviteeUsername, Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.findByUsername(inviteeUsername)).thenReturn(Optional.of(invitee));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.inviteUser(inviteeUsername)).isInstanceOf(
+        assertThatThrownBy(() -> userGroupService.inviteUser(CURRENT_USER_ID, inviteeUsername)).isInstanceOf(
             IllegalStateException.class
         );
         verify(userRepository, never()).save(any());
@@ -136,12 +119,11 @@ class UserGroupServiceTest {
         // Given
         Username nonExistentUsername = new Username("nonexistent");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.findByUsername(nonExistentUsername)).thenReturn(Optional.empty());
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.inviteUser(nonExistentUsername)).isInstanceOf(
+        assertThatThrownBy(() -> userGroupService.inviteUser(CURRENT_USER_ID, nonExistentUsername)).isInstanceOf(
             IllegalStateException.class
         );
         verify(userRepository, never()).save(any());
@@ -151,12 +133,11 @@ class UserGroupServiceTest {
     void testLeaveGroup() {
         // Given
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.save(currentUser)).thenReturn(currentUser);
 
         // When
-        userGroupService.leaveGroup();
+        userGroupService.leaveGroup(CURRENT_USER_ID);
 
         // Then
         assertThat(currentUser.isBelongsToGroup()).isFalse();
@@ -168,11 +149,12 @@ class UserGroupServiceTest {
     void testLeaveGroupWhenNotInGroup() {
         // Given
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.leaveGroup()).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.leaveGroup(CURRENT_USER_ID)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(userRepository, never()).save(any());
     }
 
@@ -182,12 +164,11 @@ class UserGroupServiceTest {
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
         User member2 = new User(OTHER_USER_ID, new Username("member2"), Optional.of(USER_GROUP_ID), null, null);
         List<User> members = List.of(currentUser, member2);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userRepository.findByUserGroupId(USER_GROUP_ID)).thenReturn(members);
 
         // When
-        List<User> actual = userGroupService.getGroupMembers();
+        List<User> actual = userGroupService.getGroupMembers(CURRENT_USER_ID);
 
         // Then
         assertThat(actual).hasSize(2);
@@ -199,11 +180,12 @@ class UserGroupServiceTest {
     void testGetGroupMembersWhenNotInGroup() {
         // Given
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.getGroupMembers()).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.getGroupMembers(CURRENT_USER_ID)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(userRepository, never()).findByUserGroupId(any());
     }
 
@@ -213,13 +195,12 @@ class UserGroupServiceTest {
         GroupName newGroupName = new GroupName("新グループ名");
         UserGroup userGroup = UserGroup.create(new GroupName("旧グループ名"), new Day(1), CURRENT_USER_ID);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
         when(userGroupRepository.save(userGroup)).thenReturn(userGroup);
 
         // When
-        UserGroup actual = userGroupService.updateGroupName(newGroupName);
+        UserGroup actual = userGroupService.updateGroupName(CURRENT_USER_ID, newGroupName);
 
         // Then
         assertThat(actual.name()).isEqualTo(newGroupName);
@@ -233,12 +214,11 @@ class UserGroupServiceTest {
         // OTHER_USER_ID がグループ作成者、CURRENT_USER_ID は作成者でない
         UserGroup userGroup = UserGroup.create(new GroupName("旧グループ名"), new Day(1), OTHER_USER_ID);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.updateGroupName(newGroupName)).isInstanceOf(
+        assertThatThrownBy(() -> userGroupService.updateGroupName(CURRENT_USER_ID, newGroupName)).isInstanceOf(
             IllegalStateException.class
         );
         verify(userGroupRepository, never()).save(any());
@@ -249,11 +229,10 @@ class UserGroupServiceTest {
         // Given
         GroupName newGroupName = new GroupName("新グループ名");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.updateGroupName(newGroupName)).isInstanceOf(
+        assertThatThrownBy(() -> userGroupService.updateGroupName(CURRENT_USER_ID, newGroupName)).isInstanceOf(
             IllegalStateException.class
         );
         verify(userGroupRepository, never()).save(any());
@@ -265,13 +244,12 @@ class UserGroupServiceTest {
         Day newDay = new Day(25);
         UserGroup userGroup = UserGroup.create(new GroupName("テストグループ"), new Day(1), CURRENT_USER_ID);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
         when(userGroupRepository.findById(USER_GROUP_ID)).thenReturn(Optional.of(userGroup));
         when(userGroupRepository.save(userGroup)).thenReturn(userGroup);
 
         // When
-        UserGroup actual = userGroupService.updateMonthStartDay(newDay);
+        UserGroup actual = userGroupService.updateMonthStartDay(CURRENT_USER_ID, newDay);
 
         // Then
         assertThat(actual.monthStartDay()).isEqualTo(newDay);
@@ -283,11 +261,10 @@ class UserGroupServiceTest {
         // Given
         Day newDay = new Day(25);
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.updateMonthStartDay(newDay)).isInstanceOf(
+        assertThatThrownBy(() -> userGroupService.updateMonthStartDay(CURRENT_USER_ID, newDay)).isInstanceOf(
             IllegalStateException.class
         );
         verify(userGroupRepository, never()).save(any());
