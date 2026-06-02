@@ -4,6 +4,7 @@ import static org.assertj.core.api.BDDAssertions.*;
 
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
 import com.takata_kento.household_expenses.domain.valueobject.BalanceEditHistoryId;
+import com.takata_kento.household_expenses.domain.valueobject.BankName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,7 +30,8 @@ class FinancialAccountTest {
             Arguments.of(
                 new FinancialAccountId(financialAccountNumber),
                 new UserId(userUUID),
-                new AccountName("メイン口座"),
+                new BankName("三菱UFJ銀行"),
+                Optional.of(new AccountName("メイン口座")),
                 new Money(100_000),
                 Boolean.TRUE,
                 new HashSet<BalanceEditHistory>(),
@@ -36,7 +39,8 @@ class FinancialAccountTest {
                 new FinancialAccount(
                     new FinancialAccountId(financialAccountNumber),
                     new UserId(userUUID),
-                    new AccountName("メイン口座"),
+                    new BankName("三菱UFJ銀行"),
+                    Optional.of(new AccountName("メイン口座")),
                     new Money(100_000),
                     Boolean.TRUE,
                     new HashSet<BalanceEditHistory>(),
@@ -51,7 +55,8 @@ class FinancialAccountTest {
     void testId(
         FinancialAccountId expectedId,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -62,6 +67,7 @@ class FinancialAccountTest {
         FinancialAccount expected = new FinancialAccount(
             expectedId,
             userId,
+            bankName,
             accountName,
             balance,
             isMainAccount,
@@ -82,7 +88,8 @@ class FinancialAccountTest {
     void testUserId(
         FinancialAccountId id,
         UserId expectedUserId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -93,6 +100,7 @@ class FinancialAccountTest {
         FinancialAccount expected = new FinancialAccount(
             id,
             expectedUserId,
+            bankName,
             accountName,
             balance,
             isMainAccount,
@@ -110,10 +118,11 @@ class FinancialAccountTest {
 
     @ParameterizedTest
     @MethodSource("provideFinancialAccountData")
-    void testAccountName(
+    void testBankName(
         FinancialAccountId id,
         UserId userId,
-        AccountName expectedAccountName,
+        BankName expectedBankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -124,6 +133,40 @@ class FinancialAccountTest {
         FinancialAccount expected = new FinancialAccount(
             id,
             userId,
+            expectedBankName,
+            accountName,
+            balance,
+            isMainAccount,
+            editHistories,
+            version
+        );
+
+        // When
+        BankName actual = financialAccount.bankName();
+
+        // Then
+        then(actual).isEqualTo(expectedBankName);
+        then(financialAccount).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideFinancialAccountData")
+    void testAccountName(
+        FinancialAccountId id,
+        UserId userId,
+        BankName bankName,
+        Optional<AccountName> expectedAccountName,
+        Money balance,
+        Boolean isMainAccount,
+        Set<BalanceEditHistory> editHistories,
+        Integer version,
+        FinancialAccount financialAccount
+    ) {
+        // Given
+        FinancialAccount expected = new FinancialAccount(
+            id,
+            userId,
+            bankName,
             expectedAccountName,
             balance,
             isMainAccount,
@@ -132,11 +175,32 @@ class FinancialAccountTest {
         );
 
         // When
-        AccountName actual = financialAccount.accountName();
+        Optional<AccountName> actual = financialAccount.accountName();
 
         // Then
         then(actual).isEqualTo(expectedAccountName);
         then(financialAccount).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @Test
+    void testAccountNameEmptyWhenNotProvided() {
+        // Given
+        FinancialAccount financialAccount = new FinancialAccount(
+            new FinancialAccountId("1234567"),
+            new UserId(UUID.randomUUID()),
+            new BankName("三菱UFJ銀行"),
+            Optional.empty(),
+            new Money(100_000),
+            Boolean.TRUE,
+            new HashSet<>(),
+            null
+        );
+
+        // When
+        Optional<AccountName> actual = financialAccount.accountName();
+
+        // Then
+        then(actual).isEmpty();
     }
 
     @ParameterizedTest
@@ -144,7 +208,8 @@ class FinancialAccountTest {
     void testBalance(
         FinancialAccountId id,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money expectedBalance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -155,6 +220,7 @@ class FinancialAccountTest {
         FinancialAccount expected = new FinancialAccount(
             id,
             userId,
+            bankName,
             accountName,
             expectedBalance,
             isMainAccount,
@@ -175,7 +241,8 @@ class FinancialAccountTest {
     void testIsMainAccount(
         FinancialAccountId id,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean expectedIsMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -186,6 +253,7 @@ class FinancialAccountTest {
         FinancialAccount expected = new FinancialAccount(
             id,
             userId,
+            bankName,
             accountName,
             balance,
             expectedIsMainAccount,
@@ -206,7 +274,8 @@ class FinancialAccountTest {
     void testEditHistories(
         FinancialAccountId id,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> expectedEditHistories,
@@ -217,6 +286,7 @@ class FinancialAccountTest {
         FinancialAccount expected = new FinancialAccount(
             id,
             userId,
+            bankName,
             accountName,
             balance,
             isMainAccount,
@@ -237,7 +307,8 @@ class FinancialAccountTest {
     void testLatestEditHistoryEmpty(
         FinancialAccountId id,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -259,7 +330,8 @@ class FinancialAccountTest {
     void testLatestEditHistory(
         FinancialAccountId id,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -298,6 +370,7 @@ class FinancialAccountTest {
         FinancialAccount accountWithHistories = new FinancialAccount(
             id,
             userId,
+            bankName,
             accountName,
             balance,
             isMainAccount,
@@ -321,7 +394,8 @@ class FinancialAccountTest {
     void testUpdateBalance(
         FinancialAccountId id,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -358,7 +432,8 @@ class FinancialAccountTest {
     void testUpdateBalanceWithoutReason(
         FinancialAccountId id,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount,
         Set<BalanceEditHistory> editHistories,
@@ -387,5 +462,72 @@ class FinancialAccountTest {
                 then(history.editReason()).isEqualTo(Optional.empty());
                 then(history.editedAt()).isEqualTo(editedAt);
             });
+    }
+
+    @Test
+    void testUpdateAccountName() {
+        // Given
+        FinancialAccountId id = new FinancialAccountId("1234567");
+        UserId userId = new UserId(UUID.randomUUID());
+        BankName bankName = new BankName("三菱UFJ銀行");
+        Money balance = new Money(100_000);
+        Boolean isMainAccount = Boolean.TRUE;
+        FinancialAccount financialAccount = new FinancialAccount(
+            id,
+            userId,
+            bankName,
+            Optional.empty(),
+            balance,
+            isMainAccount,
+            new HashSet<>(),
+            Integer.valueOf(1)
+        );
+        AccountName newAccountName = new AccountName("家計用口座");
+
+        // When
+        financialAccount.updateAccountName(newAccountName);
+
+        // Then
+        then(financialAccount.accountName()).isEqualTo(Optional.of(newAccountName));
+        // 他フィールドの不変性
+        then(financialAccount.id()).isEqualTo(id);
+        then(financialAccount.userId()).isEqualTo(userId);
+        then(financialAccount.bankName()).isEqualTo(bankName);
+        then(financialAccount.balance()).isEqualTo(balance);
+        then(financialAccount.isMainAccount()).isEqualTo(isMainAccount);
+        then(financialAccount.editHistories()).isEmpty();
+    }
+
+    @Test
+    void testUpdateAccountNameOverwritesExisting() {
+        // Given
+        FinancialAccountId id = new FinancialAccountId("1234567");
+        UserId userId = new UserId(UUID.randomUUID());
+        BankName bankName = new BankName("三菱UFJ銀行");
+        Money balance = new Money(100_000);
+        Boolean isMainAccount = Boolean.TRUE;
+        FinancialAccount financialAccount = new FinancialAccount(
+            id,
+            userId,
+            bankName,
+            Optional.of(new AccountName("旧口座名")),
+            balance,
+            isMainAccount,
+            new HashSet<>(),
+            Integer.valueOf(1)
+        );
+        AccountName newAccountName = new AccountName("新口座名");
+
+        // When
+        financialAccount.updateAccountName(newAccountName);
+
+        // Then
+        then(financialAccount.accountName()).isEqualTo(Optional.of(newAccountName));
+        // 他フィールドの不変性
+        then(financialAccount.id()).isEqualTo(id);
+        then(financialAccount.userId()).isEqualTo(userId);
+        then(financialAccount.bankName()).isEqualTo(bankName);
+        then(financialAccount.balance()).isEqualTo(balance);
+        then(financialAccount.isMainAccount()).isEqualTo(isMainAccount);
     }
 }

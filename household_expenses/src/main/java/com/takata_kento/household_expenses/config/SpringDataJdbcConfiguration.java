@@ -2,6 +2,7 @@ package com.takata_kento.household_expenses.config;
 
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
 import com.takata_kento.household_expenses.domain.valueobject.BalanceEditHistoryId;
+import com.takata_kento.household_expenses.domain.valueobject.BankName;
 import com.takata_kento.household_expenses.domain.valueobject.CategoryName;
 import com.takata_kento.household_expenses.domain.valueobject.DailyGroupTransactionId;
 import com.takata_kento.household_expenses.domain.valueobject.DailyLivingExpenseId;
@@ -87,7 +88,10 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToBalanceEditHistoryIdConverter(),
             new MonthlySavingIdToStringConverter(),
             new StringToMonthlySavingIdConverter(),
-            new StringToOptionalDescriptionConverter()
+            new StringToOptionalDescriptionConverter(),
+            new BankNameToStringConverter(),
+            new StringToBankNameConverter(),
+            new StringToOptionalAccountNameConverter()
         );
     }
 
@@ -173,6 +177,7 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
             Object inner = source.get();
             if (inner instanceof UserGroupId uid) return uid.toString();
             if (inner instanceof Description desc) return desc.value();
+            if (inner instanceof AccountName name) return name.value();
             throw new IllegalArgumentException("Unsupported Optional inner type: " + inner.getClass());
         }
     }
@@ -534,6 +539,33 @@ class SpringDataJdbcConfiguration extends AbstractJdbcConfiguration {
         @Override
         public Optional<Description> convert(String source) {
             return source != null ? Optional.of(new Description(source)) : Optional.empty();
+        }
+    }
+
+    @WritingConverter
+    static class BankNameToStringConverter implements Converter<BankName, String> {
+
+        @Override
+        public String convert(BankName source) {
+            return source.value();
+        }
+    }
+
+    @ReadingConverter
+    static class StringToBankNameConverter implements Converter<String, BankName> {
+
+        @Override
+        public BankName convert(String source) {
+            return new BankName(source);
+        }
+    }
+
+    @ReadingConverter
+    static class StringToOptionalAccountNameConverter implements Converter<String, Optional<AccountName>> {
+
+        @Override
+        public Optional<AccountName> convert(String source) {
+            return source != null ? Optional.of(new AccountName(source)) : Optional.empty();
         }
     }
 }

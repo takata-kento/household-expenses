@@ -84,13 +84,14 @@ class MonthlySavingRepositoryTest {
             .sql(
                 """
                 INSERT INTO
-                    financial_account (id, user_id, account_name, balance, is_main_account, version)
+                    financial_account (id, user_id, bank_name, account_name, balance, is_main_account, version)
                 VALUES
-                    (:id, :user_id, :account_name, :balance, :is_main_account, :version)
+                    (:id, :user_id, :bank_name, :account_name, :balance, :is_main_account, :version)
                 """
             )
             .param("id", FINANCIAL_ACCOUNT_NUMBER)
             .param("user_id", USER_UUID_1.toString())
+            .param("bank_name", "三菱UFJ銀行")
             .param("account_name", "テスト口座")
             .param("balance", 100000)
             .param("is_main_account", true)

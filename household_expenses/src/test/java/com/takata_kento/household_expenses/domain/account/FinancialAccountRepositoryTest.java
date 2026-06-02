@@ -4,6 +4,7 @@ import static org.assertj.core.api.BDDAssertions.*;
 
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
 import com.takata_kento.household_expenses.domain.valueobject.BalanceEditHistoryId;
+import com.takata_kento.household_expenses.domain.valueobject.BankName;
 import com.takata_kento.household_expenses.domain.valueobject.Description;
 import com.takata_kento.household_expenses.domain.valueobject.FinancialAccountId;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
@@ -61,6 +62,7 @@ class FinancialAccountRepositoryTest {
         // Given
         UserId userId = new UserId(TEST_USER_UUID);
         FinancialAccountId accountId = new FinancialAccountId("1234567");
+        BankName bankName = new BankName("三菱UFJ銀行");
         AccountName accountName = new AccountName("メイン口座");
         Money balance = new Money(100_000);
         Boolean isMainAccount = Boolean.TRUE;
@@ -68,7 +70,8 @@ class FinancialAccountRepositoryTest {
         FinancialAccount account = new FinancialAccount(
             accountId,
             userId,
-            accountName,
+            bankName,
+            Optional.of(accountName),
             balance,
             isMainAccount,
             new HashSet<>(),
@@ -93,6 +96,13 @@ class FinancialAccountRepositoryTest {
             .single();
         then(userIdFromDb).isEqualTo(userId.toString());
 
+        String bankNameFromDb = jdbcClient
+            .sql("SELECT bank_name FROM financial_account WHERE id = ?")
+            .param(savedAccount.id().toString())
+            .query(String.class)
+            .single();
+        then(bankNameFromDb).isEqualTo(bankName.value());
+
         String accountNameFromDb = jdbcClient
             .sql("SELECT account_name FROM financial_account WHERE id = ?")
             .param(savedAccount.id().toString())
@@ -116,17 +126,57 @@ class FinancialAccountRepositoryTest {
     }
 
     @Test
+    void testSaveWithoutAccountName() {
+        // Given
+        UserId userId = new UserId(TEST_USER_UUID);
+        FinancialAccountId accountId = new FinancialAccountId("7777777");
+        BankName bankName = new BankName("ゆうちょ銀行");
+        Money balance = new Money(30_000);
+
+        FinancialAccount account = new FinancialAccount(
+            accountId,
+            userId,
+            bankName,
+            Optional.empty(),
+            balance,
+            Boolean.FALSE,
+            new HashSet<>(),
+            null
+        );
+
+        // When
+        FinancialAccount savedAccount = repository.save(account);
+
+        // Then
+        Optional<String> accountNameFromDb = jdbcClient
+            .sql("SELECT account_name FROM financial_account WHERE id = ?")
+            .param(savedAccount.id().toString())
+            .query(String.class)
+            .optional();
+        then(accountNameFromDb).isEmpty();
+
+        String bankNameFromDb = jdbcClient
+            .sql("SELECT bank_name FROM financial_account WHERE id = ?")
+            .param(savedAccount.id().toString())
+            .query(String.class)
+            .single();
+        then(bankNameFromDb).isEqualTo(bankName.value());
+    }
+
+    @Test
     void testSaveWithEditHistories() {
         // Given
         UserId userId = new UserId(TEST_USER_UUID);
         FinancialAccountId accountId = new FinancialAccountId("2345678");
+        BankName bankName = new BankName("三菱UFJ銀行");
         AccountName accountName = new AccountName("貯金口座");
         Money balance = new Money(500_000);
 
         FinancialAccount account = new FinancialAccount(
             accountId,
             userId,
-            accountName,
+            bankName,
+            Optional.of(accountName),
             balance,
             Boolean.FALSE,
             new HashSet<>(),
@@ -176,11 +226,12 @@ class FinancialAccountRepositoryTest {
         // Given
         UserId userId = new UserId(TEST_USER_UUID);
         FinancialAccountId accountId = new FinancialAccountId("3456789");
+        BankName bankName = new BankName("三菱UFJ銀行");
         AccountName accountName = new AccountName("メイン口座");
         Money balance = new Money(100_000);
         Boolean isMainAccount = Boolean.TRUE;
 
-        insertFinancialAccount(accountId, userId, accountName, balance, isMainAccount);
+        insertFinancialAccount(accountId, userId, bankName, Optional.of(accountName), balance, isMainAccount);
 
         UUID historyId1 = UUID.randomUUID();
         UUID historyId2 = UUID.randomUUID();
@@ -197,7 +248,8 @@ class FinancialAccountRepositoryTest {
         then(actual).isPresent();
         then(actual.get().id()).isEqualTo(accountId);
         then(actual.get().userId()).isEqualTo(userId);
-        then(actual.get().accountName()).isEqualTo(accountName);
+        then(actual.get().bankName()).isEqualTo(bankName);
+        then(actual.get().accountName()).isEqualTo(Optional.of(accountName));
         then(actual.get().balance()).isEqualTo(balance);
         then(actual.get().isMainAccount()).isEqualTo(isMainAccount);
 
@@ -221,6 +273,25 @@ class FinancialAccountRepositoryTest {
     }
 
     @Test
+    void testFindByIdWithoutAccountName() {
+        // Given
+        UserId userId = new UserId(TEST_USER_UUID);
+        FinancialAccountId accountId = new FinancialAccountId("8888888");
+        BankName bankName = new BankName("ゆうちょ銀行");
+        Money balance = new Money(30_000);
+
+        insertFinancialAccount(accountId, userId, bankName, Optional.empty(), balance, Boolean.FALSE);
+
+        // When
+        Optional<FinancialAccount> actual = repository.findById(accountId);
+
+        // Then
+        then(actual).isPresent();
+        then(actual.get().bankName()).isEqualTo(bankName);
+        then(actual.get().accountName()).isEmpty();
+    }
+
+    @Test
     void testFindByIdNotFound() {
         // Given
         FinancialAccountId accountId = new FinancialAccountId("9999999");
@@ -239,8 +310,22 @@ class FinancialAccountRepositoryTest {
         FinancialAccountId accountId1 = new FinancialAccountId("1111111");
         FinancialAccountId accountId2 = new FinancialAccountId("2222222");
 
-        insertFinancialAccount(accountId1, userId, new AccountName("メイン口座"), new Money(100_000), Boolean.TRUE);
-        insertFinancialAccount(accountId2, userId, new AccountName("貯金口座"), new Money(500_000), Boolean.FALSE);
+        insertFinancialAccount(
+            accountId1,
+            userId,
+            new BankName("三菱UFJ銀行"),
+            Optional.of(new AccountName("メイン口座")),
+            new Money(100_000),
+            Boolean.TRUE
+        );
+        insertFinancialAccount(
+            accountId2,
+            userId,
+            new BankName("ゆうちょ銀行"),
+            Optional.of(new AccountName("貯金口座")),
+            new Money(500_000),
+            Boolean.FALSE
+        );
 
         // When
         List<FinancialAccount> actual = repository.findByUserId(userId);
@@ -268,7 +353,14 @@ class FinancialAccountRepositoryTest {
         UserId userId = new UserId(TEST_USER_UUID);
         FinancialAccountId accountId = new FinancialAccountId("4567890");
 
-        insertFinancialAccount(accountId, userId, new AccountName("メイン口座"), new Money(100_000), Boolean.TRUE);
+        insertFinancialAccount(
+            accountId,
+            userId,
+            new BankName("三菱UFJ銀行"),
+            Optional.of(new AccountName("メイン口座")),
+            new Money(100_000),
+            Boolean.TRUE
+        );
 
         // When
         repository.deleteById(accountId);
@@ -282,17 +374,19 @@ class FinancialAccountRepositoryTest {
     private void insertFinancialAccount(
         FinancialAccountId accountId,
         UserId userId,
-        AccountName accountName,
+        BankName bankName,
+        Optional<AccountName> accountName,
         Money balance,
         Boolean isMainAccount
     ) {
         jdbcClient
             .sql(
-                "INSERT INTO financial_account (id, user_id, account_name, balance, is_main_account) VALUES (:id, :userId, :accountName, :balance, :isMainAccount)"
+                "INSERT INTO financial_account (id, user_id, bank_name, account_name, balance, is_main_account) VALUES (:id, :userId, :bankName, :accountName, :balance, :isMainAccount)"
             )
             .param("id", accountId.toString())
             .param("userId", userId.toString())
-            .param("accountName", accountName.value())
+            .param("bankName", bankName.value())
+            .param("accountName", accountName.map(AccountName::value).orElse(null))
             .param("balance", balance.amount())
             .param("isMainAccount", isMainAccount)
             .update();
