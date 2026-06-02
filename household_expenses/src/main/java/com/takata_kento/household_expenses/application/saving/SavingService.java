@@ -1,6 +1,5 @@
 package com.takata_kento.household_expenses.application.saving;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.account.FinancialAccount;
 import com.takata_kento.household_expenses.domain.account.FinancialAccountRepository;
 import com.takata_kento.household_expenses.domain.saving.MonthlySaving;
@@ -36,8 +35,7 @@ public class SavingService {
         this.userRepository = userRepository;
     }
 
-    private User getCurrentUser() {
-        UserId userId = CognitoUserContext.currentUserId();
+    private User getCurrentUser(UserId userId) {
         return userRepository
             .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
@@ -61,13 +59,14 @@ public class SavingService {
     }
 
     public MonthlySaving recordMonthlySaving(
+        UserId currentUserId,
         Year year,
         Month month,
         Money savingAmount,
         FinancialAccountId financialAccountId,
         Optional<Description> memo
     ) {
-        User currentUser = getCurrentUser();
+        User currentUser = getCurrentUser(currentUserId);
         if (monthlySavingRepository.findByUserIdAndYearAndMonth(currentUser.id(), year, month).isPresent()) {
             throw new IllegalStateException("MonthlySaving already exists for " + year.value() + "-" + month.value());
         }
@@ -83,19 +82,20 @@ public class SavingService {
         return monthlySavingRepository.save(saving);
     }
 
-    public MonthlySaving getMonthlySaving(Year year, Month month) {
-        User currentUser = getCurrentUser();
+    public MonthlySaving getMonthlySaving(UserId currentUserId, Year year, Month month) {
+        User currentUser = getCurrentUser(currentUserId);
         return loadOwnedSaving(year, month, currentUser.id());
     }
 
     public MonthlySaving updateMonthlySaving(
+        UserId currentUserId,
         Year year,
         Month month,
         Money savingAmount,
         FinancialAccountId financialAccountId,
         Optional<Description> memo
     ) {
-        User currentUser = getCurrentUser();
+        User currentUser = getCurrentUser(currentUserId);
         MonthlySaving saving = loadOwnedSaving(year, month, currentUser.id());
         verifyAccountOwnedBy(financialAccountId, currentUser.id());
         saving.updateSavingAmount(savingAmount);
@@ -104,14 +104,14 @@ public class SavingService {
         return monthlySavingRepository.save(saving);
     }
 
-    public void deleteMonthlySaving(Year year, Month month) {
-        User currentUser = getCurrentUser();
+    public void deleteMonthlySaving(UserId currentUserId, Year year, Month month) {
+        User currentUser = getCurrentUser(currentUserId);
         MonthlySaving saving = loadOwnedSaving(year, month, currentUser.id());
         monthlySavingRepository.delete(saving);
     }
 
-    public List<MonthlySaving> getSavingsByYear(Year year) {
-        User currentUser = getCurrentUser();
+    public List<MonthlySaving> getSavingsByYear(UserId currentUserId, Year year) {
+        User currentUser = getCurrentUser(currentUserId);
         return monthlySavingRepository.findByUserIdAndYear(currentUser.id(), year);
     }
 }

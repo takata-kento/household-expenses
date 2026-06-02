@@ -4,7 +4,6 @@ import static org.assertj.core.api.BDDAssertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategory;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategoryRepository;
 import com.takata_kento.household_expenses.domain.expense.category.LivingExpenseCategory;
@@ -28,14 +27,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.AutoClose;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,9 +48,6 @@ class ExpenseServiceTest {
     @Mock
     private FixedExpenseHistoryRepository fixedExpenseHistoryRepository;
 
-    @AutoClose
-    private MockedStatic<CognitoUserContext> cognitoUserContext;
-
     @InjectMocks
     private ExpenseService expenseService;
 
@@ -67,20 +59,13 @@ class ExpenseServiceTest {
         UUID.fromString("00000000-0000-0000-0000-000000000020")
     );
 
-    @BeforeEach
-    void setUp() {
-        cognitoUserContext = Mockito.mockStatic(CognitoUserContext.class);
-    }
-
     private void mockCurrentUserInGroup() {
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.of(USER_GROUP_ID), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
     }
 
     private void mockCurrentUserNotInGroup() {
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        cognitoUserContext.when(CognitoUserContext::currentUserId).thenReturn(CURRENT_USER_ID);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
     }
 
@@ -97,7 +82,11 @@ class ExpenseServiceTest {
         );
 
         // When
-        LivingExpenseCategory actual = expenseService.createLivingExpenseCategory(expectedName, expectedDescription);
+        LivingExpenseCategory actual = expenseService.createLivingExpenseCategory(
+            CURRENT_USER_ID,
+            expectedName,
+            expectedDescription
+        );
 
         // Then
         then(actual.categoryName()).isEqualTo(expectedName);
@@ -115,7 +104,7 @@ class ExpenseServiceTest {
         mockCurrentUserNotInGroup();
 
         // When / Then
-        thenThrownBy(() -> expenseService.createLivingExpenseCategory(name, description)).isInstanceOf(
+        thenThrownBy(() -> expenseService.createLivingExpenseCategory(CURRENT_USER_ID, name, description)).isInstanceOf(
             IllegalStateException.class
         );
         verify(livingExpenseCategoryRepository, never()).save(any());
@@ -143,6 +132,7 @@ class ExpenseServiceTest {
 
         // When
         LivingExpenseCategory actual = expenseService.updateLivingExpenseCategory(
+            CURRENT_USER_ID,
             categoryId,
             expectedName,
             expectedDescription
@@ -165,9 +155,9 @@ class ExpenseServiceTest {
         when(livingExpenseCategoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
         // When / Then
-        thenThrownBy(() -> expenseService.updateLivingExpenseCategory(categoryId, name, description)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() ->
+            expenseService.updateLivingExpenseCategory(CURRENT_USER_ID, categoryId, name, description)
+        ).isInstanceOf(IllegalStateException.class);
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -189,9 +179,9 @@ class ExpenseServiceTest {
         when(livingExpenseCategoryRepository.findById(categoryId)).thenReturn(Optional.of(otherGroupCategory));
 
         // When / Then
-        thenThrownBy(() -> expenseService.updateLivingExpenseCategory(categoryId, name, description)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() ->
+            expenseService.updateLivingExpenseCategory(CURRENT_USER_ID, categoryId, name, description)
+        ).isInstanceOf(IllegalStateException.class);
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -204,9 +194,9 @@ class ExpenseServiceTest {
         mockCurrentUserNotInGroup();
 
         // When / Then
-        thenThrownBy(() -> expenseService.updateLivingExpenseCategory(categoryId, name, description)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() ->
+            expenseService.updateLivingExpenseCategory(CURRENT_USER_ID, categoryId, name, description)
+        ).isInstanceOf(IllegalStateException.class);
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -228,7 +218,7 @@ class ExpenseServiceTest {
         when(livingExpenseCategoryRepository.findById(categoryId)).thenReturn(Optional.of(existing));
 
         // When
-        expenseService.deleteLivingExpenseCategory(categoryId);
+        expenseService.deleteLivingExpenseCategory(CURRENT_USER_ID, categoryId);
 
         // Then
         verify(livingExpenseCategoryRepository).findById(categoryId);
@@ -243,7 +233,7 @@ class ExpenseServiceTest {
         when(livingExpenseCategoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
         // When / Then
-        thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(categoryId)).isInstanceOf(
+        thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(CURRENT_USER_ID, categoryId)).isInstanceOf(
             IllegalStateException.class
         );
         verify(livingExpenseCategoryRepository).findById(categoryId);
@@ -266,7 +256,7 @@ class ExpenseServiceTest {
         when(livingExpenseCategoryRepository.findById(categoryId)).thenReturn(Optional.of(otherGroupCategory));
 
         // When / Then
-        thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(categoryId)).isInstanceOf(
+        thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(CURRENT_USER_ID, categoryId)).isInstanceOf(
             IllegalStateException.class
         );
         verify(livingExpenseCategoryRepository).findById(categoryId);
@@ -280,7 +270,7 @@ class ExpenseServiceTest {
         mockCurrentUserNotInGroup();
 
         // When / Then
-        thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(categoryId)).isInstanceOf(
+        thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(CURRENT_USER_ID, categoryId)).isInstanceOf(
             IllegalStateException.class
         );
         verify(livingExpenseCategoryRepository, never()).deleteById(any(LivingExpenseCategoryId.class));
@@ -301,6 +291,7 @@ class ExpenseServiceTest {
 
         // When
         FixedExpenseCategory actual = expenseService.createFixedExpenseCategory(
+            CURRENT_USER_ID,
             expectedName,
             expectedDescription,
             expectedDefaultAmount
@@ -323,9 +314,9 @@ class ExpenseServiceTest {
         mockCurrentUserNotInGroup();
 
         // When / Then
-        thenThrownBy(() -> expenseService.createFixedExpenseCategory(name, description, defaultAmount)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() ->
+            expenseService.createFixedExpenseCategory(CURRENT_USER_ID, name, description, defaultAmount)
+        ).isInstanceOf(IllegalStateException.class);
         verify(fixedExpenseCategoryRepository, never()).save(any());
     }
 
@@ -361,6 +352,7 @@ class ExpenseServiceTest {
 
         // When
         FixedExpenseHistory actual = expenseService.setFixedExpenseAmount(
+            CURRENT_USER_ID,
             categoryId,
             expectedYear,
             expectedMonth,
@@ -415,6 +407,7 @@ class ExpenseServiceTest {
 
         // When
         FixedExpenseHistory actual = expenseService.setFixedExpenseAmount(
+            CURRENT_USER_ID,
             categoryId,
             year,
             month,
@@ -444,6 +437,7 @@ class ExpenseServiceTest {
         // When / Then
         thenThrownBy(() ->
             expenseService.setFixedExpenseAmount(
+                CURRENT_USER_ID,
                 categoryId,
                 new Year(2026),
                 new Month(5),
@@ -474,6 +468,7 @@ class ExpenseServiceTest {
         // When / Then
         thenThrownBy(() ->
             expenseService.setFixedExpenseAmount(
+                CURRENT_USER_ID,
                 categoryId,
                 new Year(2026),
                 new Month(5),
@@ -495,6 +490,7 @@ class ExpenseServiceTest {
         // When / Then
         thenThrownBy(() ->
             expenseService.setFixedExpenseAmount(
+                CURRENT_USER_ID,
                 categoryId,
                 new Year(2026),
                 new Month(5),
@@ -558,7 +554,11 @@ class ExpenseServiceTest {
         ).thenReturn(List.of(history1, history2));
 
         // When
-        List<FixedExpenseHistory> actual = expenseService.getFixedExpenses(expectedYear, expectedMonth);
+        List<FixedExpenseHistory> actual = expenseService.getFixedExpenses(
+            CURRENT_USER_ID,
+            expectedYear,
+            expectedMonth
+        );
 
         // Then
         then(actual).containsExactlyInAnyOrder(history1, history2);
@@ -579,7 +579,7 @@ class ExpenseServiceTest {
         when(fixedExpenseCategoryRepository.findByUserGroupId(USER_GROUP_ID)).thenReturn(List.of());
 
         // When
-        List<FixedExpenseHistory> actual = expenseService.getFixedExpenses(year, month);
+        List<FixedExpenseHistory> actual = expenseService.getFixedExpenses(CURRENT_USER_ID, year, month);
 
         // Then
         then(actual).isEmpty();
@@ -598,7 +598,9 @@ class ExpenseServiceTest {
         mockCurrentUserNotInGroup();
 
         // When / Then
-        thenThrownBy(() -> expenseService.getFixedExpenses(year, month)).isInstanceOf(IllegalStateException.class);
+        thenThrownBy(() -> expenseService.getFixedExpenses(CURRENT_USER_ID, year, month)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(fixedExpenseCategoryRepository, never()).findByUserGroupId(any());
     }
 }

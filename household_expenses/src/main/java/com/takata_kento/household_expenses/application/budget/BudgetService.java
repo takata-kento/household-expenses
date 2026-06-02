@@ -1,6 +1,5 @@
 package com.takata_kento.household_expenses.application.budget;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudget;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudgetRepository;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyGroupTransaction;
@@ -40,8 +39,7 @@ public class BudgetService {
         this.dailyGroupTransactionRepository = dailyGroupTransactionRepository;
     }
 
-    private User getCurrentUser() {
-        UserId userId = CognitoUserContext.currentUserId();
+    private User getCurrentUser(UserId userId) {
         return userRepository
             .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
@@ -53,8 +51,8 @@ public class BudgetService {
             .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
     }
 
-    public MonthlyBudget setMonthlyBudget(Year year, Month month, Money budgetAmount) {
-        User currentUser = getCurrentUser();
+    public MonthlyBudget setMonthlyBudget(UserId currentUserId, Year year, Month month, Money budgetAmount) {
+        User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUserGroupId(currentUser);
         return monthlyBudgetRepository
             .findByUserGroupIdAndYearAndMonth(userGroupId, year, month)
@@ -68,8 +66,8 @@ public class BudgetService {
             });
     }
 
-    public MonthlyBudget getMonthlyBudget(Year year, Month month) {
-        User currentUser = getCurrentUser();
+    public MonthlyBudget getMonthlyBudget(UserId currentUserId, Year year, Month month) {
+        User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUserGroupId(currentUser);
         return monthlyBudgetRepository
             .findByUserGroupIdAndYearAndMonth(userGroupId, year, month)
@@ -78,14 +76,14 @@ public class BudgetService {
             );
     }
 
-    public List<MonthlyBudget> getMonthlyBudgetsByYear(Year year) {
-        User currentUser = getCurrentUser();
+    public List<MonthlyBudget> getMonthlyBudgetsByYear(UserId currentUserId, Year year) {
+        User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUserGroupId(currentUser);
         return monthlyBudgetRepository.findByUserGroupIdAndYear(userGroupId, year);
     }
 
-    public Money calculateBudgetBalance(LocalDate targetDate) {
-        User currentUser = getCurrentUser();
+    public Money calculateBudgetBalance(UserId currentUserId, LocalDate targetDate) {
+        User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUserGroupId(currentUser);
         UserGroup userGroup = userGroupRepository
             .findById(userGroupId)

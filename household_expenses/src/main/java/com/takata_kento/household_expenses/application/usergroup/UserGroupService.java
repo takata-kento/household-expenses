@@ -1,6 +1,5 @@
 package com.takata_kento.household_expenses.application.usergroup;
 
-import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.user.User;
 import com.takata_kento.household_expenses.domain.user.UserRepository;
 import com.takata_kento.household_expenses.domain.usergroup.UserGroup;
@@ -27,15 +26,14 @@ public class UserGroupService {
         this.userRepository = userRepository;
     }
 
-    private User getCurrentUser() {
-        UserId userId = CognitoUserContext.currentUserId();
+    private User getCurrentUser(UserId userId) {
         return userRepository
             .findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
     }
 
-    public UserGroup createGroup(GroupName groupName) {
-        User currentUser = getCurrentUser();
+    public UserGroup createGroup(UserId currentUserId, GroupName groupName) {
+        User currentUser = getCurrentUser(currentUserId);
         if (!currentUser.canCreateGroup()) {
             throw new IllegalStateException("User already belongs to a group");
         }
@@ -46,8 +44,8 @@ public class UserGroupService {
         return savedUserGroup;
     }
 
-    public GroupInvitationId inviteUser(Username username) {
-        User currentUser = getCurrentUser();
+    public GroupInvitationId inviteUser(UserId currentUserId, Username username) {
+        User currentUser = getCurrentUser(currentUserId);
         User invitee = userRepository
             .findByUsername(username)
             .orElseThrow(() -> new IllegalStateException("User not found: " + username));
@@ -56,8 +54,8 @@ public class UserGroupService {
         return invitationId;
     }
 
-    public void leaveGroup() {
-        User currentUser = getCurrentUser();
+    public void leaveGroup(UserId currentUserId) {
+        User currentUser = getCurrentUser(currentUserId);
         if (!currentUser.canLeaveGroup()) {
             throw new IllegalStateException("User does not belong to any group");
         }
@@ -65,16 +63,16 @@ public class UserGroupService {
         userRepository.save(currentUser);
     }
 
-    public List<User> getGroupMembers() {
-        User currentUser = getCurrentUser();
+    public List<User> getGroupMembers(UserId currentUserId) {
+        User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUser
             .userGroupId()
             .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
         return userRepository.findByUserGroupId(userGroupId);
     }
 
-    public UserGroup updateGroupName(GroupName groupName) {
-        User currentUser = getCurrentUser();
+    public UserGroup updateGroupName(UserId currentUserId, GroupName groupName) {
+        User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUser
             .userGroupId()
             .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
@@ -88,8 +86,8 @@ public class UserGroupService {
         return userGroupRepository.save(userGroup);
     }
 
-    public UserGroup updateMonthStartDay(Day day) {
-        User currentUser = getCurrentUser();
+    public UserGroup updateMonthStartDay(UserId currentUserId, Day day) {
+        User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUser
             .userGroupId()
             .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
