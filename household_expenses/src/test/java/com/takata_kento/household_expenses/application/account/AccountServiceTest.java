@@ -55,7 +55,13 @@ class AccountServiceTest {
         when(financialAccountRepository.save(any(FinancialAccount.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // When
-        FinancialAccount actual = accountService.createAccount(CURRENT_USER_ID, accountId, accountName, initialBalance, isMainAccount);
+        FinancialAccount actual = accountService.createAccount(
+            CURRENT_USER_ID,
+            accountId,
+            accountName,
+            initialBalance,
+            isMainAccount
+        );
 
         // Then
         then(actual).isNotNull();
@@ -99,7 +105,13 @@ class AccountServiceTest {
         when(financialAccountRepository.save(any(FinancialAccount.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // When
-        FinancialAccount actual = accountService.createAccount(CURRENT_USER_ID, accountId, accountName, initialBalance, isMainAccount);
+        FinancialAccount actual = accountService.createAccount(
+            CURRENT_USER_ID,
+            accountId,
+            accountName,
+            initialBalance,
+            isMainAccount
+        );
 
         // Then
         then(actual).isNotNull();

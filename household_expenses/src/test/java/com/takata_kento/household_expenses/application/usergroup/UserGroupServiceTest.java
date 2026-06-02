@@ -71,7 +71,9 @@ class UserGroupServiceTest {
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> userGroupService.createGroup(CURRENT_USER_ID, groupName)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> userGroupService.createGroup(CURRENT_USER_ID, groupName)).isInstanceOf(
+            IllegalStateException.class
+        );
         verify(userGroupRepository, never()).save(any());
         verify(userRepository, never()).save(any());
     }

@@ -126,9 +126,9 @@ class BudgetServiceTest {
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
 
         // When / Then
-        assertThatThrownBy(() -> budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, budgetAmount)).isInstanceOf(
-            IllegalStateException.class
-        );
+        assertThatThrownBy(() ->
+            budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, budgetAmount)
+        ).isInstanceOf(IllegalStateException.class);
         verify(monthlyBudgetRepository, never()).save(any());
     }
 

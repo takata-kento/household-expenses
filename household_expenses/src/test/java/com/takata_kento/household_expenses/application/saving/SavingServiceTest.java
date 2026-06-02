@@ -104,7 +104,14 @@ class SavingServiceTest {
         when(monthlySavingRepository.save(any(MonthlySaving.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // When
-        MonthlySaving actual = savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, ACCOUNT_ID, memo);
+        MonthlySaving actual = savingService.recordMonthlySaving(
+            CURRENT_USER_ID,
+            year,
+            month,
+            amount,
+            ACCOUNT_ID,
+            memo
+        );
 
         // Then
         then(actual.userId()).isEqualTo(CURRENT_USER_ID);
@@ -132,7 +139,14 @@ class SavingServiceTest {
         when(monthlySavingRepository.save(any(MonthlySaving.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // When
-        MonthlySaving actual = savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, ACCOUNT_ID, memo);
+        MonthlySaving actual = savingService.recordMonthlySaving(
+            CURRENT_USER_ID,
+            year,
+            month,
+            amount,
+            ACCOUNT_ID,
+            memo
+        );
 
         // Then
         then(actual.userId()).isEqualTo(CURRENT_USER_ID);
@@ -160,9 +174,9 @@ class SavingServiceTest {
         );
 
         // When / Then
-        thenThrownBy(() -> savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, ACCOUNT_ID, memo)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() ->
+            savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, ACCOUNT_ID, memo)
+        ).isInstanceOf(IllegalStateException.class);
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);
         verify(monthlySavingRepository, never()).save(any());
@@ -182,9 +196,9 @@ class SavingServiceTest {
         when(financialAccountRepository.findById(ACCOUNT_ID)).thenReturn(Optional.empty());
 
         // When / Then
-        thenThrownBy(() -> savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, ACCOUNT_ID, memo)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() ->
+            savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, ACCOUNT_ID, memo)
+        ).isInstanceOf(IllegalStateException.class);
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);
         verify(financialAccountRepository).findById(ACCOUNT_ID);
@@ -205,9 +219,9 @@ class SavingServiceTest {
         when(financialAccountRepository.findById(OTHER_ACCOUNT_ID)).thenReturn(Optional.of(otherUserAccount()));
 
         // When / Then
-        thenThrownBy(() -> savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, OTHER_ACCOUNT_ID, memo)).isInstanceOf(
-            IllegalStateException.class
-        );
+        thenThrownBy(() ->
+            savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, OTHER_ACCOUNT_ID, memo)
+        ).isInstanceOf(IllegalStateException.class);
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);
         verify(financialAccountRepository).findById(OTHER_ACCOUNT_ID);
