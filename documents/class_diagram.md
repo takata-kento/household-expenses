@@ -138,7 +138,9 @@ classDiagram
         -LocalDate transactionDate
         -Set~DailyLivingExpense~ livingExpenses
         -Integer version
+        +livingExpenses() List~DailyLivingExpenseInfo~
         +addLivingExpense(UserId, LivingExpenseCategoryId, Money, Description) void
+        +removeLivingExpensesOf(UserId) void
         +calculateTotalLivingExpense() Money
 }
 
@@ -149,7 +151,9 @@ classDiagram
         -Money income
         -List~DailyPersonalExpense~ personalExpenses
         -Integer version
+        +personalExpenses() List~DailyPersonalExpenseInfo~
         +addPersonalExpense(Money, Description) void
+        +clearPersonalExpenses() void
         +updateIncome(Money) void
         +calculateTotalPersonalExpense() Money
 }
@@ -266,6 +270,54 @@ classDiagram
     %% リクエスト間の関係性
     DailyTransactionRequest o-- DailyLivingExpenseRequest
     DailyTransactionRequest o-- DailyPersonalExpenseRequest
+    %% 注: 上記 *Request 群は Presentation層（TransactionController）と共に未実装。
+
+    %% TransactionService の入出力型（Application層・実装済み）
+    class LivingExpenseInput {
+        <<record>>
+        -LivingExpenseCategoryId categoryId
+        -Money amount
+        -Description memo
+    }
+
+    class PersonalExpenseInput {
+        <<record>>
+        -Money amount
+        -Description memo
+    }
+
+    class DailyLivingExpenseInfo {
+        <<record>>
+        -DailyLivingExpenseId id
+        -UserId userId
+        -LivingExpenseCategoryId livingExpenseCategoryId
+        -Money amount
+        -Description memo
+        +from(DailyLivingExpense) DailyLivingExpenseInfo
+    }
+
+    class DailyPersonalExpenseInfo {
+        <<record>>
+        -DailyPersonalExpenseId id
+        -Money amount
+        -Description memo
+        +from(DailyPersonalExpense) DailyPersonalExpenseInfo
+    }
+
+    class DailyTransactionInfo {
+        <<record>>
+        -LocalDate transactionDate
+        -Money income
+        -List~DailyLivingExpenseInfo~ livingExpenses
+        -List~DailyPersonalExpenseInfo~ personalExpenses
+        -Money totalLivingExpense
+        -Money totalPersonalExpense
+        -Money totalExpense
+        -Money budgetBalance
+    }
+
+    DailyTransactionInfo o-- DailyLivingExpenseInfo
+    DailyTransactionInfo o-- DailyPersonalExpenseInfo
 
     %% 値オブジェクトクラス
     class Money {
@@ -447,16 +499,24 @@ classDiagram
     }
 
     class TransactionService {
-        -DailyTransactionRepository dailyTransactionRepository
-        -DailyLivingExpenseRepository dailyLivingExpenseRepository
-        -DailyPersonalExpenseRepository dailyPersonalExpenseRepository
+        -DailyGroupTransactionRepository dailyGroupTransactionRepository
+        -DailyPersonalTransactionRepository dailyPersonalTransactionRepository
+        -UserRepository userRepository
         -BudgetService budgetService
-        +recordDailyTransaction(DailyTransactionRequest) DailyTransaction
-        +calculateTotalExpense(List~DailyLivingExpenseRequest~, List~DailyPersonalExpenseRequest~, Integer) BigDecimal
-        +getDailyTransaction(Long, LocalDate) DailyTransaction
-        +updateDailyTransaction(Long, LocalDate, DailyTransactionRequest) DailyTransaction
-        +deleteDailyTransaction(Long, LocalDate) void
+        -getCurrentUser(UserId) User
+        -currentUserGroupId(User) UserGroupId
+        -groupMemberCount(UserGroupId) int
+        -buildInfo(UserId, LocalDate, DailyGroupTransaction, DailyPersonalTransaction, int) DailyTransactionInfo
+        +recordDailyTransaction(UserId, LocalDate, Money, List~LivingExpenseInput~, List~PersonalExpenseInput~) DailyTransactionInfo
+        +calculateTotalExpense(Money, Money, int) Money
+        +getDailyTransaction(UserId, LocalDate) DailyTransactionInfo
+        +updateDailyTransaction(UserId, LocalDate, Money, List~LivingExpenseInput~, List~PersonalExpenseInput~) DailyTransactionInfo
+        +deleteDailyTransaction(UserId, LocalDate) void
     }
+    %% 注: TransactionService は2集約 (DailyGroupTransaction=生活費・共有 / DailyPersonalTransaction=収入+個人支出・非共有) をまたいで記録する。
+    %% 支出合計 = 切り上げ(生活費合計 ÷ グループ人数) + 個人支出合計。予算残金は BudgetService.calculateBudgetBalance で算出。
+    %% 戻り値は集約 record DailyTransactionInfo。入力は LivingExpenseInput / PersonalExpenseInput。
+    %% Controller (TransactionController) と DailyTransactionRequest 等のリクエストDTOは未実装（Presentation層と共に保留）。
 
     class BudgetService {
         -UserRepository userRepository
@@ -659,6 +719,10 @@ classDiagram
     BudgetService ..> UserGroupRepository
     BudgetService ..> MonthlyBudgetRepository
     BudgetService ..> DailyGroupTransactionRepository
+    TransactionService ..> DailyGroupTransactionRepository
+    TransactionService ..> DailyPersonalTransactionRepository
+    TransactionService ..> UserRepository
+    TransactionService ..> BudgetService
     ExpenseService ..> UserRepository
     ExpenseService ..> LivingExpenseCategoryRepository
     ExpenseService ..> FixedExpenseCategoryRepository
