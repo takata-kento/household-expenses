@@ -337,6 +337,33 @@ class DailyPersonalTransactionTest {
 
     @ParameterizedTest
     @MethodSource("provideDailyPersonalTransactionData")
+    void testClearPersonalExpenses(
+        DailyPersonalTransactionId id,
+        UserId userId,
+        LocalDate transactionDate,
+        Money income,
+        List<DailyPersonalExpense> personalExpenses,
+        Integer version,
+        DailyPersonalTransaction dailyPersonalTransaction
+    ) {
+        // Given
+        dailyPersonalTransaction.addPersonalExpense(new Money(1_000), new Description("memo"));
+
+        // When
+        dailyPersonalTransaction.clearPersonalExpenses();
+
+        // Then
+        List<DailyPersonalExpenseInfo> actual = dailyPersonalTransaction.personalExpenses();
+        then(actual).isEmpty();
+
+        then(dailyPersonalTransaction.id()).isEqualTo(id);
+        then(dailyPersonalTransaction.userId()).isEqualTo(userId);
+        then(dailyPersonalTransaction.transactionDate()).isEqualTo(transactionDate);
+        then(dailyPersonalTransaction.income()).isEqualTo(income);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDailyPersonalTransactionData")
     void testCalculateTotalPersonalExpense(
         DailyPersonalTransactionId id,
         UserId userId,
