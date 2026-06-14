@@ -76,6 +76,10 @@ public class DailyPersonalTransaction {
         this.personalExpenses.add(personalExpense);
     }
 
+    public void clearPersonalExpenses() {
+        this.personalExpenses.clear();
+    }
+
     public void updateIncome(Money income) {
         if (income == null) throw new IllegalArgumentException("income must not be null");
         if (this.income.equals(income)) throw new IllegalArgumentException(

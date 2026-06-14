@@ -8,6 +8,7 @@ import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -60,8 +61,8 @@ public class DailyGroupTransaction {
         return this.transactionDate;
     }
 
-    public Set<DailyLivingExpense> livingExpenses() {
-        return new HashSet<>(this.livingExpenses);
+    public List<DailyLivingExpenseInfo> livingExpenses() {
+        return this.livingExpenses.stream().map(DailyLivingExpenseInfo::from).toList();
     }
 
     public void addLivingExpense(
@@ -78,6 +79,11 @@ public class DailyGroupTransaction {
             memo
         );
         this.livingExpenses.add(livingExpense);
+    }
+
+    public void removeLivingExpensesOf(UserId userId) {
+        if (userId == null) throw new IllegalArgumentException("userId must not be null");
+        this.livingExpenses.removeIf(livingExpense -> livingExpense.userId().equals(userId));
     }
 
     public Money calculateTotalLivingExpense() {

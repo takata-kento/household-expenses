@@ -10,6 +10,7 @@ import com.takata_kento.household_expenses.domain.valueobject.UserGroupId;
 import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -141,10 +142,10 @@ class DailyGroupTransactionTest {
         );
 
         // When
-        Set<DailyLivingExpense> actual = dailyGroupTransaction.livingExpenses();
+        List<DailyLivingExpenseInfo> actual = dailyGroupTransaction.livingExpenses();
 
         // Then
-        then(actual).isEqualTo(expectedLivingExpenses);
+        then(actual).hasSize(expectedLivingExpenses.size());
         then(dailyGroupTransaction).usingRecursiveComparison().isEqualTo(expected);
     }
 
@@ -169,7 +170,7 @@ class DailyGroupTransactionTest {
         dailyGroupTransaction.addLivingExpense(userId, categoryId, amount, memo);
 
         // Then
-        Set<DailyLivingExpense> actualLivingExpenses = dailyGroupTransaction.livingExpenses();
+        List<DailyLivingExpenseInfo> actualLivingExpenses = dailyGroupTransaction.livingExpenses();
         then(actualLivingExpenses).hasSize(expectedSize);
 
         then(actualLivingExpenses).anySatisfy(expense -> {
@@ -177,8 +178,34 @@ class DailyGroupTransactionTest {
                 then(expense.livingExpenseCategoryId()).isEqualTo(categoryId);
                 then(expense.amount()).isEqualTo(amount);
                 then(expense.memo()).isEqualTo(memo);
-                then(expense.dailyGroupTransactionId()).isEqualTo(id);
             });
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDailyGroupTransactionData")
+    void testRemoveLivingExpensesOf(
+        DailyGroupTransactionId id,
+        UserGroupId userGroupId,
+        LocalDate transactionDate,
+        Set<DailyLivingExpense> livingExpenses,
+        Integer version,
+        DailyGroupTransaction dailyGroupTransaction
+    ) {
+        // Given
+        UserId targetUserId = new UserId(UUID.randomUUID());
+        UserId otherUserId = new UserId(UUID.randomUUID());
+        LivingExpenseCategoryId categoryId = new LivingExpenseCategoryId(UUID.randomUUID());
+        dailyGroupTransaction.addLivingExpense(targetUserId, categoryId, new Money(1000), new Description("target 1"));
+        dailyGroupTransaction.addLivingExpense(targetUserId, categoryId, new Money(2000), new Description("target 2"));
+        dailyGroupTransaction.addLivingExpense(otherUserId, categoryId, new Money(3000), new Description("other"));
+
+        // When
+        dailyGroupTransaction.removeLivingExpensesOf(targetUserId);
+
+        // Then
+        List<DailyLivingExpenseInfo> actual = dailyGroupTransaction.livingExpenses();
+        then(actual).hasSize(1);
+        then(actual).allSatisfy(expense -> then(expense.userId()).isEqualTo(otherUserId));
     }
 
     @ParameterizedTest
