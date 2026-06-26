@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.takata_kento.household_expenses.application.account.AccountService;
+import com.takata_kento.household_expenses.application.exception.ConflictException;
 import com.takata_kento.household_expenses.config.WithMockCognitoUser;
 import com.takata_kento.household_expenses.domain.account.FinancialAccount;
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
@@ -88,8 +89,7 @@ class AccountControllerTest {
                 eq(Boolean.TRUE)
             )
         ).thenReturn(created);
-        String body =
-            """
+        String body = """
             {
               "id": "1234567",
               "bankName": "三菱UFJ銀行",
@@ -114,8 +114,7 @@ class AccountControllerTest {
     @WithMockCognitoUser
     void testCreateAccountWithInvalidIdReturnsBadRequest() throws Exception {
         // Given
-        String body =
-            """
+        String body = """
             {
               "id": "12",
               "bankName": "三菱UFJ銀行",
@@ -136,10 +135,9 @@ class AccountControllerTest {
     void testCreateAccountWhenAlreadyRegisteredReturnsConflict() throws Exception {
         // Given
         when(accountService.createAccount(any(), any(), any(), any(), any(), any())).thenThrow(
-            new IllegalStateException("Account is already registered: 1234567")
+            new ConflictException("Account is already registered: 1234567")
         );
-        String body =
-            """
+        String body = """
             {
               "id": "1234567",
               "bankName": "三菱UFJ銀行",
@@ -152,7 +150,7 @@ class AccountControllerTest {
         mockMvc
             .perform(post("/api/accounts").contentType(MediaType.APPLICATION_JSON).content(body))
             .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.message").value("Account is already registered: 1234567"));
+            .andExpect(jsonPath("$.message").value("リクエストが現在のリソースの状態と競合しています。"));
     }
 
     @Test
@@ -203,8 +201,7 @@ class AccountControllerTest {
                 new AccountName("更新後口座名")
             )
         ).thenReturn(updated);
-        String body =
-            """
+        String body = """
             { "accountName": "更新後口座名" }
             """;
 
@@ -229,8 +226,7 @@ class AccountControllerTest {
         when(
             accountService.updateBalance(CURRENT_USER_ID, new FinancialAccountId("4444444"), new Money(200_000))
         ).thenReturn(updated);
-        String body =
-            """
+        String body = """
             { "balance": 200000 }
             """;
 
@@ -261,8 +257,7 @@ class AccountControllerTest {
                 new Description("実残高に合わせて修正")
             )
         ).thenReturn(updated);
-        String body =
-            """
+        String body = """
             { "balance": 200000, "reason": "実残高に合わせて修正" }
             """;
 

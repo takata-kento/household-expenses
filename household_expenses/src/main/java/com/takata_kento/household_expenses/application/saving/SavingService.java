@@ -1,5 +1,8 @@
 package com.takata_kento.household_expenses.application.saving;
 
+import com.takata_kento.household_expenses.application.exception.ConflictException;
+import com.takata_kento.household_expenses.application.exception.ForbiddenException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.account.FinancialAccount;
 import com.takata_kento.household_expenses.domain.account.FinancialAccountRepository;
 import com.takata_kento.household_expenses.domain.saving.MonthlySaving;
@@ -44,9 +47,9 @@ public class SavingService {
     private void verifyAccountOwnedBy(FinancialAccountId financialAccountId, UserId userId) {
         FinancialAccount account = financialAccountRepository
             .findById(financialAccountId)
-            .orElseThrow(() -> new IllegalStateException("FinancialAccount not found: " + financialAccountId));
+            .orElseThrow(() -> new ResourceNotFoundException("FinancialAccount not found: " + financialAccountId));
         if (!account.userId().equals(userId)) {
-            throw new IllegalStateException("FinancialAccount is not owned by current user");
+            throw new ForbiddenException("FinancialAccount is not owned by current user");
         }
     }
 
@@ -54,7 +57,7 @@ public class SavingService {
         return monthlySavingRepository
             .findByUserIdAndYearAndMonth(userId, year, month)
             .orElseThrow(() ->
-                new IllegalStateException("MonthlySaving not found for " + year.value() + "-" + month.value())
+                new ResourceNotFoundException("MonthlySaving not found for " + year.value() + "-" + month.value())
             );
     }
 
@@ -68,7 +71,7 @@ public class SavingService {
     ) {
         User currentUser = getCurrentUser(currentUserId);
         if (monthlySavingRepository.findByUserIdAndYearAndMonth(currentUser.id(), year, month).isPresent()) {
-            throw new IllegalStateException("MonthlySaving already exists for " + year.value() + "-" + month.value());
+            throw new ConflictException("MonthlySaving already exists for " + year.value() + "-" + month.value());
         }
         verifyAccountOwnedBy(financialAccountId, currentUser.id());
         MonthlySaving saving = MonthlySaving.create(

@@ -1,5 +1,7 @@
 package com.takata_kento.household_expenses.application.budget;
 
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudget;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudgetRepository;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyGroupTransaction;
@@ -48,21 +50,21 @@ public class BudgetService {
     private UserGroupId currentUserGroupId(User currentUser) {
         return currentUser
             .userGroupId()
-            .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
+            .orElseThrow(() -> new GroupMembershipRequiredException("User does not belong to any group"));
     }
 
-    public MonthlyBudget setMonthlyBudget(UserId currentUserId, Year year, Month month, Money budgetAmount) {
+    public SetMonthlyBudgetResult setMonthlyBudget(UserId currentUserId, Year year, Month month, Money budgetAmount) {
         User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUserGroupId(currentUser);
         return monthlyBudgetRepository
             .findByUserGroupIdAndYearAndMonth(userGroupId, year, month)
             .map(existing -> {
                 existing.updateBudgetAmount(budgetAmount, currentUser.id());
-                return monthlyBudgetRepository.save(existing);
+                return new SetMonthlyBudgetResult(monthlyBudgetRepository.save(existing), false);
             })
             .orElseGet(() -> {
                 MonthlyBudget created = MonthlyBudget.create(userGroupId, year, month, budgetAmount, currentUser.id());
-                return monthlyBudgetRepository.save(created);
+                return new SetMonthlyBudgetResult(monthlyBudgetRepository.save(created), true);
             });
     }
 
@@ -72,7 +74,7 @@ public class BudgetService {
         return monthlyBudgetRepository
             .findByUserGroupIdAndYearAndMonth(userGroupId, year, month)
             .orElseThrow(() ->
-                new IllegalStateException("MonthlyBudget not found: " + year.value() + "-" + month.value())
+                new ResourceNotFoundException("MonthlyBudget not found: " + year.value() + "-" + month.value())
             );
     }
 
@@ -94,7 +96,9 @@ public class BudgetService {
         MonthlyBudget budget = monthlyBudgetRepository
             .findByUserGroupIdAndYearAndMonth(userGroupId, periodYear, periodMonth)
             .orElseThrow(() ->
-                new IllegalStateException("MonthlyBudget not found: " + periodYear.value() + "-" + periodMonth.value())
+                new ResourceNotFoundException(
+                    "MonthlyBudget not found: " + periodYear.value() + "-" + periodMonth.value()
+                )
             );
         Money totalSpent = dailyGroupTransactionRepository
             .findByUserGroupIdAndTransactionDateBetween(userGroupId, periodStart, targetDate)

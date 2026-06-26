@@ -1,5 +1,9 @@
 package com.takata_kento.household_expenses.application.usergroup;
 
+import com.takata_kento.household_expenses.application.exception.ConflictException;
+import com.takata_kento.household_expenses.application.exception.ForbiddenException;
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.user.User;
 import com.takata_kento.household_expenses.domain.user.UserRepository;
 import com.takata_kento.household_expenses.domain.usergroup.UserGroup;
@@ -35,7 +39,7 @@ public class UserGroupService {
     public UserGroup createGroup(UserId currentUserId, GroupName groupName) {
         User currentUser = getCurrentUser(currentUserId);
         if (!currentUser.canCreateGroup()) {
-            throw new IllegalStateException("User already belongs to a group");
+            throw new ConflictException("User already belongs to a group");
         }
         UserGroup userGroup = UserGroup.create(groupName, new Day(1), currentUser.id());
         UserGroup savedUserGroup = userGroupRepository.save(userGroup);
@@ -46,9 +50,12 @@ public class UserGroupService {
 
     public GroupInvitationId inviteUser(UserId currentUserId, Username username) {
         User currentUser = getCurrentUser(currentUserId);
+        currentUser
+            .userGroupId()
+            .orElseThrow(() -> new GroupMembershipRequiredException("User does not belong to any group"));
         User invitee = userRepository
             .findByUsername(username)
-            .orElseThrow(() -> new IllegalStateException("User not found: " + username));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
         GroupInvitationId invitationId = currentUser.invite(invitee);
         userRepository.save(invitee);
         return invitationId;
@@ -57,7 +64,7 @@ public class UserGroupService {
     public void leaveGroup(UserId currentUserId) {
         User currentUser = getCurrentUser(currentUserId);
         if (!currentUser.canLeaveGroup()) {
-            throw new IllegalStateException("User does not belong to any group");
+            throw new GroupMembershipRequiredException("User does not belong to any group");
         }
         currentUser.leaveGroup();
         userRepository.save(currentUser);
@@ -67,7 +74,7 @@ public class UserGroupService {
         User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUser
             .userGroupId()
-            .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
+            .orElseThrow(() -> new GroupMembershipRequiredException("User does not belong to any group"));
         return userRepository.findByUserGroupId(userGroupId);
     }
 
@@ -75,12 +82,12 @@ public class UserGroupService {
         User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUser
             .userGroupId()
-            .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
+            .orElseThrow(() -> new GroupMembershipRequiredException("User does not belong to any group"));
         UserGroup userGroup = userGroupRepository
             .findById(userGroupId)
             .orElseThrow(() -> new IllegalStateException("UserGroup not found: " + userGroupId));
         if (!userGroup.canBeModifiedBy(currentUser.id())) {
-            throw new IllegalStateException("Only the group creator can update the group name");
+            throw new ForbiddenException("Only the group creator can update the group name");
         }
         userGroup.updateGroupName(groupName);
         return userGroupRepository.save(userGroup);
@@ -90,7 +97,7 @@ public class UserGroupService {
         User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUser
             .userGroupId()
-            .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
+            .orElseThrow(() -> new GroupMembershipRequiredException("User does not belong to any group"));
         UserGroup userGroup = userGroupRepository
             .findById(userGroupId)
             .orElseThrow(() -> new IllegalStateException("UserGroup not found: " + userGroupId));

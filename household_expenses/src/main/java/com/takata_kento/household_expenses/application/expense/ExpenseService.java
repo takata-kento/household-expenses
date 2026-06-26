@@ -1,5 +1,8 @@
 package com.takata_kento.household_expenses.application.expense;
 
+import com.takata_kento.household_expenses.application.exception.ForbiddenException;
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategory;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategoryRepository;
 import com.takata_kento.household_expenses.domain.expense.category.LivingExpenseCategory;
@@ -53,7 +56,7 @@ public class ExpenseService {
     private UserGroupId getCurrentUserGroupId(UserId userId) {
         return getCurrentUser(userId)
             .userGroupId()
-            .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
+            .orElseThrow(() -> new GroupMembershipRequiredException("User does not belong to any group"));
     }
 
     public LivingExpenseCategory createLivingExpenseCategory(
@@ -75,9 +78,9 @@ public class ExpenseService {
         UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         LivingExpenseCategory category = livingExpenseCategoryRepository
             .findById(id)
-            .orElseThrow(() -> new IllegalStateException("LivingExpenseCategory not found: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("LivingExpenseCategory not found: " + id));
         if (!category.belongsTo(userGroupId)) {
-            throw new IllegalStateException("Cannot modify category from another group: " + id);
+            throw new ForbiddenException("Cannot modify category from another group: " + id);
         }
         category.updateCategoryName(name);
         category.updateDescription(description);
@@ -88,9 +91,9 @@ public class ExpenseService {
         UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         LivingExpenseCategory category = livingExpenseCategoryRepository
             .findById(id)
-            .orElseThrow(() -> new IllegalStateException("LivingExpenseCategory not found: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("LivingExpenseCategory not found: " + id));
         if (!category.belongsTo(userGroupId)) {
-            throw new IllegalStateException("Cannot delete category from another group: " + id);
+            throw new ForbiddenException("Cannot delete category from another group: " + id);
         }
         livingExpenseCategoryRepository.deleteById(id);
     }
@@ -118,9 +121,9 @@ public class ExpenseService {
         UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         FixedExpenseCategory category = fixedExpenseCategoryRepository
             .findById(categoryId)
-            .orElseThrow(() -> new IllegalStateException("FixedExpenseCategory not found: " + categoryId));
+            .orElseThrow(() -> new ResourceNotFoundException("FixedExpenseCategory not found: " + categoryId));
         if (!category.belongsTo(userGroupId)) {
-            throw new IllegalStateException("Cannot set amount for category from another group: " + categoryId);
+            throw new ForbiddenException("Cannot set amount for category from another group: " + categoryId);
         }
         FixedExpenseHistory history = fixedExpenseHistoryRepository
             .findByFixedExpenseCategoryIdAndYearAndMonth(categoryId, year, month)

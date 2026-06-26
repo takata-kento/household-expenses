@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -134,10 +133,10 @@ public class ExpenseController {
         return ResponseEntity.ok(FixedExpenseHistoryResponse.from(history));
     }
 
-    @GetMapping("/fixed")
+    @GetMapping("/fixed/{year}/{month}")
     public ResponseEntity<List<FixedExpenseHistoryResponse>> getFixedExpenses(
-        @RequestParam int year,
-        @RequestParam int month
+        @PathVariable int year,
+        @PathVariable int month
     ) {
         UserId currentUserId = CognitoUserContext.currentUserId();
         List<FixedExpenseHistoryResponse> histories = expenseService

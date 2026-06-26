@@ -1,6 +1,7 @@
 package com.takata_kento.household_expenses.presentation.budget;
 
 import com.takata_kento.household_expenses.application.budget.BudgetService;
+import com.takata_kento.household_expenses.application.budget.SetMonthlyBudgetResult;
 import com.takata_kento.household_expenses.config.CognitoUserContext;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudget;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
@@ -9,6 +10,7 @@ import com.takata_kento.household_expenses.domain.valueobject.UserId;
 import com.takata_kento.household_expenses.domain.valueobject.Year;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,20 +37,18 @@ public class BudgetController {
     @PostMapping
     public ResponseEntity<MonthlyBudgetResponse> setMonthlyBudget(@Valid @RequestBody SetMonthlyBudgetRequest request) {
         UserId currentUserId = CognitoUserContext.currentUserId();
-        MonthlyBudget budget = budgetService.setMonthlyBudget(
+        SetMonthlyBudgetResult result = budgetService.setMonthlyBudget(
             currentUserId,
             new Year(request.year()),
             new Month(request.month()),
             new Money(request.budgetAmount())
         );
-        return ResponseEntity.ok(MonthlyBudgetResponse.from(budget));
+        HttpStatus status = result.created() ? HttpStatus.CREATED : HttpStatus.OK;
+        return ResponseEntity.status(status).body(MonthlyBudgetResponse.from(result.budget()));
     }
 
     @GetMapping("/{year}/{month}")
-    public ResponseEntity<MonthlyBudgetResponse> getMonthlyBudget(
-        @PathVariable int year,
-        @PathVariable int month
-    ) {
+    public ResponseEntity<MonthlyBudgetResponse> getMonthlyBudget(@PathVariable int year, @PathVariable int month) {
         UserId currentUserId = CognitoUserContext.currentUserId();
         MonthlyBudget budget = budgetService.getMonthlyBudget(currentUserId, new Year(year), new Month(month));
         return ResponseEntity.ok(MonthlyBudgetResponse.from(budget));

@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.takata_kento.household_expenses.application.budget.BudgetService;
+import com.takata_kento.household_expenses.application.budget.SetMonthlyBudgetResult;
 import com.takata_kento.household_expenses.config.WithMockCognitoUser;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudget;
 import com.takata_kento.household_expenses.domain.valueobject.Money;
@@ -43,25 +44,30 @@ class BudgetControllerTest {
     );
 
     private MonthlyBudget buildBudget(int year, int month, int amount) {
-        return MonthlyBudget.create(USER_GROUP_ID, new Year(year), new Month(month), new Money(amount), CURRENT_USER_ID);
+        return MonthlyBudget.create(
+            USER_GROUP_ID,
+            new Year(year),
+            new Month(month),
+            new Money(amount),
+            CURRENT_USER_ID
+        );
     }
 
     @Test
     @WithMockCognitoUser
-    void testSetMonthlyBudget() throws Exception {
+    void testSetMonthlyBudgetWhenCreatedReturnsCreated() throws Exception {
         // Given
         when(
             budgetService.setMonthlyBudget(CURRENT_USER_ID, new Year(2026), new Month(6), new Money(150_000))
-        ).thenReturn(buildBudget(2026, 6, 150_000));
-        String body =
-            """
+        ).thenReturn(new SetMonthlyBudgetResult(buildBudget(2026, 6, 150_000), true));
+        String body = """
             { "year": 2026, "month": 6, "budgetAmount": 150000 }
             """;
 
         // When / Then
         mockMvc
             .perform(post("/api/budgets").contentType(MediaType.APPLICATION_JSON).content(body))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(jsonPath("$.year").value(2026))
             .andExpect(jsonPath("$.month").value(6))
             .andExpect(jsonPath("$.budgetAmount").value(150_000));
@@ -69,10 +75,27 @@ class BudgetControllerTest {
 
     @Test
     @WithMockCognitoUser
+    void testSetMonthlyBudgetWhenUpdatedReturnsOk() throws Exception {
+        // Given
+        when(
+            budgetService.setMonthlyBudget(CURRENT_USER_ID, new Year(2026), new Month(6), new Money(150_000))
+        ).thenReturn(new SetMonthlyBudgetResult(buildBudget(2026, 6, 150_000), false));
+        String body = """
+            { "year": 2026, "month": 6, "budgetAmount": 150000 }
+            """;
+
+        // When / Then
+        mockMvc
+            .perform(post("/api/budgets").contentType(MediaType.APPLICATION_JSON).content(body))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.budgetAmount").value(150_000));
+    }
+
+    @Test
+    @WithMockCognitoUser
     void testSetMonthlyBudgetWithInvalidMonthReturnsBadRequest() throws Exception {
         // Given
-        String body =
-            """
+        String body = """
             { "year": 2026, "month": 13, "budgetAmount": 150000 }
             """;
 

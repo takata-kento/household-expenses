@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
 import com.takata_kento.household_expenses.application.expense.ExpenseService;
 import com.takata_kento.household_expenses.config.WithMockCognitoUser;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategory;
@@ -71,8 +72,7 @@ class ExpenseControllerTest {
                 new Description("外食関連費用")
             )
         ).thenReturn(created);
-        String body =
-            """
+        String body = """
             { "name": "外食費", "description": "外食関連費用" }
             """;
 
@@ -105,8 +105,7 @@ class ExpenseControllerTest {
                 new Description("更新後説明")
             )
         ).thenReturn(updated);
-        String body =
-            """
+        String body = """
             { "name": "更新後分類", "description": "更新後説明" }
             """;
 
@@ -150,8 +149,7 @@ class ExpenseControllerTest {
                 new Money(80_000)
             )
         ).thenReturn(created);
-        String body =
-            """
+        String body = """
             { "name": "家賃", "description": "毎月の家賃", "defaultAmount": 80000 }
             """;
 
@@ -186,8 +184,7 @@ class ExpenseControllerTest {
                 eq(Optional.of(new Description("値上げ")))
             )
         ).thenReturn(history);
-        String body =
-            """
+        String body = """
             { "year": 2026, "month": 6, "amount": 85000, "effectiveDate": "2026-06-01", "memo": "値上げ" }
             """;
 
@@ -290,10 +287,22 @@ class ExpenseControllerTest {
 
         // When / Then
         mockMvc
-            .perform(get("/api/expenses/fixed").param("year", "2026").param("month", "6"))
+            .perform(get("/api/expenses/fixed/2026/6"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
             .andExpect(jsonPath("$[0].amount").value(85_000))
             .andExpect(jsonPath("$[0].memo").doesNotExist());
+    }
+
+    @Test
+    @WithMockCognitoUser
+    void testGetLivingExpenseCategoriesWhenNotInGroupReturnsBadRequest() throws Exception {
+        // Given
+        when(expenseService.getLivingExpenseCategories(CURRENT_USER_ID)).thenThrow(
+            new GroupMembershipRequiredException("User does not belong to any group")
+        );
+
+        // When / Then
+        mockMvc.perform(get("/api/expenses/living-categories")).andExpect(status().isBadRequest());
     }
 }
