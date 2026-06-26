@@ -603,4 +603,94 @@ class ExpenseServiceTest {
         );
         verify(fixedExpenseCategoryRepository, never()).findByUserGroupId(any());
     }
+
+    // ===== getLivingExpenseCategories =====
+
+    @Test
+    void testGetLivingExpenseCategories() {
+        // Given
+        LivingExpenseCategory category1 = new LivingExpenseCategory(
+            new LivingExpenseCategoryId(UUID.randomUUID()),
+            USER_GROUP_ID,
+            new CategoryName("食費"),
+            new Description("食材費"),
+            false,
+            1
+        );
+        LivingExpenseCategory category2 = new LivingExpenseCategory(
+            new LivingExpenseCategoryId(UUID.randomUUID()),
+            USER_GROUP_ID,
+            new CategoryName("日用品"),
+            new Description("日用品費"),
+            true,
+            1
+        );
+        mockCurrentUserInGroup();
+        when(livingExpenseCategoryRepository.findByUserGroupId(USER_GROUP_ID)).thenReturn(
+            List.of(category1, category2)
+        );
+
+        // When
+        List<LivingExpenseCategory> actual = expenseService.getLivingExpenseCategories(CURRENT_USER_ID);
+
+        // Then
+        then(actual).containsExactly(category1, category2);
+        verify(livingExpenseCategoryRepository).findByUserGroupId(USER_GROUP_ID);
+    }
+
+    @Test
+    void testGetLivingExpenseCategoriesWhenNotInGroup() {
+        // Given
+        mockCurrentUserNotInGroup();
+
+        // When / Then
+        thenThrownBy(() -> expenseService.getLivingExpenseCategories(CURRENT_USER_ID)).isInstanceOf(
+            IllegalStateException.class
+        );
+        verify(livingExpenseCategoryRepository, never()).findByUserGroupId(any());
+    }
+
+    // ===== getFixedExpenseCategories =====
+
+    @Test
+    void testGetFixedExpenseCategories() {
+        // Given
+        FixedExpenseCategory category1 = new FixedExpenseCategory(
+            new FixedExpenseCategoryId(UUID.randomUUID()),
+            USER_GROUP_ID,
+            new CategoryName("家賃"),
+            new Description("毎月の家賃"),
+            new Money(80000),
+            1
+        );
+        FixedExpenseCategory category2 = new FixedExpenseCategory(
+            new FixedExpenseCategoryId(UUID.randomUUID()),
+            USER_GROUP_ID,
+            new CategoryName("光熱費"),
+            new Description("電気・ガス・水道"),
+            new Money(15000),
+            1
+        );
+        mockCurrentUserInGroup();
+        when(fixedExpenseCategoryRepository.findByUserGroupId(USER_GROUP_ID)).thenReturn(List.of(category1, category2));
+
+        // When
+        List<FixedExpenseCategory> actual = expenseService.getFixedExpenseCategories(CURRENT_USER_ID);
+
+        // Then
+        then(actual).containsExactly(category1, category2);
+        verify(fixedExpenseCategoryRepository).findByUserGroupId(USER_GROUP_ID);
+    }
+
+    @Test
+    void testGetFixedExpenseCategoriesWhenNotInGroup() {
+        // Given
+        mockCurrentUserNotInGroup();
+
+        // When / Then
+        thenThrownBy(() -> expenseService.getFixedExpenseCategories(CURRENT_USER_ID)).isInstanceOf(
+            IllegalStateException.class
+        );
+        verify(fixedExpenseCategoryRepository, never()).findByUserGroupId(any());
+    }
 }

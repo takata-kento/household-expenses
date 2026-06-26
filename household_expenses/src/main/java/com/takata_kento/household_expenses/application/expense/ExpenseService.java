@@ -134,6 +134,16 @@ public class ExpenseService {
         return fixedExpenseHistoryRepository.save(history);
     }
 
+    public List<LivingExpenseCategory> getLivingExpenseCategories(UserId currentUserId) {
+        UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
+        return livingExpenseCategoryRepository.findByUserGroupId(userGroupId);
+    }
+
+    public List<FixedExpenseCategory> getFixedExpenseCategories(UserId currentUserId) {
+        UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
+        return fixedExpenseCategoryRepository.findByUserGroupId(userGroupId);
+    }
+
     public List<FixedExpenseHistory> getFixedExpenses(UserId currentUserId, Year year, Month month) {
         UserGroupId userGroupId = getCurrentUserGroupId(currentUserId);
         List<FixedExpenseCategoryId> categoryIds = fixedExpenseCategoryRepository

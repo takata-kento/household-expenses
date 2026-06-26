@@ -79,6 +79,17 @@ public class ExpenseController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/living-categories")
+    public ResponseEntity<List<LivingExpenseCategoryResponse>> getLivingExpenseCategories() {
+        UserId currentUserId = CognitoUserContext.currentUserId();
+        List<LivingExpenseCategoryResponse> categories = expenseService
+            .getLivingExpenseCategories(currentUserId)
+            .stream()
+            .map(LivingExpenseCategoryResponse::from)
+            .toList();
+        return ResponseEntity.ok(categories);
+    }
+
     @PostMapping("/fixed-categories")
     public ResponseEntity<FixedExpenseCategoryResponse> createFixedExpenseCategory(
         @Valid @RequestBody CreateFixedExpenseCategoryRequest request
@@ -91,6 +102,17 @@ public class ExpenseController {
             new Money(request.defaultAmount())
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(FixedExpenseCategoryResponse.from(category));
+    }
+
+    @GetMapping("/fixed-categories")
+    public ResponseEntity<List<FixedExpenseCategoryResponse>> getFixedExpenseCategories() {
+        UserId currentUserId = CognitoUserContext.currentUserId();
+        List<FixedExpenseCategoryResponse> categories = expenseService
+            .getFixedExpenseCategories(currentUserId)
+            .stream()
+            .map(FixedExpenseCategoryResponse::from)
+            .toList();
+        return ResponseEntity.ok(categories);
     }
 
     @PutMapping("/fixed-categories/{categoryId}/amounts")

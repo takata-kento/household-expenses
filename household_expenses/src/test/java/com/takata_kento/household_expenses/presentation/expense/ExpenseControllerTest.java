@@ -206,6 +206,74 @@ class ExpenseControllerTest {
 
     @Test
     @WithMockCognitoUser
+    void testGetLivingExpenseCategories() throws Exception {
+        // Given
+        LivingExpenseCategory category1 = new LivingExpenseCategory(
+            new LivingExpenseCategoryId(UUID.fromString(CATEGORY_ID)),
+            USER_GROUP_ID,
+            new CategoryName("食費"),
+            new Description("食材費"),
+            false,
+            1
+        );
+        LivingExpenseCategory category2 = new LivingExpenseCategory(
+            new LivingExpenseCategoryId(UUID.fromString("00000000-0000-0000-0000-0000000000bb")),
+            USER_GROUP_ID,
+            new CategoryName("日用品"),
+            new Description("日用品費"),
+            true,
+            1
+        );
+        when(expenseService.getLivingExpenseCategories(CURRENT_USER_ID)).thenReturn(List.of(category1, category2));
+
+        // When / Then
+        mockMvc
+            .perform(get("/api/expenses/living-categories"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").value(CATEGORY_ID))
+            .andExpect(jsonPath("$[0].categoryName").value("食費"))
+            .andExpect(jsonPath("$[0].isDefault").value(false))
+            .andExpect(jsonPath("$[1].categoryName").value("日用品"))
+            .andExpect(jsonPath("$[1].isDefault").value(true));
+    }
+
+    @Test
+    @WithMockCognitoUser
+    void testGetFixedExpenseCategories() throws Exception {
+        // Given
+        FixedExpenseCategory category1 = new FixedExpenseCategory(
+            new FixedExpenseCategoryId(UUID.fromString(CATEGORY_ID)),
+            USER_GROUP_ID,
+            new CategoryName("家賃"),
+            new Description("毎月の家賃"),
+            new Money(80_000),
+            1
+        );
+        FixedExpenseCategory category2 = new FixedExpenseCategory(
+            new FixedExpenseCategoryId(UUID.fromString("00000000-0000-0000-0000-0000000000bb")),
+            USER_GROUP_ID,
+            new CategoryName("光熱費"),
+            new Description("電気・ガス・水道"),
+            new Money(15_000),
+            1
+        );
+        when(expenseService.getFixedExpenseCategories(CURRENT_USER_ID)).thenReturn(List.of(category1, category2));
+
+        // When / Then
+        mockMvc
+            .perform(get("/api/expenses/fixed-categories"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").value(CATEGORY_ID))
+            .andExpect(jsonPath("$[0].categoryName").value("家賃"))
+            .andExpect(jsonPath("$[0].defaultAmount").value(80_000))
+            .andExpect(jsonPath("$[1].categoryName").value("光熱費"))
+            .andExpect(jsonPath("$[1].defaultAmount").value(15_000));
+    }
+
+    @Test
+    @WithMockCognitoUser
     void testGetFixedExpenses() throws Exception {
         // Given
         FixedExpenseHistory history = FixedExpenseHistory.create(
