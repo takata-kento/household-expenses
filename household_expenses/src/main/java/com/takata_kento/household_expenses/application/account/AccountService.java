@@ -1,5 +1,8 @@
 package com.takata_kento.household_expenses.application.account;
 
+import com.takata_kento.household_expenses.application.exception.ConflictException;
+import com.takata_kento.household_expenses.application.exception.ForbiddenException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.account.FinancialAccount;
 import com.takata_kento.household_expenses.domain.account.FinancialAccountRepository;
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
@@ -37,9 +40,9 @@ public class AccountService {
             .findById(id)
             .ifPresent(existing -> {
                 if (existing.userId().equals(currentUserId)) {
-                    throw new IllegalStateException("Account is already registered: " + id);
+                    throw new ConflictException("Account is already registered: " + id);
                 }
-                throw new IllegalStateException("Account number is already used by another user: " + id);
+                throw new ConflictException("Account number is already used by another user: " + id);
             });
         if (isMainAccount) {
             boolean alreadyHasMain = financialAccountRepository
@@ -47,7 +50,7 @@ public class AccountService {
                 .stream()
                 .anyMatch(FinancialAccount::isMainAccount);
             if (alreadyHasMain) {
-                throw new IllegalStateException("User already has a main account");
+                throw new ConflictException("User already has a main account");
             }
         }
         FinancialAccount account = new FinancialAccount(
@@ -105,9 +108,9 @@ public class AccountService {
     private FinancialAccount findOwnedAccount(FinancialAccountId id, UserId userId) {
         FinancialAccount account = financialAccountRepository
             .findById(id)
-            .orElseThrow(() -> new IllegalStateException("FinancialAccount not found: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("FinancialAccount not found: " + id));
         if (!account.userId().equals(userId)) {
-            throw new IllegalStateException("FinancialAccount is not owned by the current user");
+            throw new ForbiddenException("FinancialAccount is not owned by the current user");
         }
         return account;
     }

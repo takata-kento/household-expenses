@@ -3,6 +3,10 @@ package com.takata_kento.household_expenses.application.usergroup;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.takata_kento.household_expenses.application.exception.ConflictException;
+import com.takata_kento.household_expenses.application.exception.ForbiddenException;
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.user.GroupInvitationInfo;
 import com.takata_kento.household_expenses.domain.user.User;
 import com.takata_kento.household_expenses.domain.user.UserRepository;
@@ -72,7 +76,7 @@ class UserGroupServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> userGroupService.createGroup(CURRENT_USER_ID, groupName)).isInstanceOf(
-            IllegalStateException.class
+            ConflictException.class
         );
         verify(userGroupRepository, never()).save(any());
         verify(userRepository, never()).save(any());
@@ -105,13 +109,11 @@ class UserGroupServiceTest {
         // Given
         Username inviteeUsername = new Username("invitee");
         User currentUser = new User(CURRENT_USER_ID, new Username("testuser"), Optional.empty(), null, null);
-        User invitee = new User(OTHER_USER_ID, inviteeUsername, Optional.empty(), null, null);
         when(userRepository.findById(CURRENT_USER_ID)).thenReturn(Optional.of(currentUser));
-        when(userRepository.findByUsername(inviteeUsername)).thenReturn(Optional.of(invitee));
 
         // When / Then
         assertThatThrownBy(() -> userGroupService.inviteUser(CURRENT_USER_ID, inviteeUsername)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(userRepository, never()).save(any());
     }
@@ -126,7 +128,7 @@ class UserGroupServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> userGroupService.inviteUser(CURRENT_USER_ID, nonExistentUsername)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
         verify(userRepository, never()).save(any());
     }
@@ -155,7 +157,7 @@ class UserGroupServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> userGroupService.leaveGroup(CURRENT_USER_ID)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(userRepository, never()).save(any());
     }
@@ -186,7 +188,7 @@ class UserGroupServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> userGroupService.getGroupMembers(CURRENT_USER_ID)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(userRepository, never()).findByUserGroupId(any());
     }
@@ -221,7 +223,7 @@ class UserGroupServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> userGroupService.updateGroupName(CURRENT_USER_ID, newGroupName)).isInstanceOf(
-            IllegalStateException.class
+            ForbiddenException.class
         );
         verify(userGroupRepository, never()).save(any());
     }
@@ -235,7 +237,7 @@ class UserGroupServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> userGroupService.updateGroupName(CURRENT_USER_ID, newGroupName)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(userGroupRepository, never()).save(any());
     }
@@ -267,7 +269,7 @@ class UserGroupServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> userGroupService.updateMonthStartDay(CURRENT_USER_ID, newDay)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(userGroupRepository, never()).save(any());
     }

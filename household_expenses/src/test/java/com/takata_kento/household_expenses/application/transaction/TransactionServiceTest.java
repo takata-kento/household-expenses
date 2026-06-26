@@ -5,6 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.takata_kento.household_expenses.application.budget.BudgetService;
+import com.takata_kento.household_expenses.application.exception.ConflictException;
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyGroupTransaction;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyGroupTransactionRepository;
 import com.takata_kento.household_expenses.domain.transaction.personal.DailyPersonalTransaction;
@@ -241,7 +244,7 @@ class TransactionServiceTest {
         // When / Then
         thenThrownBy(() ->
             transactionService.recordDailyTransaction(CURRENT_USER_ID, DATE, new Money(0), List.of(), List.of())
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ConflictException.class);
         verify(dailyPersonalTransactionRepository, never()).save(any());
         verify(dailyGroupTransactionRepository, never()).save(any());
     }
@@ -254,7 +257,7 @@ class TransactionServiceTest {
         // When / Then
         thenThrownBy(() ->
             transactionService.recordDailyTransaction(CURRENT_USER_ID, DATE, new Money(0), List.of(), List.of())
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(GroupMembershipRequiredException.class);
         verify(dailyPersonalTransactionRepository, never()).save(any());
         verify(dailyGroupTransactionRepository, never()).save(any());
     }
@@ -374,7 +377,7 @@ class TransactionServiceTest {
         // When / Then
         thenThrownBy(() ->
             transactionService.updateDailyTransaction(CURRENT_USER_ID, DATE, new Money(0), List.of(), List.of())
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ResourceNotFoundException.class);
         verify(dailyPersonalTransactionRepository, never()).save(any());
     }
 
@@ -438,7 +441,7 @@ class TransactionServiceTest {
 
         // When / Then
         thenThrownBy(() -> transactionService.deleteDailyTransaction(CURRENT_USER_ID, DATE)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
         verify(dailyPersonalTransactionRepository, never()).delete(any());
         verify(dailyGroupTransactionRepository, never()).delete(any());

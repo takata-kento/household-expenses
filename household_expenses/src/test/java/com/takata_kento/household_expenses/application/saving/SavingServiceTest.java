@@ -4,6 +4,9 @@ import static org.assertj.core.api.BDDAssertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.takata_kento.household_expenses.application.exception.ConflictException;
+import com.takata_kento.household_expenses.application.exception.ForbiddenException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.account.FinancialAccount;
 import com.takata_kento.household_expenses.domain.account.FinancialAccountRepository;
 import com.takata_kento.household_expenses.domain.saving.MonthlySaving;
@@ -179,7 +182,7 @@ class SavingServiceTest {
         // When / Then
         thenThrownBy(() ->
             savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, ACCOUNT_ID, memo)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ConflictException.class);
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);
         verify(monthlySavingRepository, never()).save(any());
@@ -201,7 +204,7 @@ class SavingServiceTest {
         // When / Then
         thenThrownBy(() ->
             savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, ACCOUNT_ID, memo)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ResourceNotFoundException.class);
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);
         verify(financialAccountRepository).findById(ACCOUNT_ID);
@@ -224,7 +227,7 @@ class SavingServiceTest {
         // When / Then
         thenThrownBy(() ->
             savingService.recordMonthlySaving(CURRENT_USER_ID, year, month, amount, OTHER_ACCOUNT_ID, memo)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ForbiddenException.class);
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);
         verify(financialAccountRepository).findById(OTHER_ACCOUNT_ID);
@@ -263,7 +266,7 @@ class SavingServiceTest {
 
         // When / Then
         thenThrownBy(() -> savingService.getMonthlySaving(CURRENT_USER_ID, year, month)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);
@@ -368,7 +371,7 @@ class SavingServiceTest {
                 ACCOUNT_ID,
                 Optional.of(new Description("memo"))
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ResourceNotFoundException.class);
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository, never()).save(any());
     }
@@ -395,7 +398,7 @@ class SavingServiceTest {
                 OTHER_ACCOUNT_ID,
                 Optional.of(new Description("memo"))
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ForbiddenException.class);
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);
         verify(monthlySavingRepository, never()).save(any());
@@ -433,7 +436,7 @@ class SavingServiceTest {
 
         // When / Then
         thenThrownBy(() -> savingService.deleteMonthlySaving(CURRENT_USER_ID, year, month)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
         verify(userRepository).findById(CURRENT_USER_ID);
         verify(monthlySavingRepository).findByUserIdAndYearAndMonth(CURRENT_USER_ID, year, month);

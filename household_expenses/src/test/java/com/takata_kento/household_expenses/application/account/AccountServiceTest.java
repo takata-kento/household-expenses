@@ -3,6 +3,9 @@ package com.takata_kento.household_expenses.application.account;
 import static org.assertj.core.api.BDDAssertions.*;
 import static org.mockito.Mockito.*;
 
+import com.takata_kento.household_expenses.application.exception.ConflictException;
+import com.takata_kento.household_expenses.application.exception.ForbiddenException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.account.FinancialAccount;
 import com.takata_kento.household_expenses.domain.account.FinancialAccountRepository;
 import com.takata_kento.household_expenses.domain.valueobject.AccountName;
@@ -140,7 +143,7 @@ class AccountServiceTest {
                 initialBalance,
                 isMainAccount
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ConflictException.class);
         verify(financialAccountRepository, never()).save(any());
     }
 
@@ -171,7 +174,7 @@ class AccountServiceTest {
                 initialBalance,
                 isMainAccount
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ConflictException.class);
         verify(financialAccountRepository, never()).save(any());
     }
 
@@ -203,7 +206,7 @@ class AccountServiceTest {
                 initialBalance,
                 isMainAccount
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ConflictException.class);
         verify(financialAccountRepository, never()).save(any());
     }
 
@@ -275,7 +278,7 @@ class AccountServiceTest {
 
         // When / Then
         thenThrownBy(() -> accountService.updateAccountName(CURRENT_USER_ID, accountId, newAccountName)).isInstanceOf(
-            IllegalStateException.class
+            ForbiddenException.class
         );
         verify(financialAccountRepository, never()).save(any());
     }
@@ -289,7 +292,7 @@ class AccountServiceTest {
 
         // When / Then
         thenThrownBy(() -> accountService.updateAccountName(CURRENT_USER_ID, accountId, newAccountName)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
         verify(financialAccountRepository, never()).save(any());
     }
@@ -361,7 +364,7 @@ class AccountServiceTest {
 
         // When / Then
         thenThrownBy(() -> accountService.updateBalance(CURRENT_USER_ID, accountId, newBalance)).isInstanceOf(
-            IllegalStateException.class
+            ForbiddenException.class
         );
         verify(financialAccountRepository, never()).save(any());
     }
@@ -383,7 +386,7 @@ class AccountServiceTest {
 
         // When / Then
         thenThrownBy(() -> accountService.updateBalance(CURRENT_USER_ID, accountId, newBalance, reason)).isInstanceOf(
-            IllegalStateException.class
+            ForbiddenException.class
         );
         verify(financialAccountRepository, never()).save(any());
     }
@@ -397,7 +400,7 @@ class AccountServiceTest {
 
         // When / Then
         thenThrownBy(() -> accountService.updateBalance(CURRENT_USER_ID, accountId, newBalance)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
         verify(financialAccountRepository, never()).save(any());
     }
@@ -459,7 +462,7 @@ class AccountServiceTest {
                 new Money(80_000),
                 new Money(20_000)
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ForbiddenException.class);
     }
 
     @Test

@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudget;
 import com.takata_kento.household_expenses.domain.budget.MonthlyBudgetRepository;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyGroupTransaction;
@@ -75,14 +77,15 @@ class BudgetServiceTest {
         when(monthlyBudgetRepository.save(any(MonthlyBudget.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // When
-        MonthlyBudget actual = budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, budgetAmount);
+        SetMonthlyBudgetResult actual = budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, budgetAmount);
 
         // Then
-        assertThat(actual.userGroupId()).isEqualTo(USER_GROUP_ID);
-        assertThat(actual.year()).isEqualTo(year);
-        assertThat(actual.month()).isEqualTo(month);
-        assertThat(actual.budgetAmount()).isEqualTo(budgetAmount);
-        assertThat(actual.setByUserId()).isEqualTo(CURRENT_USER_ID);
+        assertThat(actual.created()).isTrue();
+        assertThat(actual.budget().userGroupId()).isEqualTo(USER_GROUP_ID);
+        assertThat(actual.budget().year()).isEqualTo(year);
+        assertThat(actual.budget().month()).isEqualTo(month);
+        assertThat(actual.budget().budgetAmount()).isEqualTo(budgetAmount);
+        assertThat(actual.budget().setByUserId()).isEqualTo(CURRENT_USER_ID);
         verify(monthlyBudgetRepository).save(any(MonthlyBudget.class));
     }
 
@@ -108,11 +111,12 @@ class BudgetServiceTest {
         when(monthlyBudgetRepository.save(existing)).thenReturn(existing);
 
         // When
-        MonthlyBudget actual = budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, newBudgetAmount);
+        SetMonthlyBudgetResult actual = budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, newBudgetAmount);
 
         // Then
-        assertThat(actual.budgetAmount()).isEqualTo(newBudgetAmount);
-        assertThat(actual.setByUserId()).isEqualTo(CURRENT_USER_ID);
+        assertThat(actual.created()).isFalse();
+        assertThat(actual.budget().budgetAmount()).isEqualTo(newBudgetAmount);
+        assertThat(actual.budget().setByUserId()).isEqualTo(CURRENT_USER_ID);
         verify(monthlyBudgetRepository).save(existing);
     }
 
@@ -128,7 +132,7 @@ class BudgetServiceTest {
         // When / Then
         assertThatThrownBy(() ->
             budgetService.setMonthlyBudget(CURRENT_USER_ID, year, month, budgetAmount)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(GroupMembershipRequiredException.class);
         verify(monthlyBudgetRepository, never()).save(any());
     }
 
@@ -164,7 +168,7 @@ class BudgetServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> budgetService.getMonthlyBudget(CURRENT_USER_ID, year, month)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
     }
 
@@ -178,7 +182,7 @@ class BudgetServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> budgetService.getMonthlyBudget(CURRENT_USER_ID, year, month)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(monthlyBudgetRepository, never()).findByUserGroupIdAndYearAndMonth(any(), any(), any());
     }
@@ -221,7 +225,7 @@ class BudgetServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> budgetService.getMonthlyBudgetsByYear(CURRENT_USER_ID, year)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(monthlyBudgetRepository, never()).findByUserGroupIdAndYear(any(), any());
     }
@@ -404,7 +408,7 @@ class BudgetServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> budgetService.calculateBudgetBalance(CURRENT_USER_ID, targetDate)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
         verify(dailyGroupTransactionRepository, never()).findByUserGroupIdAndTransactionDateBetween(
             any(),
@@ -422,7 +426,7 @@ class BudgetServiceTest {
 
         // When / Then
         assertThatThrownBy(() -> budgetService.calculateBudgetBalance(CURRENT_USER_ID, targetDate)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(userGroupRepository, never()).findById(any());
         verify(monthlyBudgetRepository, never()).findByUserGroupIdAndYearAndMonth(any(), any(), any());

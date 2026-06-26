@@ -4,6 +4,9 @@ import static org.assertj.core.api.BDDAssertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import com.takata_kento.household_expenses.application.exception.ForbiddenException;
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategory;
 import com.takata_kento.household_expenses.domain.expense.category.FixedExpenseCategoryRepository;
 import com.takata_kento.household_expenses.domain.expense.category.LivingExpenseCategory;
@@ -105,7 +108,7 @@ class ExpenseServiceTest {
 
         // When / Then
         thenThrownBy(() -> expenseService.createLivingExpenseCategory(CURRENT_USER_ID, name, description)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
@@ -157,7 +160,7 @@ class ExpenseServiceTest {
         // When / Then
         thenThrownBy(() ->
             expenseService.updateLivingExpenseCategory(CURRENT_USER_ID, categoryId, name, description)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ResourceNotFoundException.class);
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -181,7 +184,7 @@ class ExpenseServiceTest {
         // When / Then
         thenThrownBy(() ->
             expenseService.updateLivingExpenseCategory(CURRENT_USER_ID, categoryId, name, description)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ForbiddenException.class);
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -196,7 +199,7 @@ class ExpenseServiceTest {
         // When / Then
         thenThrownBy(() ->
             expenseService.updateLivingExpenseCategory(CURRENT_USER_ID, categoryId, name, description)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(GroupMembershipRequiredException.class);
         verify(livingExpenseCategoryRepository, never()).save(any());
     }
 
@@ -234,7 +237,7 @@ class ExpenseServiceTest {
 
         // When / Then
         thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(CURRENT_USER_ID, categoryId)).isInstanceOf(
-            IllegalStateException.class
+            ResourceNotFoundException.class
         );
         verify(livingExpenseCategoryRepository).findById(categoryId);
         verify(livingExpenseCategoryRepository, never()).deleteById(any(LivingExpenseCategoryId.class));
@@ -257,7 +260,7 @@ class ExpenseServiceTest {
 
         // When / Then
         thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(CURRENT_USER_ID, categoryId)).isInstanceOf(
-            IllegalStateException.class
+            ForbiddenException.class
         );
         verify(livingExpenseCategoryRepository).findById(categoryId);
         verify(livingExpenseCategoryRepository, never()).deleteById(any(LivingExpenseCategoryId.class));
@@ -271,7 +274,7 @@ class ExpenseServiceTest {
 
         // When / Then
         thenThrownBy(() -> expenseService.deleteLivingExpenseCategory(CURRENT_USER_ID, categoryId)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
         );
         verify(livingExpenseCategoryRepository, never()).deleteById(any(LivingExpenseCategoryId.class));
     }
@@ -316,7 +319,7 @@ class ExpenseServiceTest {
         // When / Then
         thenThrownBy(() ->
             expenseService.createFixedExpenseCategory(CURRENT_USER_ID, name, description, defaultAmount)
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(GroupMembershipRequiredException.class);
         verify(fixedExpenseCategoryRepository, never()).save(any());
     }
 
@@ -445,7 +448,7 @@ class ExpenseServiceTest {
                 LocalDate.of(2026, 5, 1),
                 Optional.empty()
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ResourceNotFoundException.class);
         verify(fixedExpenseCategoryRepository).findById(categoryId);
         verify(fixedExpenseHistoryRepository, never()).save(any());
     }
@@ -476,7 +479,7 @@ class ExpenseServiceTest {
                 LocalDate.of(2026, 5, 1),
                 Optional.empty()
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(ForbiddenException.class);
         verify(fixedExpenseCategoryRepository).findById(categoryId);
         verify(fixedExpenseHistoryRepository, never()).save(any());
     }
@@ -498,7 +501,7 @@ class ExpenseServiceTest {
                 LocalDate.of(2026, 5, 1),
                 Optional.empty()
             )
-        ).isInstanceOf(IllegalStateException.class);
+        ).isInstanceOf(GroupMembershipRequiredException.class);
         verify(fixedExpenseHistoryRepository, never()).save(any());
     }
 
@@ -599,7 +602,97 @@ class ExpenseServiceTest {
 
         // When / Then
         thenThrownBy(() -> expenseService.getFixedExpenses(CURRENT_USER_ID, year, month)).isInstanceOf(
-            IllegalStateException.class
+            GroupMembershipRequiredException.class
+        );
+        verify(fixedExpenseCategoryRepository, never()).findByUserGroupId(any());
+    }
+
+    // ===== getLivingExpenseCategories =====
+
+    @Test
+    void testGetLivingExpenseCategories() {
+        // Given
+        LivingExpenseCategory category1 = new LivingExpenseCategory(
+            new LivingExpenseCategoryId(UUID.randomUUID()),
+            USER_GROUP_ID,
+            new CategoryName("食費"),
+            new Description("食材費"),
+            false,
+            1
+        );
+        LivingExpenseCategory category2 = new LivingExpenseCategory(
+            new LivingExpenseCategoryId(UUID.randomUUID()),
+            USER_GROUP_ID,
+            new CategoryName("日用品"),
+            new Description("日用品費"),
+            true,
+            1
+        );
+        mockCurrentUserInGroup();
+        when(livingExpenseCategoryRepository.findByUserGroupId(USER_GROUP_ID)).thenReturn(
+            List.of(category1, category2)
+        );
+
+        // When
+        List<LivingExpenseCategory> actual = expenseService.getLivingExpenseCategories(CURRENT_USER_ID);
+
+        // Then
+        then(actual).containsExactly(category1, category2);
+        verify(livingExpenseCategoryRepository).findByUserGroupId(USER_GROUP_ID);
+    }
+
+    @Test
+    void testGetLivingExpenseCategoriesWhenNotInGroup() {
+        // Given
+        mockCurrentUserNotInGroup();
+
+        // When / Then
+        thenThrownBy(() -> expenseService.getLivingExpenseCategories(CURRENT_USER_ID)).isInstanceOf(
+            GroupMembershipRequiredException.class
+        );
+        verify(livingExpenseCategoryRepository, never()).findByUserGroupId(any());
+    }
+
+    // ===== getFixedExpenseCategories =====
+
+    @Test
+    void testGetFixedExpenseCategories() {
+        // Given
+        FixedExpenseCategory category1 = new FixedExpenseCategory(
+            new FixedExpenseCategoryId(UUID.randomUUID()),
+            USER_GROUP_ID,
+            new CategoryName("家賃"),
+            new Description("毎月の家賃"),
+            new Money(80000),
+            1
+        );
+        FixedExpenseCategory category2 = new FixedExpenseCategory(
+            new FixedExpenseCategoryId(UUID.randomUUID()),
+            USER_GROUP_ID,
+            new CategoryName("光熱費"),
+            new Description("電気・ガス・水道"),
+            new Money(15000),
+            1
+        );
+        mockCurrentUserInGroup();
+        when(fixedExpenseCategoryRepository.findByUserGroupId(USER_GROUP_ID)).thenReturn(List.of(category1, category2));
+
+        // When
+        List<FixedExpenseCategory> actual = expenseService.getFixedExpenseCategories(CURRENT_USER_ID);
+
+        // Then
+        then(actual).containsExactly(category1, category2);
+        verify(fixedExpenseCategoryRepository).findByUserGroupId(USER_GROUP_ID);
+    }
+
+    @Test
+    void testGetFixedExpenseCategoriesWhenNotInGroup() {
+        // Given
+        mockCurrentUserNotInGroup();
+
+        // When / Then
+        thenThrownBy(() -> expenseService.getFixedExpenseCategories(CURRENT_USER_ID)).isInstanceOf(
+            GroupMembershipRequiredException.class
         );
         verify(fixedExpenseCategoryRepository, never()).findByUserGroupId(any());
     }

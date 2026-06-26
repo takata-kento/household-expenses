@@ -1,6 +1,9 @@
 package com.takata_kento.household_expenses.application.transaction;
 
 import com.takata_kento.household_expenses.application.budget.BudgetService;
+import com.takata_kento.household_expenses.application.exception.ConflictException;
+import com.takata_kento.household_expenses.application.exception.GroupMembershipRequiredException;
+import com.takata_kento.household_expenses.application.exception.ResourceNotFoundException;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyGroupTransaction;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyGroupTransactionRepository;
 import com.takata_kento.household_expenses.domain.transaction.group.DailyLivingExpenseInfo;
@@ -52,7 +55,7 @@ public class TransactionService {
     private UserGroupId currentUserGroupId(User currentUser) {
         return currentUser
             .userGroupId()
-            .orElseThrow(() -> new IllegalStateException("User does not belong to any group"));
+            .orElseThrow(() -> new GroupMembershipRequiredException("User does not belong to any group"));
     }
 
     private int groupMemberCount(UserGroupId userGroupId) {
@@ -81,7 +84,7 @@ public class TransactionService {
         User currentUser = getCurrentUser(currentUserId);
         UserGroupId userGroupId = currentUserGroupId(currentUser);
         if (dailyPersonalTransactionRepository.existsByUserIdAndTransactionDate(currentUser.id(), transactionDate)) {
-            throw new IllegalStateException("DailyPersonalTransaction already exists for " + transactionDate);
+            throw new ConflictException("DailyPersonalTransaction already exists for " + transactionDate);
         }
 
         DailyGroupTransaction groupTransaction = dailyGroupTransactionRepository
@@ -154,7 +157,9 @@ public class TransactionService {
 
         DailyPersonalTransaction personalTransaction = dailyPersonalTransactionRepository
             .findByUserIdAndTransactionDate(currentUser.id(), transactionDate)
-            .orElseThrow(() -> new IllegalStateException("DailyPersonalTransaction not found for " + transactionDate));
+            .orElseThrow(() ->
+                new ResourceNotFoundException("DailyPersonalTransaction not found for " + transactionDate)
+            );
         if (!personalTransaction.income().equals(income)) {
             personalTransaction.updateIncome(income);
         }
@@ -168,7 +173,7 @@ public class TransactionService {
 
         DailyGroupTransaction groupTransaction = dailyGroupTransactionRepository
             .findByUserGroupIdAndTransactionDate(userGroupId, transactionDate)
-            .orElseThrow(() -> new IllegalStateException("DailyGroupTransaction not found for " + transactionDate));
+            .orElseThrow(() -> new ResourceNotFoundException("DailyGroupTransaction not found for " + transactionDate));
         groupTransaction.removeLivingExpensesOf(currentUser.id());
         for (LivingExpenseInput input : livingExpenses) {
             groupTransaction.addLivingExpense(currentUser.id(), input.categoryId(), input.amount(), input.memo());
@@ -190,7 +195,9 @@ public class TransactionService {
 
         DailyPersonalTransaction personalTransaction = dailyPersonalTransactionRepository
             .findByUserIdAndTransactionDate(currentUser.id(), transactionDate)
-            .orElseThrow(() -> new IllegalStateException("DailyPersonalTransaction not found for " + transactionDate));
+            .orElseThrow(() ->
+                new ResourceNotFoundException("DailyPersonalTransaction not found for " + transactionDate)
+            );
         dailyPersonalTransactionRepository.delete(personalTransaction);
 
         dailyGroupTransactionRepository
