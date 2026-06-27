@@ -13,3 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **データベース**: PostgreSQL
 
 > 各バージョンは `household_expenses/pom.xml` および `household-expenses-front/package.json` を参照（単一情報源として管理）。
+
+## 開発フロー
+
+- 指示された開発が完了したら、その変更でドラフトPR（draft pull request）を起票する。
+
