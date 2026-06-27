@@ -24,7 +24,23 @@
       "Bash(docker volume rm:*)",
       "Bash(docker volume prune:*)",
       "Bash(docker system prune:*)",
-      "Bash(docker rm -f:*)"
+      "Bash(docker rm -f:*)",
+      "Bash(npm publish:*)",
+      "Bash(npm unpublish:*)",
+      "Bash(npm install -g:*)",
+      "Bash(npm i -g:*)",
+      "Bash(npm uninstall -g:*)",
+      "Bash(npm rm -g:*)",
+      "Bash(npm audit fix --force:*)",
+      "Bash(npm cache clean --force:*)",
+      "Bash(mvn deploy:*)",
+      "Bash(./mvnw deploy:*)",
+      "Bash(mvn release:*)",
+      "Bash(./mvnw release:*)",
+      "Bash(mvn versions:set:*)",
+      "Bash(./mvnw versions:set:*)",
+      "Bash(mvn dependency:purge-local-repository:*)",
+      "Bash(./mvnw dependency:purge-local-repository:*)"
     ]
   }
 }
