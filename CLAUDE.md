@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### アーキテクチャ構成
 - **バックエンド**: Spring Boot + Java + PostgreSQL
 - **データアクセス**: Spring Data JDBC（JPAではない）
-- **フロントエンド**: Vue.js
+- **フロントエンド**: Next.js（React + TypeScript）
 - **データベース**: PostgreSQL
 
-> 各バージョンは `household_expenses/pom.xml` および `front/household-expenses/package.json` を参照（単一情報源として管理）。
+> 各バージョンは `household_expenses/pom.xml` および `household-expenses-front/package.json` を参照（単一情報源として管理）。
